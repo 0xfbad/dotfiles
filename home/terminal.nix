@@ -39,7 +39,6 @@
 
     # multiplexers
     tmux
-    zellij
 
     # fun
     cowsay
@@ -209,7 +208,10 @@
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
-    options = [ "--cmd" "cd" ];
+    options = [
+      "--cmd"
+      "cd"
+    ];
   };
 
   programs.btop = {
@@ -231,6 +233,16 @@
   programs.tealdeer = {
     enable = true;
     settings.updates.auto_update = true;
+  };
+
+  programs.zellij = {
+    enable = true;
+    settings = {
+      theme = "catppuccin-mocha";
+      default_layout = "compact";
+      copy_on_select = false;
+      show_startup_tips = false;
+    };
   };
 
   programs.alacritty = {
