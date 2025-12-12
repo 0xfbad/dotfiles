@@ -31,6 +31,11 @@
     # screenshots
     swappy
     font-awesome
+    slurp
+    imagemagick
+    wl-clipboard
+    wf-recorder
+    pngquant
 
     # gaming
     prismlauncher

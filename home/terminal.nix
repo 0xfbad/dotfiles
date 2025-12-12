@@ -54,14 +54,43 @@
       ls = "eza -l";
       la = "eza -la";
       lt = "eza --tree";
+      cat = "bat -pp";
       rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles#desktop";
       update = "nix flake update ~/dotfiles";
+      ss = ''grim -g "$(slurp)" - | magick - -shave 1x1 - | swappy -f -'';
+      se = "wl-paste | swappy -f -";
+      sr = ''wf-recorder -g "$(slurp)"'';
+      sra = ''wf-recorder -g "$(slurp)" --audio'';
+      gc = "sudo nix-collect-garbage -d && nix-collect-garbage -d";
     };
     oh-my-zsh = {
       enable = true;
-      plugins = [ "git" "python" "tmux" ];
+      plugins = [ ];
     };
     initContent = ''
+      optimize-video() {
+        local input="$1"
+        local output="''${input%.*}-optimized.mp4"
+        ffmpeg -i "$input" -c:v libx264 -crf 23 -c:a aac -b:a 128k "$output"
+      }
+
+      optimize-image() {
+        local input="$1"
+        local ext="''${input##*.}"
+        case "''${ext:l}" in
+          png)
+            pngquant --strip --force --output "''${input%.*}-optimized.png" "$input"
+            ;;
+          jpg|jpeg)
+            magick "$input" -strip -quality 85 "''${input%.*}-optimized.jpg"
+            ;;
+          *)
+            echo "unsupported format: $ext"
+            return 1
+            ;;
+        esac
+      }
+
       greet() {
         local hour=$(date +%H)
         local day=$(date +%u)
