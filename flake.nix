@@ -23,5 +23,20 @@
         }
       ];
     };
+
+    nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
+      system = "x86_64-linux";
+      modules = [
+        ./hosts/laptop/configuration.nix
+        home-manager.nixosModules.home-manager
+        nix-flatpak.nixosModules.nix-flatpak
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.backupFileExtension = "backup";
+          home-manager.users.fbad = import ./home;
+        }
+      ];
+    };
   };
 }
