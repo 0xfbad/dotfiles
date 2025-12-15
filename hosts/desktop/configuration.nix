@@ -70,6 +70,9 @@
     package = config.boot.kernelPackages.nvidiaPackages.production;
   };
 
+  # sudo
+  security.sudo.extraConfig = "Defaults pwfeedback";
+
   # audio
   services.pulseaudio.enable = false;
   security.rtkit.enable = true;
@@ -93,6 +96,12 @@
   # services
   services.printing.enable = true;
   services.netbird.enable = true;
+
+  # flatpak
+  services.flatpak.enable = true;
+  services.flatpak.packages = [
+    "org.vinegarhq.Sober"
+  ];
 
   # programs
   programs.firefox.enable = true;

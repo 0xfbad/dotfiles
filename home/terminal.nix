@@ -17,7 +17,6 @@
     # file tools
     fd
     ripgrep
-    bat
     pdfgrep
 
     # compression
@@ -54,8 +53,11 @@
       la = "eza -la";
       lt = "eza --tree";
       cat = "bat -pp";
-      rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles#desktop";
-      update = "nix flake update ~/dotfiles";
+      man = "batman";
+      diff = "batdiff";
+      grep = "batgrep";
+      rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles";
+      update = "nix flake update --flake ~/dotfiles && sudo nixos-rebuild switch --flake ~/dotfiles";
       ss = ''grim -g "$(slurp)" - | magick - -shave 1x1 - | swappy -f -'';
       se = "wl-paste | swappy -f -";
       sr = ''wf-recorder -g "$(slurp)"'';
@@ -244,6 +246,16 @@
   programs.tealdeer = {
     enable = true;
     settings.updates.auto_update = true;
+  };
+
+  programs.bat = {
+    enable = true;
+    config.theme = "Catppuccin Mocha";
+    extraPackages = with pkgs.bat-extras; [
+      batman
+      batdiff
+      batgrep
+    ];
   };
 
   programs.zellij = {
