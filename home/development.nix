@@ -6,10 +6,9 @@
     gitui
 
     # python
-    python313
-    pyright
-    black
-    python312Packages.debugpy
+    python314
+    ty
+    ruff
 
     # rust
     rust-analyzer

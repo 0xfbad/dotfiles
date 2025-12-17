@@ -27,9 +27,13 @@
     };
     languages = {
       language-server = {
-        pyright = {
-          command = "pyright-langserver";
-          args = [ "--stdio" ];
+        ty = {
+          command = "ty";
+          args = [ "server" ];
+        };
+        ruff = {
+          command = "ruff";
+          args = [ "server" ];
         };
         rust-analyzer = {
           command = "rust-analyzer";
@@ -62,9 +66,9 @@
       language = [
         {
           name = "python";
-          language-servers = [ "pyright" ];
+          language-servers = [ "ty" "ruff" ];
           auto-format = true;
-          formatter = { command = "black"; args = [ "-" ]; };
+          formatter = { command = "ruff"; args = [ "format" "-" ]; };
         }
         {
           name = "rust";
