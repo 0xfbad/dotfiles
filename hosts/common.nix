@@ -40,8 +40,36 @@
 	# display and desktop
 	services.xserver.enable = true;
 	services.xserver.xkb.layout = "us";
+	services.xserver.excludePackages = [ pkgs.xterm ];
 	services.displayManager.gdm.enable = true;
 	services.desktopManager.gnome.enable = true;
+	environment.gnome.excludePackages = with pkgs; [
+		gnome-terminal        # terminal emulator
+		gnome-console         # newer terminal emulator
+		gnome-calculator      # calculator
+		gnome-connections     # remote desktop client
+		gnome-logs            # systemd journal viewer
+		seahorse              # passwords and encryption keys manager
+		geary                 # email client
+		gnome-contacts        # contacts manager
+		gnome-calendar        # calendar app
+		gnome-music           # music player
+		totem                 # video player (old)
+		showtime              # video player (new)
+		gnome-photos          # photo manager
+		snapshot              # camera/webcam app
+		gnome-maps            # maps
+		gnome-clocks          # world clocks, alarms, timers
+		simple-scan           # document scanner
+		baobab                # disk usage analyzer
+		gnome-tour            # welcome/intro tour
+		yelp                  # help docs viewer
+		epiphany              # web browser
+		gnome-text-editor     # text editor
+		gnome-weather         # weather app
+		gnome-software        # app store
+		gnome-system-monitor  # system monitor
+	];
 
 	# nvidia
 	hardware.graphics.enable = true;
@@ -114,7 +142,6 @@
 
 		# virtualization
 		virt-manager
-		virt-viewer
 		qemu
 		spice-gtk
 		libvirt
