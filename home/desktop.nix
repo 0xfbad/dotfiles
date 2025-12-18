@@ -40,7 +40,6 @@
     # gaming
     prismlauncher
     steam
-    lutris
     superTuxKart
 
     # vpn and networking
