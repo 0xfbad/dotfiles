@@ -8,6 +8,7 @@
     # cli utilities
     fastfetch
     less
+    bitwarden-cli
     jq
     file
     socat
@@ -17,7 +18,10 @@
     # file tools
     fd
     ripgrep
+    fzf
     pdfgrep
+    poppler
+    resvg
 
     # compression
     zip
@@ -189,6 +193,10 @@
       }
 
       greet | cowsay
+
+      if [[ -z "$ZELLIJ" && "$TERM" != "linux" && -z "$SSH_CONNECTION" ]]; then
+        exec zellij attach -c
+      fi
     '';
   };
 
@@ -267,14 +275,58 @@
     };
   };
 
-  programs.alacritty = {
-    enable = true;
-    settings = {
-      colors.primary.background = "#000000";
-      font = {
-        normal.family = "JetBrainsMono Nerd Font";
-        size = 11;
+  programs.yazi =
+    let
+      yazi-flavors = pkgs.fetchFromGitHub {
+        owner = "yazi-rs";
+        repo = "flavors";
+        rev = "ffe6e3a16c5c51d7e2dedacf8de662fe2413f73a";
+        hash = "sha256-hEnrvfJwCAgM12QwPmjHEwF5xNrwqZH1fTIb/QG0NFI=";
       };
+    in
+    {
+      enable = true;
+      enableZshIntegration = true;
+      flavors.catppuccin-mocha = "${yazi-flavors}/catppuccin-mocha.yazi";
+      settings.flavor.use = "catppuccin-mocha";
     };
+
+  xdg.mimeApps = {
+    enable = true;
+    defaultApplications = {
+      "x-scheme-handler/terminal" = "org.wezfurlong.wezterm.desktop";
+      "x-scheme-handler/http" = "firefox.desktop";
+      "x-scheme-handler/https" = "firefox.desktop";
+      "text/html" = "firefox.desktop";
+      "application/xhtml+xml" = "firefox.desktop";
+    };
+  };
+
+  programs.wezterm = {
+    enable = true;
+    extraConfig = ''
+      local wezterm = require("wezterm")
+      return {
+        color_scheme = "Catppuccin Mocha",
+        colors = {
+          background = "#000000",
+        },
+        font = wezterm.font("JetBrainsMono Nerd Font"),
+        font_size = 11,
+        enable_wayland = true,
+        enable_tab_bar = false,
+        disable_default_key_bindings = true,
+        window_padding = {
+          left = 0,
+          right = 0,
+          top = 0,
+          bottom = 0,
+        },
+        wezterm.on("gui-startup", function(cmd)
+          local _, _, window = wezterm.mux.spawn_window(cmd or {})
+          window:gui_window():maximize()
+        end),
+      }
+    '';
   };
 }
