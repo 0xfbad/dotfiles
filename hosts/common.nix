@@ -65,7 +65,6 @@
 		gnome-tour            # welcome/intro tour
 		yelp                  # help docs viewer
 		epiphany              # web browser
-		gnome-text-editor     # text editor
 		gnome-weather         # weather app
 		gnome-software        # app store
 		gnome-system-monitor  # system monitor
