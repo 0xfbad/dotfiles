@@ -291,6 +291,20 @@
       settings.flavor.use = "catppuccin-mocha";
     };
 
+  programs.gitui =
+    let
+      catppuccin-gitui = pkgs.fetchFromGitHub {
+        owner = "catppuccin";
+        repo = "gitui";
+        rev = "df2f59f847e047ff119a105afff49238311b2d36";
+        hash = "sha256-DRK/j3899qJW4qP1HKzgEtefz/tTJtwPkKtoIzuoTj0=";
+      };
+    in
+    {
+      enable = true;
+      theme = builtins.readFile "${catppuccin-gitui}/themes/catppuccin-mocha.ron";
+    };
+
   xdg.mimeApps = {
     enable = true;
     defaultApplications = {
@@ -316,6 +330,10 @@
         enable_wayland = true,
         enable_tab_bar = false,
         disable_default_key_bindings = true,
+        keys = {
+          { key = "c", mods = "CTRL|SHIFT", action = wezterm.action.CopyTo("Clipboard") },
+          { key = "v", mods = "CTRL|SHIFT", action = wezterm.action.PasteFrom("Clipboard") },
+        },
         window_padding = {
           left = 0,
           right = 0,
