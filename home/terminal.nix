@@ -16,12 +16,14 @@
     libqalculate
 
     # file tools
+    mdcat
     fd
     ripgrep
     fzf
     pdfgrep
     poppler
     resvg
+    magic-wormhole
 
     # compression
     zip

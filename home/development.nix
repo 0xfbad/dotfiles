@@ -31,6 +31,9 @@
     docker
     dockerfile-language-server
 
+    # database
+    mongodb-compass
+
     # shell
     bash-language-server
     shfmt
