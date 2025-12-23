@@ -38,6 +38,7 @@
     pngquant
 
     # gaming
+    bottles
     prismlauncher
     steam
     superTuxKart
