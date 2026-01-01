@@ -17,6 +17,7 @@
       theme = "catppuccin_mocha_transparent";
       editor = {
         line-number = "relative";
+        soft-wrap.enable = true;
         cursor-shape = {
           insert = "bar";
           normal = "block";
