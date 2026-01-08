@@ -30,6 +30,7 @@
     # docker
     docker
     dockerfile-language-server
+    virtiofsd
 
     # database
     mongodb-compass
