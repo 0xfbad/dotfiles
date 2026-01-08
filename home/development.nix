@@ -58,9 +58,12 @@
     exploitdb
     wordlists
     crunch
-    john
+    # john brokey
     pwntools
     binwalk
+    glances
+    xxd
+    expect
 
     # ai
     claude-code
