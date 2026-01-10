@@ -14,6 +14,7 @@
 		device = "/dev/nvme0n1";
 		useOSProber = true;
 	};
+	boot.loader.timeout = 0;
 	boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
 	boot.extraModprobeConfig = ''
 		options kvm-intel nested=1
