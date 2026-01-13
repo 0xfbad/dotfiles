@@ -197,7 +197,7 @@
       greet | cowsay
 
       if [[ -z "$ZELLIJ" && "$TERM" != "linux" && -z "$SSH_CONNECTION" ]]; then
-        exec zellij attach -c
+        exec zellij
       fi
     '';
   };
@@ -323,6 +323,14 @@
     enable = true;
     extraConfig = ''
       local wezterm = require("wezterm")
+      local seen = {}
+      wezterm.on("window-focus-changed", function(window, pane)
+        local wid = window:window_id()
+        if not seen[wid] then
+          seen[wid] = true
+          window:maximize()
+        end
+      end)
       return {
         color_scheme = "Catppuccin Mocha",
         colors = {
@@ -352,10 +360,6 @@
           top = 0,
           bottom = 0,
         },
-        wezterm.on("gui-startup", function(cmd)
-          local _, _, window = wezterm.mux.spawn_window(cmd or {})
-          window:gui_window():maximize()
-        end),
       }
     '';
   };
