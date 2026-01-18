@@ -62,6 +62,7 @@
       man = "batman";
       diff = "batdiff";
       grep = "batgrep";
+      open = "xdg-open";
       rebuild = "sudo nixos-rebuild switch --flake ~/dotfiles";
       update = "nix flake update --flake ~/dotfiles && sudo nixos-rebuild switch --flake ~/dotfiles";
       ss = ''grim -g "$(slurp)" - | magick - -shave 1x1 - | swappy -f -'';

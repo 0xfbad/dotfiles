@@ -36,6 +36,7 @@
     docker
     dockerfile-language-server
     virtiofsd
+    cloudflared
 
     # database
     mongodb-compass
@@ -73,5 +74,8 @@
 
     # ai
     claude-code
+
+    # ide for notebooks
+    jetbrains.pycharm
   ];
 }

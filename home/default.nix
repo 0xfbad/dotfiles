@@ -5,6 +5,7 @@
     ./terminal.nix
     ./development.nix
     ./desktop.nix
+    ./pycharm.nix
   ];
 
   home.stateVersion = "24.11";
