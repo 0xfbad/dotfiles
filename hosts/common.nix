@@ -116,6 +116,21 @@
   services.printing.enable = true;
   services.netbird.enable = true;
 
+  # anonymity
+  services.i2pd = {
+    enable = true;
+    notransit = true;
+    proto = {
+      http.enable = true;
+      httpProxy.enable = true;
+      socksProxy.enable = true;
+    };
+  };
+  services.tor = {
+    enable = true;
+    client.enable = true;
+  };
+
   # flatpak
   services.flatpak.enable = true;
   services.flatpak.packages = [
