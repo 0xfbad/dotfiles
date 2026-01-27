@@ -21,6 +21,7 @@
     signal-desktop
     vesktop
     zoom-us
+    weechat
 
     # productivity
     libreoffice
