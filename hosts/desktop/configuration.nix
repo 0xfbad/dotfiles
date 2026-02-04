@@ -13,6 +13,7 @@
 		enable = true;
 		device = "/dev/nvme0n1";
 		useOSProber = true;
+		configurationLimit = 5;
 	};
 	boot.loader.timeout = 0;
 	boot.kernelModules = [ "kvm-intel" "kvm-amd" ];
