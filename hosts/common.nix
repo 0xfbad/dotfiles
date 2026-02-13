@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, self, ... }:
 
 {
   # nix
@@ -7,7 +7,8 @@
     "flakes"
   ];
   nix.settings.warn-dirty = false;
-  nixpkgs.config.allowUnfree = true;
+  # lets ad-hoc commands use unfree packages: nix shell self#ngrok
+  nix.registry.self.flake = self;
   programs.nix-ld.enable = true;
   system.stateVersion = "24.11";
 

@@ -8,35 +8,50 @@
     nix-flatpak.url = "github:gmodena/nix-flatpak";
   };
 
-  outputs = { nixpkgs, home-manager, nix-flatpak, ... }: {
-    nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hosts/desktop/configuration.nix
-        home-manager.nixosModules.home-manager
-        nix-flatpak.nixosModules.nix-flatpak
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.backupFileExtension = "hm-backup";
-          home-manager.users.fbad = import ./home;
-        }
-      ];
-    };
+  outputs = { self, nixpkgs, home-manager, nix-flatpak, ... }:
+    let
+      # single pkgs instance with allowUnfree, shared by nixosSystem and
+      # exposed via legacyPackages so `nix shell self#pkg` works
+      pkgs = import nixpkgs {
+        system = "x86_64-linux";
+        config.allowUnfree = true;
+      };
+    in
+    {
+      legacyPackages.x86_64-linux = pkgs;
 
-    nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
-      system = "x86_64-linux";
-      modules = [
-        ./hosts/laptop/configuration.nix
-        home-manager.nixosModules.home-manager
-        nix-flatpak.nixosModules.nix-flatpak
-        {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.backupFileExtension = "hm-backup";
-          home-manager.users.fbad = import ./home;
-        }
-      ];
+      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit self; };
+        modules = [
+          ./hosts/desktop/configuration.nix
+          home-manager.nixosModules.home-manager
+          nix-flatpak.nixosModules.nix-flatpak
+          { nixpkgs.pkgs = pkgs; }
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "hm-backup";
+            home-manager.users.fbad = import ./home;
+          }
+        ];
+      };
+
+      nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit self; };
+        modules = [
+          ./hosts/laptop/configuration.nix
+          home-manager.nixosModules.home-manager
+          nix-flatpak.nixosModules.nix-flatpak
+          { nixpkgs.pkgs = pkgs; }
+          {
+            home-manager.useGlobalPkgs = true;
+            home-manager.useUserPackages = true;
+            home-manager.backupFileExtension = "hm-backup";
+            home-manager.users.fbad = import ./home;
+          }
+        ];
+      };
     };
-  };
 }
