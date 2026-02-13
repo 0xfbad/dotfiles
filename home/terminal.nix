@@ -70,6 +70,7 @@
       sr = ''wf-recorder -g "$(slurp)"'';
       sra = ''wf-recorder -g "$(slurp)" --audio'';
       gc = "sudo nix-collect-garbage -d && nix-collect-garbage -d";
+      cc = "claude --dangerously-skip-permissions";
     };
     oh-my-zsh = {
       enable = true;

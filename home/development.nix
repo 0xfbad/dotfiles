@@ -25,7 +25,7 @@
     delve
 
     # zig
-    zls
+    # zls  # broken in nixpkgs
     zig
 
     # typescript/javascript
@@ -74,6 +74,7 @@
 
     # ai
     claude-code
+    opencode
 
     # ide for notebooks
     jetbrains.pycharm
