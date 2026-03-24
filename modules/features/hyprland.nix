@@ -77,7 +77,7 @@
       margin_top: 0
       margin_left: 0
       margin_right: 0
-      entries:
+      menu:
         - { key: Return, desc: terminal }
         - { key: Q, desc: close window }
         - { key: F, desc: maximize }
@@ -234,7 +234,7 @@
       bind = ${mod}, mouse_up, workspace, e+1
 
       # keybind hints
-      bind = ${mod}, slash, exec, ${lib.getExe pkgs.wlr-which-key} ${whichKeyConfig}
+      bind = ${mod} SHIFT, slash, exec, ${lib.getExe pkgs.wlr-which-key} ${whichKeyConfig}
 
       # launcher
       bind = ${mod}, S, exec, ${noctaliaExe} ipc call launcher toggle
