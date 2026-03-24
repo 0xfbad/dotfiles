@@ -6,15 +6,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flatpak.url = "github:gmodena/nix-flatpak";
+    nix-matlab = {
+      url = "gitlab:doronbehar/nix-matlab";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-flatpak, ... }:
+  outputs = { self, nixpkgs, home-manager, nix-flatpak, nix-matlab, ... }:
     let
       # single pkgs instance with allowUnfree, shared by nixosSystem and
       # exposed via legacyPackages so `nix shell self#pkg` works
       pkgs = import nixpkgs {
         system = "x86_64-linux";
         config.allowUnfree = true;
+        overlays = [ nix-matlab.overlay ];
       };
     in
     {
