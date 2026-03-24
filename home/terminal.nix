@@ -6,9 +6,10 @@
     nerd-fonts.jetbrains-mono
 
     # cli utilities
+    sox
     fastfetch
     less
-    bitwarden-cli
+
     jq
     file
     socat
@@ -298,6 +299,7 @@
     in
     {
       enable = true;
+      shellWrapperName = "y";
       enableZshIntegration = true;
       flavors.catppuccin-mocha = "${yazi-flavors}/catppuccin-mocha.yazi";
       settings.flavor.use = "catppuccin-mocha";

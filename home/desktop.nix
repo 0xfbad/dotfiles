@@ -26,7 +26,7 @@
     # productivity
     libreoffice
     odt2txt
-    bitwarden-desktop
+
     obsidian
 
     # screenshots
@@ -42,7 +42,7 @@
     bottles
     prismlauncher
     steam
-    superTuxKart
+    supertuxkart
 
     # vpn and networking
     openvpn
@@ -56,6 +56,9 @@
     gnomeExtensions.clipboard-indicator
     gnomeExtensions.vitals
     gnomeExtensions.tiling-shell
+
+    # matlab
+    matlab
 
     # misc
     spotify
