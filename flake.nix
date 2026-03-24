@@ -1,6 +1,9 @@
 {
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    import-tree.url = "github:vic/import-tree";
+    wrapper-modules.url = "github:BirdeeHub/nix-wrapper-modules";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -10,53 +13,20 @@
       url = "gitlab:doronbehar/nix-matlab";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-index-database = {
+      url = "github:Mic92/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    treefmt = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # don't follow nixpkgs here, keeps flakehub cache hits
+    determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-flatpak, nix-matlab, ... }:
-    let
-      # single pkgs instance with allowUnfree, shared by nixosSystem and
-      # exposed via legacyPackages so `nix shell self#pkg` works
-      pkgs = import nixpkgs {
-        system = "x86_64-linux";
-        config.allowUnfree = true;
-        overlays = [ nix-matlab.overlay ];
-      };
-    in
-    {
-      legacyPackages.x86_64-linux = pkgs;
-
-      nixosConfigurations.desktop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit self; };
-        modules = [
-          ./hosts/desktop/configuration.nix
-          home-manager.nixosModules.home-manager
-          nix-flatpak.nixosModules.nix-flatpak
-          { nixpkgs.pkgs = pkgs; }
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "hm-backup";
-            home-manager.users.fbad = import ./home;
-          }
-        ];
-      };
-
-      nixosConfigurations.laptop = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
-        specialArgs = { inherit self; };
-        modules = [
-          ./hosts/laptop/configuration.nix
-          home-manager.nixosModules.home-manager
-          nix-flatpak.nixosModules.nix-flatpak
-          { nixpkgs.pkgs = pkgs; }
-          {
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.backupFileExtension = "hm-backup";
-            home-manager.users.fbad = import ./home;
-          }
-        ];
-      };
-    };
+  outputs = inputs:
+    inputs.flake-parts.lib.mkFlake
+    {inherit inputs;}
+    (inputs.import-tree ./modules);
 }
