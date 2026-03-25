@@ -28,6 +28,7 @@ _: {
       kdePackages.plasma-integration
       kdePackages.qqc2-desktop-style
       catppuccin-kde
+      glib # gsettings needed for gtk apps to read dconf
     ];
 
     xdg.configFile = {
@@ -151,6 +152,7 @@ _: {
 
     dconf.settings."org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
+      gtk-theme = "catppuccin-mocha-mauve-standard+default";
     };
   };
 }
