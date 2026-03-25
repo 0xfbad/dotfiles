@@ -44,9 +44,6 @@ _: {
       pavucontrol
       pwvucontrol
 
-      # thumbnails
-      ffmpegthumbnailer
-
       # vpn and networking
       openvpn
       openconnect

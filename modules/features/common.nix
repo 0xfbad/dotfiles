@@ -179,16 +179,8 @@
       package = pkgs.wireshark;
     };
 
-    # file manager
-    programs.thunar = {
-      enable = true;
-      plugins = with pkgs.xfce; [
-        thunar-archive-plugin
-        thunar-volman
-      ];
-    };
-    services.gvfs.enable = true;
-    services.tumbler.enable = true;
+    # dolphin file manager needs this for "open with" outside plasma
+    environment.etc."xdg/menus/applications.menu".source = "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
     # shell
     programs.zsh.enable = true;

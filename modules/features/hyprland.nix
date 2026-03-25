@@ -112,7 +112,7 @@
           cmd: "${lib.getExe pkgs.pavucontrol}"
         - key: n
           desc: file manager
-          cmd: "thunar"
+          cmd: "dolphin"
     '';
 
     mod = "SUPER";

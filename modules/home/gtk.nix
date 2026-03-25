@@ -18,6 +18,25 @@ _: {
       };
     };
 
+    qt = {
+      enable = true;
+      platformTheme.name = "qtct";
+      style.name = "kvantum";
+    };
+
+    xdg.configFile = {
+      "Kvantum/kvantum.kvconfig".text = ''
+        [General]
+        theme=catppuccin-mocha-mauve
+      '';
+      "Kvantum/catppuccin-mocha-mauve".source = "${
+        pkgs.catppuccin-kvantum.override {
+          variant = "mocha";
+          accent = "mauve";
+        }
+      }/share/Kvantum/catppuccin-mocha-mauve";
+    };
+
     dconf.settings."org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
     };
