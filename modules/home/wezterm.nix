@@ -4,14 +4,6 @@ _: {
       enable = true;
       extraConfig = ''
         local wezterm = require("wezterm")
-        local seen = {}
-        wezterm.on("window-focus-changed", function(window, pane)
-          local wid = window:window_id()
-          if not seen[wid] then
-            seen[wid] = true
-            window:maximize()
-          end
-        end)
         return {
           color_scheme = "Catppuccin Mocha",
           colors = {
