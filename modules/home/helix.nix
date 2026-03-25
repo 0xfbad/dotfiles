@@ -52,6 +52,17 @@ _: {
           nil = {
             command = "nil";
           };
+          nixd = {
+            command = "nixd";
+            config.nixd = {
+              nixpkgs.expr = ''import (builtins.getFlake "/home/fbad/dotfiles").inputs.nixpkgs { }'';
+              formatting.command = ["alejandra"];
+              options = {
+                nixos.expr = ''(builtins.getFlake "/home/fbad/dotfiles").nixosConfigurations.desktop.options'';
+                home-manager.expr = ''(builtins.getFlake "/home/fbad/dotfiles").nixosConfigurations.desktop.options.home-manager.users.type.getSubOptions []'';
+              };
+            };
+          };
           tinymist = {
             command = "tinymist";
           };
@@ -129,7 +140,7 @@ _: {
           }
           {
             name = "nix";
-            language-servers = ["nil"];
+            language-servers = ["nixd" "nil"];
             auto-format = true;
             formatter = {command = "alejandra";};
           }
