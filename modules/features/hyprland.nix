@@ -61,6 +61,60 @@
       "${lib.getExe pkgs.mpvpaper} '*' ${./../../wallpapers/dark-particles.mp4} --mpv-options '--loop --no-audio --speed=0.8 --panscan=1.0'"
     );
 
+    layoutToggle = lib.getExe (pkgs.writeShellApplication {
+      name = "hypr-layout-toggle";
+      runtimeInputs = with pkgs; [hyprland jq];
+      text = ''
+        current=$(hyprctl activeworkspace -j | jq -r '.layout')
+        if [ "$current" = "dwindle" ]; then
+          hyprctl keyword general:layout scrolling
+        else
+          hyprctl keyword general:layout dwindle
+        fi
+      '';
+    });
+
+    whichKeyConfig = pkgs.writeText "wlr-which-key.yaml" ''
+      font: "JetBrainsMono Nerd Font 12"
+      background: "#000000e6"
+      color: "#cdd6f4"
+      border: "#cba6f7"
+      separator: " -> "
+      border_width: 2
+      corner_r: 8
+      padding: 15
+      anchor: center
+
+      menu:
+        - key: s
+          desc: screenshot region
+          cmd: "${screenshot}"
+        - key: f
+          desc: screenshot full
+          cmd: "${screenshotFull}"
+        - key: e
+          desc: edit clipboard
+          cmd: "${editClipboard}"
+        - key: p
+          desc: screenshot + edit
+          cmd: "${screenshotEdit}"
+        - key: r
+          desc: record region
+          cmd: "${recordRegion}"
+        - key: a
+          desc: record + audio
+          cmd: "${recordRegionAudio}"
+        - key: g
+          desc: record gif
+          cmd: "${recordGif}"
+        - key: v
+          desc: volume mixer
+          cmd: "${lib.getExe pkgs.pavucontrol}"
+        - key: n
+          desc: file manager
+          cmd: "${lib.getExe pkgs.nautilus}"
+    '';
+
     mod = "SUPER";
 
     keybindTheme = pkgs.writeText "keybind-rofi.rasi" ''
@@ -109,6 +163,9 @@
       Super + Shift + R             record region
       Super + Ctrl + R              record with audio
       Super + Shift + G             record gif
+
+      <b>LAYOUT</b>
+      Super + \                     toggle scrolling/dwindle
 
       <b>SYSTEM</b>
       Super + S                     launcher
@@ -160,7 +217,7 @@
         gaps_in = 0
         gaps_out = 0
         border_size = 2
-        col.active_border = rgb(fab387)
+        col.active_border = rgb(ffffff)
         col.inactive_border = rgb(000000)
         layout = dwindle
       }
@@ -256,9 +313,12 @@
       bindd = ${mod}, mouse_down, workspaces: scroll, workspace, e-1
       bind = ${mod}, mouse_up, workspace, e+1
 
+      # layout: toggle between dwindle and scrolling (niri-like)
+      bindd = ${mod}, backslash, layout: toggle scrolling, exec, ${layoutToggle}
+
       # system
-      # hold super for ~1s to see keybind help
       bind = ${mod} SHIFT, slash, exec, ${lib.getExe keybindPopup}
+      bindd = ${mod}, D, system: which-key, exec, ${lib.getExe pkgs.wlr-which-key} ${whichKeyConfig}
       bindd = ${mod}, S, system: launcher, exec, ${noctaliaExe} ipc call launcher toggle
       bindd = ${mod}, V, system: mic mute, exec, ${pkgs.alsa-utils}/bin/amixer sset Capture toggle
 
