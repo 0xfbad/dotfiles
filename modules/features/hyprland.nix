@@ -199,6 +199,7 @@
       env = HYPRCURSOR_SIZE,24
       env = XCURSOR_THEME,Bibata-Modern-Classic
       env = XCURSOR_SIZE,24
+      env = GTK_THEME,catppuccin-mocha-mauve-standard+default
 
       # input
       input {
