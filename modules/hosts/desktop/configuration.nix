@@ -27,7 +27,7 @@
     boot.loader.grub = {
       enable = true;
       device = "/dev/nvme0n1";
-      useOSProber = true;
+      useOSProber = false;
       configurationLimit = 5;
     };
     boot.loader.timeout = 0;
