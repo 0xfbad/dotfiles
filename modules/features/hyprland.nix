@@ -134,51 +134,52 @@
     '';
 
     keybindPopup = pkgs.writeShellScriptBin "keybind-popup" ''
-            text=$(cat <<'HELPEOF'
+      text=$(cat <<'HELPEOF'
       <b>WINDOWS</b>
-      Super + Enter                 terminal
-      Super + Q                     close window
-      Super + F                     maximize
-      Super + G                     fullscreen
-      Super + Shift + F             float
-      Super + C                     center
+      Super + Enter                terminal
+      Super + Q                    close window
+      Super + F                    maximize
+      Super + G                    fullscreen
+      Super + Shift + F            float
+      Super + C                    center
 
       <b>FOCUS</b>
-      Super + [H/J/K/L]         navigate
-      Super + Arrows                navigate
-      Super + Shift + [H/J/K/L] move window
-      Super + Shift + Arrows        to monitor
-      Super + Ctrl + [H/J/K/L]  resize
+      Super + H/J/K/L              navigate
+      Super + Arrows               navigate
+      Super + Shift + H/J/K/L      move window
+      Super + Shift + Arrows       to monitor
+      Super + Ctrl + H/J/K/L       resize
 
       <b>WORKSPACES</b>
-      Super + [1-0]                 switch workspace
-      Super + Shift + [1-0]         move to workspace
-      Super + Scroll                cycle workspaces
+      Super + 1-0                  switch workspace
+      Super + Shift + 1-0          move to workspace
+      Super + Scroll               cycle workspaces
 
       <b>CAPTURE</b>
-      Super + Shift + S             screenshot region
-      Super + Ctrl + S              screenshot full
-      Super + Shift + E             edit clipboard
-      Print                         screenshot and edit
-      Super + Shift + R             record region
-      Super + Ctrl + R              record with audio
-      Super + Shift + G             record gif
+      Super + Shift + S            screenshot region
+      Super + Ctrl + S             screenshot full
+      Super + Shift + E            edit clipboard
+      Print                        screenshot and edit
+      Super + Shift + R            record region
+      Super + Ctrl + R             record with audio
+      Super + Shift + G            record gif
 
       <b>LAYOUT</b>
-      Super + \                     toggle scrolling/dwindle
+      Super + \                    toggle scrolling/dwindle
 
       <b>SYSTEM</b>
-      Super + S                     launcher
-      Super + V                     mic mute
-      Volume Up / Down / Mute       audio
-      Super + Shift + ?             this overlay
+      Super + S                    launcher
+      Super + D                    which-key
+      Super + V                    mic mute
+      Volume Up/Down/Mute          audio
+      Super + Shift + ?            this overlay
 
       <small>press escape or enter to close</small>
       HELPEOF
       )
-            lines=$(echo "$text" | wc -l)
-            height=$(( lines * 22 + 48 ))
-            ${lib.getExe pkgs.rofi} -e "$text" -markup -theme ${keybindTheme} -theme-str "window { width: ''${height}px; height: ''${height}px; }"
+      lines=$(echo "$text" | wc -l)
+      height=$(( lines * 22 + 48 ))
+      ${lib.getExe pkgs.rofi} -e "$text" -markup -theme ${keybindTheme} -theme-str "window { width: ''${height}px; height: ''${height}px; }"
     '';
   in {
     home.pointerCursor = {
