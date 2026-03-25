@@ -14,9 +14,9 @@ _: {
         diff = "batdiff";
         grep = "batgrep";
         open = "xdg-open";
-        rebuild = "nh os switch";
-        update = "nh os switch -u";
-        gc = "nh clean all --keep 3 --keep-since 7d";
+        rebuild = "NH_NOM=0 nh os switch";
+        update = "NH_NOM=0 nh os switch -u";
+        gc = "NH_NOM=0 nh clean all --keep 3 --keep-since 7d";
         cc = "claude --dangerously-skip-permissions";
         qalc = "qalc -s 'autocalc' -s 'decimal comma off'";
       };
