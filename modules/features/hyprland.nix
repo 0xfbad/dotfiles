@@ -90,11 +90,11 @@
       Super + C                     center
 
       <b>FOCUS</b>
-      Super + H / J / K / L         navigate
+      Super + [H/J/K/L]         navigate
       Super + Arrows                navigate
-      Super + Shift + H / J / K / L move window
+      Super + Shift + [H/J/K/L] move window
       Super + Shift + Arrows        to monitor
-      Super + Ctrl + H / J / K / L  resize
+      Super + Ctrl + [H/J/K/L]  resize
 
       <b>WORKSPACES</b>
       Super + [1-0]                 switch workspace
