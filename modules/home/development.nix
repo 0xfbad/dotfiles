@@ -11,6 +11,7 @@ _: {
 
     home.packages = with pkgs; [
       # version control
+      gh
       gitui
 
       # python
@@ -24,11 +25,12 @@ _: {
 
       # go
       gopls
+      # lowPrio because gotools ships an older lib that conflicts with sox
       (lib.lowPrio gotools)
       delve
 
       # zig
-      # zls  # broken in nixpkgs
+      zls
       zig
 
       # typescript/javascript
@@ -50,6 +52,8 @@ _: {
 
       # nix
       nil
+      nixd
+      nix-inspect
       statix
       alejandra
       manix
@@ -71,7 +75,7 @@ _: {
       exploitdb
       wordlists
       crunch
-      # john broken
+      john
       pwntools
       binwalk
       glances
