@@ -79,7 +79,8 @@ Features are all optional, just import the ones you want in your host's `configu
 - Greetd login with system specs on screen (CPU, RAM, GPU, disk, IP)
 - Keybind cheat sheet popup on Super + Shift + ? via rofi
 - wlr-which-key on Super + D for quick actions (screenshots, recording, volume mixer, file manager)
-- Live wallpaper through mpvpaper
+- Wallpaper rotation from ~/dotfiles/wallpapers/, different image per monitor, shuffles every 30 minutes
+- Dolphin file manager with full catppuccin kdeglobals color scheme and Kvantum theming
 - Bibata cursor theme
 - Catppuccin mocha on everything that supports it (btop, gitui, yazi, helix, wezterm, zed, eza, bat)
 - Cowsay greeting that changes based on time of day
@@ -94,7 +95,7 @@ Features are all optional, just import the ones you want in your host's `configu
 - Ripdrag for dragging files out of the terminal into GUI apps
 - Declarative Firefox with extensions force-installed (uBlock, Bitwarden, Dark Reader, Tampermonkey, Unhook, etc), all telemetry/AI/pocket/sponsored slop nuked, OLED black userChrome, custom search engines (`@np` nix packages, `@no` nixos options, `@nw` wiki, `@hm` home-manager)
 - Zed as a gui editor for when you don't want a terminal, stripped down with all the networking/AI/collab stuff off
-- Nautilus for when you need a gui file manager
+- btop with GPU monitoring
 - sshfs for mounting remote dirs over SSH
 - Gaming stack: proton-ge, gamescope, gamemode, mangohud overlay. `gamemoderun mangohud %command%` in steam launch options
 
