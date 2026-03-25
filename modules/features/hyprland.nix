@@ -56,10 +56,40 @@
       text = ''wf-recorder -g "$(slurp)" -c gif -f /tmp/recording.gif'';
     });
 
-    wallpaper = lib.getExe (
-      pkgs.writeShellScriptBin "wallpaper"
-      "${lib.getExe pkgs.mpvpaper} '*' ${./../../wallpapers/dark-particles.mp4} --mpv-options '--loop --no-audio --speed=0.8 --panscan=1.0'"
-    );
+    wallpaper = lib.getExe (pkgs.writeShellApplication {
+      name = "wallpaper";
+      runtimeInputs = with pkgs; [coreutils swaybg procps hyprland jq findutils];
+      text = ''
+        WALL_DIR="$HOME/dotfiles/wallpapers"
+
+        set_wallpapers() {
+          # list all wallpaper files
+          mapfile -t walls < <(find "$WALL_DIR" -type f \( -name '*.jpg' -o -name '*.png' \) | shuf)
+          if [ ''${#walls[@]} -eq 0 ]; then return 1; fi
+
+          # get monitors from hyprland
+          monitors=$(hyprctl monitors -j)
+          mon_count=$(echo "$monitors" | jq 'length')
+
+          pkill -x swaybg 2>/dev/null || true
+          sleep 0.3
+
+          for i in $(seq 0 $((mon_count - 1))); do
+            mon_name=$(echo "$monitors" | jq -r ".[$i].name")
+            # pick a different wallpaper per monitor, wrap around if fewer images than monitors
+            idx=$((i % ''${#walls[@]}))
+            swaybg -o "$mon_name" -m fill -i "''${walls[$idx]}" &
+          done
+        }
+
+        set_wallpapers
+
+        while true; do
+          sleep 1800
+          set_wallpapers
+        done
+      '';
+    });
 
     layoutToggle = lib.getExe (pkgs.writeShellApplication {
       name = "hypr-layout-toggle";
