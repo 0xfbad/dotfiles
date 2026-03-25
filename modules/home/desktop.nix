@@ -2,7 +2,6 @@ _: {
   flake.homeModules.desktop = {pkgs, ...}: {
     home.packages = with pkgs; [
       # browsers
-      firefox
       ungoogled-chromium
       tor
       torsocks
@@ -39,8 +38,14 @@ _: {
       # gaming
       bottles
       prismlauncher
-      steam
       supertuxkart
+
+      # audio mixers
+      pavucontrol
+      pwvucontrol
+
+      # file manager
+      nautilus
 
       # vpn and networking
       openvpn

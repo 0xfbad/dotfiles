@@ -17,6 +17,12 @@
     nix.settings.warn-dirty = false;
     programs.nix-ld.enable = true;
     programs.nix-index-database.comma.enable = true;
+    programs.nh = {
+      enable = true;
+      clean.enable = true;
+      clean.extraArgs = "--keep-since 7d --keep 3";
+      flake = "/home/fbad/dotfiles";
+    };
     system.stateVersion = "24.11";
 
     # boot (shared settings, bootloader is host-specific)
@@ -97,8 +103,77 @@
     services.netbird.enable = true;
 
     # programs
-    programs.firefox.enable = true;
-    programs.steam.enable = true;
+    programs.firefox = {
+      enable = true;
+      policies = {
+        DisableTelemetry = true;
+        DisableFirefoxStudies = true;
+        DisablePocket = true;
+        DisableFirefoxAccounts = true;
+        DisableProfileImport = true;
+        DontCheckDefaultBrowser = true;
+        EnableTrackingProtection = {
+          Value = true;
+          Locked = true;
+          Cryptomining = true;
+          Fingerprinting = true;
+        };
+        FirefoxHome = {
+          Highlights = false;
+          Locked = true;
+        };
+        NoDefaultBookmarks = true;
+        DisplayBookmarksToolbar = "always";
+        ExtensionSettings = {
+          "uBlock0@raymondhill.net" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+          "addon@darkreader.org" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+          "firefox@tampermonkey.net" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/tampermonkey/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+          "myallychou@gmail.com" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/youtube-recommended-videos/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+          "{a6c4a591-f1b2-4f03-b3ff-767e5bedf4e7}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/user-agent-string-switcher/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+          "{7343f7d1-e6ef-4d8a-8449-d4c18850f559}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/clipboard2file/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "navbar";
+          };
+        };
+      };
+    };
+    programs.steam = {
+      enable = true;
+      protontricks.enable = true;
+      extraCompatPackages = with pkgs; [proton-ge-bin];
+      extraPackages = with pkgs; [gamescope];
+    };
+    programs.gamemode.enable = true;
+    programs.gamescope = {
+      enable = true;
+      capSysNice = true;
+    };
     programs.wireshark = {
       enable = true;
       package = pkgs.wireshark;
