@@ -226,7 +226,7 @@
           wallpaperChange = "";
         };
         location = {
-          name = "Santa Cruz";
+          name = "Santa Cruz, United States";
           analogClockInCalendar = false;
           firstDayOfWeek = -1;
           showCalendarEvents = true;
