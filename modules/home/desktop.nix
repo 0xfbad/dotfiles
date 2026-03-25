@@ -44,8 +44,8 @@ _: {
       pavucontrol
       pwvucontrol
 
-      # file manager
-      nautilus
+      # thumbnails
+      ffmpegthumbnailer
 
       # vpn and networking
       openvpn

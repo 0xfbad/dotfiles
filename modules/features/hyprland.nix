@@ -112,7 +112,7 @@
           cmd: "${lib.getExe pkgs.pavucontrol}"
         - key: n
           desc: file manager
-          cmd: "${lib.getExe pkgs.nautilus}"
+          cmd: "thunar"
     '';
 
     mod = "SUPER";
