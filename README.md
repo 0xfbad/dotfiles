@@ -71,6 +71,19 @@ Features are all optional, just import the ones you want in your host's `configu
 - Tealdeer for tldr pages
 - Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
 
+## aliases
+
+- `rebuild` - nixos-rebuild switch
+- `update` - flake update + rebuild
+- `gc` - garbage collect nix store
+- `ls` / `la` / `lt` - eza (list, all, tree)
+- `cat` - bat
+- `man` - batman
+- `diff` - batdiff
+- `grep` - batgrep
+- `open` - xdg-open
+- `cc` - claude code (skip permissions)
+
 ## how i do projects
 
 Each repo gets a `flake.nix` with a devshell and an `.envrc` that says `use flake`. cd in, direnv loads everything, cd out and it unloads. All project deps are scoped to that directory
