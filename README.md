@@ -45,9 +45,35 @@ Features are all optional, just import the ones you want in your host's `configu
 
 `sudo nixos-rebuild switch --flake ~/dotfiles#yourhostname` and pray
 
+## cool stuff about this setup
+
+- DNS over HTTPS via dnscrypt-proxy (no local or ISP snooping)
+- OLEDmaxxing theme, everything is fully black
+- Hyprland with no gaps because i paid for my pixels and im going to use all of them
+- Noctalia bar with animations off for snappy response
+- Wezterm + zellij (basically better tmux, sane config, built-in layouts)
+- Yazi for file browsing (more modern ranger with image previews)
+- Helix with LSPs for like 10 languages
+- Atuin for shell history (searchable, syncs across machines if you want)
+- Zoxide instead of cd (learns your frequent dirs, `cd foo` jumps to ~/whatever/foo)
+- Starship prompt
+- Bat instead of cat (syntax highlighting, git diff integration, batman for man pages)
+- Eza instead of ls (icons, git status, tree view)
+- Greetd login with system specs on screen (CPU, RAM, GPU, disk, IP)
+- Keybind cheat sheet popup on Super + Shift + ? via rofi
+- Live wallpaper through mpvpaper
+- Bibata cursor theme
+- Catppuccin mocha on everything that supports it (btop, gitui, yazi, helix, wezterm, eza, bat)
+- Cowsay greeting that changes based on time of day
+- Some shell functions for quickly optimizing videos and images (`optimize-video`, `optimize-image`)
+- My more used cyber tools (nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex, etc)
+- Claude Code and opencode for slopmaxxing
+- Tealdeer for tldr pages
+- Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
+
 ## how i do projects
 
-Each repo gets a `flake.nix` with a devshell and an `.envrc` that says `use flake`. cd into the project, direnv loads the environment, cd out and it's gone. `, sometool` (comma, via nix-index-database) for when you need something quick without writing a whole devshell for it
+Each repo gets a `flake.nix` with a devshell and an `.envrc` that says `use flake`. cd in, direnv loads everything, cd out and it unloads. All project deps are scoped to that directory
 
 ## determinate nix
 
