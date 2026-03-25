@@ -18,6 +18,13 @@ _: {
       breeze-icons
     ];
 
+    xdg.configFile."dolphinrc".text = ''
+      [General]
+      ShowFullPath=true
+      ShowZoomSlider=false
+      ShowStatusBar=1
+    '';
+
     xdg.mimeApps.defaultApplications = {
       "inode/directory" = "org.kde.dolphin.desktop";
     };
