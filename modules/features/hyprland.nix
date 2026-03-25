@@ -200,7 +200,7 @@
       env = XCURSOR_THEME,Bibata-Modern-Classic
       env = XCURSOR_SIZE,24
       env = GTK_THEME,catppuccin-mocha-mauve-standard+default
-      env = QT_QPA_PLATFORMTHEME,qt5ct
+      env = QT_QPA_PLATFORMTHEME,kde
       env = QT_STYLE_OVERRIDE,kvantum
       env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
 
