@@ -10,7 +10,8 @@ _: {
       modesetting.enable = true;
       powerManagement.enable = false;
       powerManagement.finegrained = false;
-      open = false;
+      # open kernel modules work for turing+ (20xx and above)
+      open = true;
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.production;
     };

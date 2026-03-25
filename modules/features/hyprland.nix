@@ -63,40 +63,65 @@
 
     mod = "SUPER";
 
-    whichKeyConfig = pkgs.writeText "which-key.yaml" ''
-      font: JetBrainsMono Nerd Font
-      background: "#000000"
-      color: "#cdd6f4"
-      border: "#cba6f7"
-      separator: " → "
-      border_width: 2
-      corner_r: 8
-      padding: 16
-      anchor: center
-      margin_bottom: 0
-      margin_top: 0
-      margin_left: 0
-      margin_right: 0
-      menu:
-        - { key: Return, desc: terminal }
-        - { key: Q, desc: close window }
-        - { key: F, desc: maximize }
-        - { key: G, desc: fullscreen }
-        - { key: S, desc: launcher }
-        - { key: V, desc: mic mute }
-        - { key: C, desc: center window }
-        - { key: H/J/K/L, desc: focus }
-        - { key: Shift+H/J/K/L, desc: move window }
-        - { key: Shift+Arrow, desc: move to monitor }
-        - { key: Ctrl+H/J/K/L, desc: resize }
-        - { key: 1-0, desc: workspace }
-        - { key: Shift+1-0, desc: move to workspace }
-        - { key: Shift+S, desc: screenshot region }
-        - { key: Ctrl+S, desc: screenshot full }
-        - { key: Shift+E, desc: edit clipboard }
-        - { key: Shift+R, desc: record region }
-        - { key: Shift+G, desc: record gif }
-        - { key: Shift+F, desc: toggle float }
+    keybindTheme = pkgs.writeText "keybind-rofi.rasi" ''
+      * {
+        background-color: #000000FF;
+        text-color: #cdd6f4FF;
+      }
+      window {
+        border: 2px solid;
+        border-color: #cba6f7FF;
+        border-radius: 8px;
+        padding: 24px;
+      }
+      textbox {
+        font: "JetBrainsMono Nerd Font 12";
+      }
+    '';
+
+    keybindPopup = pkgs.writeShellScriptBin "keybind-popup" ''
+            text=$(cat <<'HELPEOF'
+      <b>WINDOWS</b>
+      Super + Enter                 terminal
+      Super + Q                     close window
+      Super + F                     maximize
+      Super + G                     fullscreen
+      Super + Shift + F             float
+      Super + C                     center
+
+      <b>FOCUS</b>
+      Super + H / J / K / L         navigate
+      Super + Arrows                navigate
+      Super + Shift + H / J / K / L move window
+      Super + Shift + Arrows        to monitor
+      Super + Ctrl + H / J / K / L  resize
+
+      <b>WORKSPACES</b>
+      Super + [1-0]                 switch workspace
+      Super + Shift + [1-0]         move to workspace
+      Super + Scroll                cycle workspaces
+
+      <b>CAPTURE</b>
+      Super + Shift + S             screenshot region
+      Super + Ctrl + S              screenshot full
+      Super + Shift + E             edit clipboard
+      Print                         screenshot and edit
+      Super + Shift + R             record region
+      Super + Ctrl + R              record with audio
+      Super + Shift + G             record gif
+
+      <b>SYSTEM</b>
+      Super + S                     launcher
+      Super + V                     mic mute
+      Volume Up / Down / Mute       audio
+      Super + Shift + ?             this overlay
+
+      <small>press escape or enter to close</small>
+      HELPEOF
+      )
+            lines=$(echo "$text" | wc -l)
+            height=$(( lines * 22 + 48 ))
+            ${lib.getExe pkgs.rofi} -e "$text" -markup -theme ${keybindTheme} -theme-str "window { width: ''${height}px; height: ''${height}px; }"
     '';
   in {
     home.pointerCursor = {
@@ -109,7 +134,7 @@
     xdg.configFile."hypr/hyprland.conf".text = ''
       # monitors
       monitor = DP-2, 2560x1440@240, 0x0, 1, transform, 1
-      monitor = DP-3, 3440x1440@240, 1440x540, 1
+      monitor = DP-3, 3440x1440@240, 1440x545, 1
 
       # cursor
       env = HYPRCURSOR_THEME,Bibata-Modern-Classic
@@ -168,46 +193,45 @@
       # startup
       exec-once = ${noctaliaExe}
       exec-once = ${wallpaper}
-      exec-once = ${lib.getExe pkgs.wlr-which-key} ${whichKeyConfig}
 
-      # window management
-      bind = ${mod}, Return, exec, ${lib.getExe pkgs.wezterm}
-      bind = ${mod}, Q, killactive
-      bind = ${mod}, F, fullscreen, 1
-      bind = ${mod}, G, fullscreen, 0
-      bind = ${mod} SHIFT, F, togglefloating
-      bind = ${mod}, C, centerwindow
+      # windows
+      bindd = ${mod}, Return, windows: terminal, exec, ${lib.getExe pkgs.wezterm}
+      bindd = ${mod}, Q, windows: close, killactive
+      bindd = ${mod}, F, windows: maximize, fullscreen, 1
+      bindd = ${mod}, G, windows: fullscreen, fullscreen, 0
+      bindd = ${mod} SHIFT, F, windows: float, togglefloating
+      bindd = ${mod}, C, windows: center, centerwindow
 
       # focus
-      bind = ${mod}, H, movefocus, l
+      bindd = ${mod}, H, focus: navigate (H J K L), movefocus, l
       bind = ${mod}, L, movefocus, r
       bind = ${mod}, K, movefocus, u
       bind = ${mod}, J, movefocus, d
-      bind = ${mod}, Left, movefocus, l
+      bindd = ${mod}, Left, focus: navigate (← → ↑ ↓), movefocus, l
       bind = ${mod}, Right, movefocus, r
       bind = ${mod}, Up, movefocus, u
       bind = ${mod}, Down, movefocus, d
 
-      # move windows
-      bind = ${mod} SHIFT, H, movewindow, l
+      # focus: move
+      bindd = ${mod} SHIFT, H, focus: move (⇧ H J K L), movewindow, l
       bind = ${mod} SHIFT, L, movewindow, r
       bind = ${mod} SHIFT, K, movewindow, u
       bind = ${mod} SHIFT, J, movewindow, d
 
-      # move to other monitor
-      bind = ${mod} SHIFT, Left, movewindow, mon:l
+      # focus: monitor
+      bindd = ${mod} SHIFT, Left, focus: to monitor (⇧ ← → ↑ ↓), movewindow, mon:l
       bind = ${mod} SHIFT, Right, movewindow, mon:r
       bind = ${mod} SHIFT, Up, movewindow, mon:u
       bind = ${mod} SHIFT, Down, movewindow, mon:d
 
-      # resize
-      binde = ${mod} CTRL, H, resizeactive, -50 0
+      # focus: resize
+      bindd = ${mod} CTRL, H, focus: resize (Ctrl H J K L), resizeactive, -50 0
       binde = ${mod} CTRL, L, resizeactive, 50 0
       binde = ${mod} CTRL, J, resizeactive, 0 50
       binde = ${mod} CTRL, K, resizeactive, 0 -50
 
       # workspaces
-      bind = ${mod}, 1, workspace, 1
+      bindd = ${mod}, 1, workspaces: switch (1 – 0), workspace, 1
       bind = ${mod}, 2, workspace, 2
       bind = ${mod}, 3, workspace, 3
       bind = ${mod}, 4, workspace, 4
@@ -218,7 +242,7 @@
       bind = ${mod}, 9, workspace, 9
       bind = ${mod}, 0, workspace, 10
 
-      bind = ${mod} SHIFT, 1, movetoworkspace, 1
+      bindd = ${mod} SHIFT, 1, workspaces: move to (⇧ 1 – 0), movetoworkspace, 1
       bind = ${mod} SHIFT, 2, movetoworkspace, 2
       bind = ${mod} SHIFT, 3, movetoworkspace, 3
       bind = ${mod} SHIFT, 4, movetoworkspace, 4
@@ -229,36 +253,28 @@
       bind = ${mod} SHIFT, 9, movetoworkspace, 9
       bind = ${mod} SHIFT, 0, movetoworkspace, 10
 
-      # scroll navigation
-      bind = ${mod}, mouse_down, workspace, e-1
+      bindd = ${mod}, mouse_down, workspaces: scroll, workspace, e-1
       bind = ${mod}, mouse_up, workspace, e+1
 
-      # keybind hints
-      bind = ${mod} SHIFT, slash, exec, ${lib.getExe pkgs.wlr-which-key} ${whichKeyConfig}
+      # system
+      # hold super for ~1s to see keybind help
+      bind = ${mod} SHIFT, slash, exec, ${lib.getExe keybindPopup}
+      bindd = ${mod}, S, system: launcher, exec, ${noctaliaExe} ipc call launcher toggle
+      bindd = ${mod}, V, system: mic mute, exec, ${pkgs.alsa-utils}/bin/amixer sset Capture toggle
 
-      # launcher
-      bind = ${mod}, S, exec, ${noctaliaExe} ipc call launcher toggle
-      # mic mute
-      bind = ${mod}, V, exec, ${pkgs.alsa-utils}/bin/amixer sset Capture toggle
+      # capture
+      bindd = ${mod} SHIFT, S, capture: screenshot region, exec, ${screenshot}
+      bindd = ${mod} CTRL, S, capture: screenshot full, exec, ${screenshotFull}
+      bindd = ${mod} SHIFT, E, capture: edit clipboard, exec, ${editClipboard}
+      bindd = , Print, capture: screenshot and edit, exec, ${screenshotEdit}
+      bindd = ${mod} SHIFT, R, capture: record region, exec, ${recordRegion}
+      bindd = ${mod} CTRL, R, capture: record with audio, exec, ${recordRegionAudio}
+      bindd = ${mod} SHIFT, G, capture: record gif, exec, ${recordGif}
 
-      # screenshots
-      bind = ${mod} SHIFT, S, exec, ${screenshot}
-      bind = ${mod} CTRL, S, exec, ${screenshotFull}
-      bind = ${mod} SHIFT, E, exec, ${editClipboard}
-      bind = , Print, exec, ${screenshotEdit}
-
-      # screen recording
-      bind = ${mod} SHIFT, R, exec, ${recordRegion}
-      bind = ${mod} CTRL, R, exec, ${recordRegionAudio}
-      bind = ${mod} SHIFT, G, exec, ${recordGif}
-
-      # audio
-      binde = , XF86AudioRaiseVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+
-      binde = , XF86AudioLowerVolume, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-
-      bind = , XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
-
-      # window rules
-      windowrule = tile on, match:class org.wezfurlong.wezterm
+      # system: audio
+      bindde = , XF86AudioRaiseVolume, system: volume up, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%+
+      bindde = , XF86AudioLowerVolume, system: volume down, exec, wpctl set-volume -l 1.4 @DEFAULT_AUDIO_SINK@ 5%-
+      bindd = , XF86AudioMute, system: mute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
     '';
   };
 }

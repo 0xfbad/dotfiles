@@ -22,8 +22,37 @@
     # boot (shared settings, bootloader is host-specific)
     # logs scroll normally, greetd covers them when it starts
 
-    # clean /etc/issue for tuigreet
-    environment.etc."issue".text = "\\n \\l\n";
+    # generate /etc/issue with system specs at boot
+    systemd.services.generate-issue = {
+      description = "Generate /etc/issue with system specs";
+      wantedBy = ["multi-user.target"];
+      before = ["greetd.service"];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+      };
+      path = [pkgs.gawk pkgs.pciutils pkgs.iproute2 pkgs.coreutils pkgs.util-linux];
+      script = ''
+                os=$(. /etc/os-release && echo "$PRETTY_NAME")
+                kernel=$(uname -r)
+                arch=$(uname -m)
+                cpu=$(awk -F: '/model name/ {gsub(/^ +/, "", $2); print $2; exit}' /proc/cpuinfo)
+                cores=$(nproc)
+                mem=$(awk '/MemTotal/ {printf "%.0f GB", $2/1024/1024}' /proc/meminfo)
+                gpu=$(lspci | awk -F: '/VGA|3D/ {gsub(/^ +/, "", $3); print $3; exit}')
+                disk=$(df -h / | awk 'NR==2 {print $2 " total, " $4 " free"}')
+                ip=$(ip -4 -br addr show | awk '/UP/ {gsub(/\/.*/, "", $3); print $3; exit}')
+                host=$(hostname)
+
+                cat > /etc/issue <<EOF
+        $os | $arch | $kernel
+        $cpu ($cores cores) | $mem RAM
+        $gpu
+        Disk: $disk | IP: ''${ip:-no network}
+        EOF
+      '';
+    };
+    environment.etc."issue".enable = false;
 
     # locale
     time.timeZone = "America/Los_Angeles";
