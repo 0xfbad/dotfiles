@@ -37,7 +37,7 @@
         Type = "oneshot";
         RemainAfterExit = true;
       };
-      path = [pkgs.gawk pkgs.pciutils pkgs.iproute2 pkgs.coreutils pkgs.util-linux];
+      path = [pkgs.gawk pkgs.pciutils pkgs.iproute2 pkgs.coreutils pkgs.util-linux pkgs.hostname];
       script = ''
                 os=$(. /etc/os-release && echo "$PRETTY_NAME")
                 kernel=$(uname -r)
@@ -119,7 +119,13 @@
           Fingerprinting = true;
         };
         FirefoxHome = {
+          Search = true;
+          TopSites = false;
+          SponsoredTopSites = false;
           Highlights = false;
+          Pocket = false;
+          SponsoredPocket = false;
+          Snippets = false;
           Locked = true;
         };
         NoDefaultBookmarks = true;

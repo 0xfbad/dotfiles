@@ -129,6 +129,19 @@ _: {
           "browser.formfill.enable" = false;
           "extensions.formautofill.available" = "off";
 
+          # weather
+          "browser.urlbar.weather.featureGate" = false;
+          "browser.newtabpage.activity-stream.showWeather" = false;
+          "browser.newtabpage.activity-stream.system.showWeather" = false;
+
+          # shortcuts/topsites on new tab
+          "browser.newtabpage.activity-stream.feeds.topsites" = false;
+          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
+
+          # firefox view
+          "browser.tabs.firefox-view" = false;
+          "browser.tabs.firefox-view-next" = false;
+
           # anti-slop (sponsored suggestions, recommendations, etc)
           "browser.urlbar.suggest.quicksuggest.sponsored" = false;
           "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
