@@ -1,0 +1,12 @@
+_: {
+  flake.homeModules.zellij = _: {
+    programs.zellij = {
+      enable = true;
+      settings = {
+        theme = "catppuccin-mocha";
+        default_layout = "compact";
+        show_startup_tips = false;
+      };
+    };
+  };
+}
