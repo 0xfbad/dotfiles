@@ -2,6 +2,9 @@
 
 Personal dotfiles for NixOS and every other hipster riced app I use via home-manager. Following the [dendritic pattern](https://vimjoyer.dev/p/organizing-nix-config/) from vimjoyer's video, everything in `modules/` gets auto-discovered by flake-parts + import-tree so you never have to manually wire imports in the flake
 
+Inspiration and things stolen from some other cool dotfiles:
+- https://github.com/JakeGinesin/nix-config
+
 ## layout
 
 ```
@@ -10,28 +13,35 @@ modules/
   flake-parts.nix
   formatting.nix              treefmt, alejandra, statix
   hosts/
-    desktop/                   RTX 3090, dual monitor, GRUB (because i dont fucking know what happened to efi), intel cpu
-    laptop/                    Discrete RTX 4090, systemd-boot, LUKS, intel cpu
+    desktop/                   RTX 3090, dual monitor, GRUB, intel cpu, xpadneo
+    laptop/                    Discrete RTX 4090, systemd-boot, LUKS, intel cpu, iwd
   features/
-    hyprland.nix               compositor, keybinds, wallpaper
-    noctalia.nix               bar, notifications, launcher, clipboard
+    hyprland.nix               compositor, scrolling layout, keybinds, wallpaper, window rules
     greetd.nix                 tuigreet + uwsm
-    common.nix                 nix settings, locale, bluetooth, user
+    common.nix                 nix settings, locale, bluetooth, user, fontconfig
     nvidia.nix                 GPU drivers, wayland session vars
     audio.nix                  pipewire
-    virtualization.nix         docker, libvirt, qemu
+    virtualization.nix         docker (log rotation), libvirt, qemu
     anonymity.nix              tor, dnscrypt
     networking.nix             networkmanager, dns
     flatpak.nix                flatpak, sober
     determinate.nix            determinate nix
   home/
     default.nix                home-manager wiring
-    terminal.nix               packages (cli utils, compression, networking)
-    desktop.nix                packages (browsers, media, comms, gaming)
-    development.nix            packages (LSPs, dev tools, security), direnv
-    helix.nix                  editor config, nixd + nil
+    terminal.nix               packages (cli utils, compression, networking, system tools)
+    desktop.nix                packages (browsers, media, comms, gaming, video editing)
+    development.nix            packages (LSPs, dev tools, security, ai), direnv
+    helix.nix                  editor config, nixd + nil + harper + hyprls
+    git.nix                    git settings (rebase, histogram diffs, rerere, verbose commits)
+    shell-functions.nix        ff (fzf+bat), git worktree helpers, ssh port forwarding
+    waybar.nix                 status bar, catppuccin OLED
+    mako.nix                   notification daemon
+    walker.nix                 app launcher, clipboard, calculator, emoji, websearch
+    swayosd.nix                volume/brightness OSD
+    hyprlock.nix               lock screen
+    hypridle.nix               idle management (auto-lock, DPMS)
     firefox.nix                declarative profile, search engines, privacy
-    zsh.nix                    shell, aliases, functions
+    zsh.nix                    shell, aliases, functions, tab completion
     wezterm.nix                terminal emulator
     atuin.nix                  shell history
     bat.nix                    cat replacement + extras
@@ -39,7 +49,7 @@ modules/
     yazi.nix                   file manager + catppuccin
     gitui.nix                  git TUI + theme
     zellij.nix                 multiplexer
-    starship.nix               prompt
+    starship.nix               prompt (mauve accent, git status)
     zoxide.nix                 smart cd
     btop.nix                   system monitor
     tealdeer.nix               tldr
@@ -64,32 +74,38 @@ Features are all optional, just import the ones you want in your host's `configu
 ## cool stuff about this setup
 
 - DNS over HTTPS via dnscrypt-proxy (no local or ISP snooping)
-- OLEDmaxxing theme, everything is fully black
-- Hyprland with no gaps because i paid for my pixels and im going to use all of them
-- Noctalia bar with animations off for snappy response
+- OLEDmaxxing theme, everything is fully black with catppuccin mocha mauve accent on every app that supports it
+- Hyprland with niri-style scrolling layout by default (infinite horizontal columns, cycle column widths with Super+Alt+=/-, scroll viewport with Super+[/]), Super+\\ toggles back to dwindle
+- Modular desktop shell inspired by [Omarchy](https://github.com/basecamp/omarchy): waybar, mako notifications, walker launcher (clipboard history, calc, emoji, websearch all built in), swayosd for volume/brightness popups, hyprlock + hypridle for lock and auto-sleep
+- wlr-which-key on Super+D for quick actions (screenshots, recording, bluetui, impala wifi, lazydocker, hyprmon monitor config, volume mixer, dolphin)
+- Walker launcher on Super+Space with `$` prefix for clipboard history, `=` for calculator, `@` for websearch
+- Scratchpad workspace (Super+S), window groups (Super+G), pop-out float+pin (Super+O)
+- hyprdim auto-dims inactive windows so you can tell what's focused without borders, wl-clip-persist keeps clipboard alive after closing the source app
+- Monitor config lives in a mutable `monitors.conf` that gets sourced by the nix-managed config, so hyprmon TUI can save monitor layouts and they survive rebuilds
 - Wezterm + zellij (basically better tmux, sane config, built-in layouts)
 - Yazi for file browsing (more modern ranger with image previews)
-- Helix with LSPs for like 10 languages, nixd for NixOS/home-manager option completion
+- Helix with LSPs for like 10 languages, nixd for NixOS/home-manager option completion, harper for grammar checking in markdown and git commits, hyprls for hyprland config diagnostics
+- Git config with histogram diffs, colorMoved (highlights moved code differently from changed code), rerere (remembers how you resolved conflicts and auto-applies next time), verbose commits so you see the diff in your editor, push.autoSetupRemote so you never type --set-upstream again
+- `ff` function: fzf + bat preview, finds and opens files. `ga`/`gd` for git worktree add/remove. `fip`/`dip`/`lip` for SSH port forwarding
 - Atuin for shell history (searchable, syncs across machines if you want)
 - Zoxide instead of cd (learns your frequent dirs, `cd foo` jumps to ~/whatever/foo)
-- Starship prompt
+- Starship prompt with mauve accent, truncated directory, italic git branch
 - Bat instead of cat (syntax highlighting, git diff integration, batman for man pages)
 - Eza instead of ls (icons, git status, tree view)
 - Dust instead of du (visual disk usage bars, sorted by size)
+- Lazydocker for Docker TUI, bluetui and impala for bluetooth and wifi TUIs
 - Greetd login with system specs on screen (CPU, RAM, GPU, disk, IP)
-- Keybind cheat sheet popup on Super + Shift + ? via rofi
-- wlr-which-key on Super + D for quick actions (screenshots, recording, volume mixer, file manager)
+- Keybind cheat sheet popup on Super+Shift+? via wezterm
 - Wallpaper rotation from ~/dotfiles/wallpapers/, different image per monitor, shuffles every 30 minutes
 - Dolphin file manager with full catppuccin kdeglobals color scheme and Kvantum theming
 - Bibata cursor theme
-- Catppuccin mocha on everything that supports it (btop, gitui, yazi, helix, wezterm, zed, eza, bat)
 - Cowsay greeting that changes based on time of day
 - Some shell functions for quickly optimizing videos and images (`optimize-video`, `optimize-image`)
 - My more used cyber tools (nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex, etc)
 - Claude Code and opencode for slopmaxxing
-- Tealdeer for tldr pages
 - Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
 - nh for nixos rebuilds, shows you a diff of what's changing before it applies
+- `rebuild` and `update` aliases run `nix flake check` (alejandra + statix) before applying so you never deploy broken config
 - nix-ld so you can run random binaries without the "interpreter not found" song and dance
 - Jujutsu (jj) alongside git, modern VCS with undo, auto-commit working copy, colocated with git repos
 - Ripdrag for dragging files out of the terminal into GUI apps
@@ -98,11 +114,16 @@ Features are all optional, just import the ones you want in your host's `configu
 - btop with GPU monitoring
 - sshfs for mounting remote dirs over SSH
 - Gaming stack: proton-ge, gamescope, gamemode, mangohud overlay. `gamemoderun mangohud %command%` in steam launch options
+- Screenshot annotation with satty, hyprpicker for color picking, hyprsunset for blue light filtering
+- Custom Firefox startpage with catppuccin colors, DuckDuckGo search, quick-link categories, and a wallpaper art panel. Generated from nix so the palette stays in sync with everything else
+- Screen recordings get random dictionary-word filenames (like `coffee-telescope.mp4`) so you never have to name them
+- Centralized color palette in `colors.nix`, every module references it instead of hardcoding hex values so changing the theme is one file
+- iwd backend for NetworkManager (faster wifi scans, works with impala TUI)
 
 ## aliases
 
-- `rebuild` - nh os switch (shows diff before applying)
-- `update` - nh os switch -u (updates flake lock then rebuilds)
+- `rebuild` - nix flake check + nh os switch (lint then apply)
+- `update` - nix flake check + nh os switch -u (lint, update flake lock, rebuild)
 - `gc` - nh clean all (keeps 3 generations, 7 days)
 - `ls` / `la` / `lt` - eza (list, all, tree)
 - `cat` - bat
@@ -112,6 +133,9 @@ Features are all optional, just import the ones you want in your host's `configu
 - `open` - xdg-open
 - `cc` - claude code (skip permissions)
 - `qalc` - libqalculate with autocalc mode
+- `ff` - fzf file finder with bat preview, opens in editor
+- `ga` / `gd` - git worktree add/remove
+- `fip` / `dip` / `lip` - ssh port forward/disconnect/list
 
 ## how i do projects
 
@@ -131,4 +155,4 @@ Use `boot` not `switch` for that first one, it swaps the dbus implementation und
 
 ## formatting
 
-`nix fmt` runs alejandra, `nix flake check` runs alejandra + statix
+`nix fmt` runs alejandra, `nix flake check` runs alejandra + statix. The `rebuild` and `update` aliases run `nix flake check` before applying so you never deploy broken config
