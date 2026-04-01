@@ -3,6 +3,10 @@ _: {
     home.packages = with pkgs; [
       # fonts
       nerd-fonts.jetbrains-mono
+      noto-fonts
+      noto-fonts-cjk-sans
+      noto-fonts-color-emoji
+      liberation_ttf
 
       # cli utilities
       cloc
@@ -49,6 +53,21 @@ _: {
 
       # multiplexers
       tmux
+
+      # system tools
+      libnotify
+      hyprmon
+      hyprpicker
+      hyprsunset
+      hyprdim
+      wl-clip-persist
+      gum
+      lazydocker
+      inxi
+      playerctl
+      brightnessctl
+      bluetui
+      impala
 
       # fun
       cowsay

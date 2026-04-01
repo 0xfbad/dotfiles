@@ -82,6 +82,15 @@ _: {
       xxd
       expect
 
+      # prose
+      harper
+
+      # hyprland
+      hyprls
+
+      # parser tools
+      tree-sitter
+
       # ai
       claude-code
       opencode
