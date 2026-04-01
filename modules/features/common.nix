@@ -28,7 +28,6 @@
     # boot (shared settings, bootloader is host-specific)
     # logs scroll normally, greetd covers them when it starts
 
-    # generate /etc/issue with system specs at boot
     systemd.services.generate-issue = {
       description = "Generate /etc/issue with system specs";
       wantedBy = ["multi-user.target"];
@@ -78,6 +77,8 @@
     # sudo
     security.sudo.extraConfig = "Defaults pwfeedback";
 
+    security.pam.services.hyprlock = {};
+
     # bluetooth (needs to be up before greetd for wireless keyboards)
     hardware.bluetooth.enable = true;
     hardware.bluetooth.powerOnBoot = true;
@@ -91,7 +92,8 @@
         IdleTimeout = 0;
       };
     };
-    services.blueman.enable = true;
+    # blueman tray disabled, using bluetui instead
+    services.blueman.enable = false;
 
     # disable ERTM for bluetooth keyboards
     boot.extraModprobeConfig = ''
@@ -130,6 +132,8 @@
         };
         NoDefaultBookmarks = true;
         DisplayBookmarksToolbar = "always";
+        DisplayMenuBar = "default-off";
+        ShowHomeButton = true;
         ExtensionSettings = {
           "uBlock0@raymondhill.net" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
@@ -154,17 +158,22 @@
           "myallychou@gmail.com" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/youtube-recommended-videos/latest.xpi";
             installation_mode = "force_installed";
-            default_area = "navbar";
+            default_area = "menupanel";
           };
           "{a6c4a591-f1b2-4f03-b3ff-767e5bedf4e7}" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/user-agent-string-switcher/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
           };
+          "{DEBA3021-9876-4702-89BA-42D095339A0A}" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/disable-page-visibility/latest.xpi";
+            installation_mode = "force_installed";
+            default_area = "menupanel";
+          };
           "{7343f7d1-e6ef-4d8a-8449-d4c18850f559}" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/clipboard2file/latest.xpi";
             installation_mode = "force_installed";
-            default_area = "navbar";
+            default_area = "menupanel";
           };
         };
       };
@@ -196,9 +205,24 @@
     # editor
     environment.variables.EDITOR = "hx";
     environment.variables.VISUAL = "hx";
+    environment.variables.SUDO_EDITOR = "hx";
 
     # wayland env vars for electron apps
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
+
+    # faster shutdown for hung services
+    systemd.settings.Manager.DefaultTimeoutStopSec = "5s";
+
+    # ollama
+    services.ollama.enable = true;
+
+    # fonts
+    fonts.fontconfig.defaultFonts = {
+      sansSerif = ["Noto Sans" "Noto Color Emoji"];
+      serif = ["Noto Serif" "Noto Color Emoji"];
+      monospace = ["JetBrainsMono Nerd Font" "Noto Color Emoji"];
+      emoji = ["Noto Color Emoji"];
+    };
 
     # system packages
     environment.systemPackages = with pkgs; [
@@ -206,6 +230,7 @@
       wget
       git
       grim
+      polkit_gnome
     ];
 
     # user

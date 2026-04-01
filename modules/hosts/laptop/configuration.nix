@@ -24,6 +24,10 @@
 
     networking.hostName = "laptop";
 
+    # iwd for faster wifi
+    networking.wireless.iwd.enable = true;
+    networking.networkmanager.wifi.backend = "iwd";
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.systemd-boot.configurationLimit = 5;
     boot.loader.efi.canTouchEfiVariables = true;

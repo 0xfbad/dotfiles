@@ -24,6 +24,10 @@
 
     networking.hostName = "desktop";
 
+    # iwd for impala wifi TUI
+    networking.wireless.iwd.enable = true;
+    networking.networkmanager.wifi.backend = "iwd";
+
     boot.loader.grub = {
       enable = true;
       device = "/dev/nvme0n1";
@@ -32,6 +36,7 @@
     };
     boot.loader.timeout = 0;
     boot.kernelModules = ["kvm-intel" "kvm-amd"];
+    boot.extraModulePackages = with pkgs.linuxPackages; [xpadneo];
     boot.extraModprobeConfig = ''
       options kvm-intel nested=1
       options kvm-amd nested=1
