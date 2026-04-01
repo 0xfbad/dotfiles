@@ -66,6 +66,14 @@ _: {
           tinymist = {
             command = "tinymist";
           };
+          harper-ls = {
+            command = "harper-ls";
+            args = ["--stdio"];
+          };
+          hyprls = {
+            command = "hyprls";
+            args = ["--stdio"];
+          };
         };
         language = [
           {
@@ -148,6 +156,18 @@ _: {
             name = "typst";
             language-servers = ["tinymist"];
             auto-format = true;
+          }
+          {
+            name = "markdown";
+            language-servers = ["harper-ls"];
+          }
+          {
+            name = "git-commit";
+            language-servers = ["harper-ls"];
+          }
+          {
+            name = "hyprlang";
+            language-servers = ["hyprls"];
           }
         ];
       };

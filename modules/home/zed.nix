@@ -1,5 +1,7 @@
 _: {
-  flake.homeModules.zed = _: {
+  flake.homeModules.zed = {config, ...}: let
+    c = config.colors;
+  in {
     programs.zed-editor = {
       enable = true;
       extensions = ["catppuccin"];
@@ -36,14 +38,14 @@ _: {
           light = "Catppuccin Mocha";
         };
         "experimental.theme_overrides" = {
-          background = "#000000";
-          "editor.background" = "#000000";
-          "panel.background" = "#000000";
-          "tab_bar.background" = "#000000";
-          "title_bar.background" = "#000000";
-          "toolbar.background" = "#000000";
-          "status_bar.background" = "#000000";
-          "scrollbar.track.background" = "#000000";
+          background = c.bg;
+          "editor.background" = c.bg;
+          "panel.background" = c.bg;
+          "tab_bar.background" = c.bg;
+          "title_bar.background" = c.bg;
+          "toolbar.background" = c.bg;
+          "status_bar.background" = c.bg;
+          "scrollbar.track.background" = c.bg;
         };
 
         # fonts (match helix/wezterm)

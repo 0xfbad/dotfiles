@@ -1,5 +1,7 @@
 _: {
-  flake.homeModules.wezterm = _: {
+  flake.homeModules.wezterm = {config, ...}: let
+    c = config.colors;
+  in {
     programs.wezterm = {
       enable = true;
       extraConfig = ''
@@ -7,12 +9,13 @@ _: {
         return {
           color_scheme = "Catppuccin Mocha",
           colors = {
-            background = "#000000",
+            background = "${c.bg}",
           },
           font = wezterm.font("JetBrainsMono Nerd Font"),
           font_size = 11,
           enable_wayland = true,
           enable_tab_bar = false,
+          window_close_confirmation = "NeverPrompt",
           disable_default_key_bindings = true,
           keys = {
             {
