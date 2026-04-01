@@ -18,7 +18,7 @@ _: {
 
           modules-left = ["hyprland/workspaces"];
           modules-center = ["clock"];
-          modules-right = ["custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "battery"];
+          modules-right = ["custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
 
           "hyprland/workspaces" = {
             format = "{icon}";
@@ -86,12 +86,28 @@ _: {
             format = "{icon} {capacity}%";
             format-charging = "󰂄 {capacity}%";
             format-plugged = "󰚥 {capacity}%";
+            format-full = "󰁹 full";
             format-icons = ["󰂎" "󰁺" "󰁻" "󰁼" "󰁽" "󰁾" "󰁿" "󰂀" "󰂁" "󰂂" "󰁹"];
             states = {
               warning = 20;
               critical = 10;
             };
-            tooltip-format = "{timeTo}";
+            tooltip-format-discharging = "time to empty   {time}\npower draw      {power:.1f}W\nhealth          {health}%\ncycles          {cycles}";
+            tooltip-format-charging = "time to full    {time}\ncharge rate     {power:.1f}W\nhealth          {health}%\ncycles          {cycles}";
+            tooltip-format-full = "status          full\nhealth          {health}%\ncycles          {cycles}";
+            tooltip-format-plugged = "status          plugged\nhealth          {health}%\ncycles          {cycles}";
+            interval = 5;
+          };
+
+          power-profiles-daemon = {
+            format = "{icon}";
+            format-icons = {
+              default = "󰗑";
+              performance = "󱐌";
+              balanced = "󰗑";
+              power-saver = "󰌪";
+            };
+            tooltip-format = "Profile: {profile}";
           };
 
           "custom/recording" = {
@@ -141,7 +157,7 @@ _: {
           color: ${c.text};
         }
 
-        #cpu, #memory, #pulseaudio, #network, #bluetooth, #battery, #tray {
+        #cpu, #memory, #pulseaudio, #network, #bluetooth, #battery, #power-profiles-daemon, #tray {
           padding: 0 8px;
           color: ${c.text};
         }
