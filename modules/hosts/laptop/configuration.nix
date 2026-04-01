@@ -24,9 +24,14 @@
 
     networking.hostName = "laptop";
 
-    # iwd for faster wifi
+    # iwd for impala wifi TUI
     networking.wireless.iwd.enable = true;
     networking.networkmanager.wifi.backend = "iwd";
+
+    # disable wifi 6 (HE) - iwd can't handle HE on this intel ax card
+    networking.wireless.iwd.settings.General.EnableHE = false;
+
+    services.power-profiles-daemon.enable = true;
 
     boot.loader.systemd-boot.enable = true;
     boot.loader.systemd-boot.configurationLimit = 5;
