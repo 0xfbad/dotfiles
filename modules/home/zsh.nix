@@ -14,8 +14,8 @@ _: {
         diff = "batdiff";
         grep = "batgrep";
         open = "xdg-open";
-        rebuild = "NH_NOM=0 nh os switch";
-        update = "NH_NOM=0 nh os switch -u";
+        rebuild = "nix flake check ~/dotfiles && nh os switch";
+        update = "nix flake check ~/dotfiles && nh os switch -u";
         gc = "NH_NOM=0 nh clean all --keep 3 --keep-since 7d";
         cc = "claude --dangerously-skip-permissions";
         qalc = "qalc -s 'autocalc' -s 'decimal comma off'";
@@ -25,6 +25,10 @@ _: {
         plugins = [];
       };
       initContent = ''
+        zstyle ':completion:*' menu select
+        zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+        setopt menu_complete
+
         optimize-video() {
           local input="$1"
           local output="''${input%.*}-optimized.mp4"
