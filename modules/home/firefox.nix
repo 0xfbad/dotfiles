@@ -1,5 +1,11 @@
 _: {
-  flake.homeModules.firefox = {pkgs, ...}: {
+  flake.homeModules.firefox = {
+    pkgs,
+    config,
+    ...
+  }: let
+    c = config.colors;
+  in {
     programs.firefox = {
       enable = true;
       profiles.default = {
@@ -52,29 +58,47 @@ _: {
               definedAliases = ["@hm"];
             };
             "bing".metaData.hidden = true;
+            "amazondotcom-us".metaData.hidden = true;
+            "ebay".metaData.hidden = true;
+            "perplexity".metaData.hidden = true;
           };
         };
         settings = {
-          # telemetry
+          # telemetry, studies, crash reports
+          # https://wiki.mozilla.org/Telemetry
           "toolkit.telemetry.enabled" = false;
           "toolkit.telemetry.unified" = false;
           "toolkit.telemetry.archive.enabled" = false;
-          "toolkit.telemetry.server" = "";
+          "toolkit.telemetry.server" = "data:,";
+          "toolkit.telemetry.coverage.opt-out" = true;
+          "toolkit.coverage.opt-out" = true;
+          "toolkit.coverage.endpoint.base" = "";
           "datareporting.healthreport.uploadEnabled" = false;
+          "datareporting.healthreport.service.enabled" = false;
           "datareporting.policy.dataSubmissionEnabled" = false;
-
-          # studies and experiments
+          "browser.ping-centre.telemetry" = false;
+          # https://mozilla.github.io/normandy/
           "app.shield.optoutstudies.enabled" = false;
           "app.normandy.enabled" = false;
           "app.normandy.api_url" = "";
+          "experiments.supported" = false;
+          "experiments.enabled" = false;
+          "experiments.manifest.uri" = "";
+          # crash reports
+          "breakpad.reportURL" = "";
+          "browser.tabs.crashReporting.sendReport" = false;
+          "browser.crashReports.unsubmittedCheck.autoSubmit2" = false;
 
-          # pocket
+          # pocket (kill it)
           "extensions.pocket.enabled" = false;
           "extensions.pocket.site" = "";
           "extensions.pocket.oAuthConsumerKey" = "";
           "extensions.pocket.api" = "";
 
-          # activity stream
+          # new tab page (custom startpage)
+          "browser.newtabpage.enabled" = false;
+          "browser.startup.homepage" = "file:///home/fbad/dotfiles/startpage/index.html";
+          "browser.newtabpage.activity-stream.enabled" = false;
           "browser.newtabpage.activity-stream.feeds.telemetry" = false;
           "browser.newtabpage.activity-stream.telemetry" = false;
           "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
@@ -83,26 +107,56 @@ _: {
           "browser.newtabpage.activity-stream.showSponsored" = false;
           "browser.newtabpage.activity-stream.showSponsoredTopSites" = false;
           "browser.newtabpage.activity-stream.default.sites" = "";
+          "browser.newtabpage.activity-stream.feeds.topsites" = false;
+          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
+          "browser.newtabpage.activity-stream.showWeather" = false;
+          "browser.newtabpage.activity-stream.system.showWeather" = false;
+          "browser.newtabpage.enhanced" = false;
+          "browser.newtab.preload" = false;
 
-          # tracking protection
+          # tracking protection (strict mode, purge trackers)
           "privacy.trackingprotection.enabled" = true;
           "privacy.trackingprotection.socialtracking.enabled" = true;
           "browser.contentblocking.category" = "strict";
+          "privacy.purge_trackers.enabled" = true;
+          "privacy.donottrackheader.enabled" = true;
+          "privacy.donottrackheader.value" = 1;
+          "privacy.globalprivacycontrol.enabled" = true;
+          "privacy.globalprivacycontrol.functionality.enabled" = true;
 
-          # network privacy
+          # network (disable prefetch, speculative connections, tighten dns cache)
           "network.dns.disablePrefetch" = true;
+          "network.dns.disablePrefetchFromHTTPS" = true;
           "network.prefetch-next" = false;
           "network.predictor.enabled" = false;
+          "network.predictor.enable-prefetch" = false;
           "network.http.speculative-parallel-limit" = 0;
+          "network.dnsCacheExpiration" = 0;
+          # enable QUIC/HTTP3
+          "network.http.http3.enabled" = true;
 
-          # webrtc leak prevention
+          # security
+          # https only mode
+          "dom.security.https_only_mode" = true;
+          # webrtc leak prevention (only expose default route)
           "media.peerconnection.ice.default_address_only" = true;
+          # TLS 0-RTT replay attack prevention
+          "security.tls.enable_0rtt_data" = false;
+          "security.pki.sha1_enforcement_level" = 1;
+          # show punycode to prevent unicode domain spoofing
+          "network.IDN_show_punycode" = true;
 
-          # sidebar (kill it)
+          # drm (needed for netflix, spotify web, etc)
+          "media.eme.enabled" = true;
+          "media.gmp-widevinecdm.enabled" = true;
+
+          # sidebar (disable new redesign, keep old ctrl+h history panel)
           "sidebar.revamp" = false;
+          "sidebar.verticalTabs" = false;
 
-          # ai features (kill all of it)
+          # ai features (kill every single one)
           "browser.ml.enable" = false;
+          "browser.ml.assistant.enabled" = false;
           "browser.ml.chat.enabled" = false;
           "browser.ml.chat.sidebar" = false;
           "browser.ml.chat.shortcuts" = false;
@@ -115,7 +169,7 @@ _: {
           "extensions.ml.enabled" = false;
           "browser.tabs.groups.smart.enabled" = false;
 
-          # passwords, autofill, credit cards (bitwarden handles this)
+          # passwords and autofill (bitwarden handles all of this)
           "signon.rememberSignons" = false;
           "signon.autofillForms" = false;
           "signon.generation.enabled" = false;
@@ -126,23 +180,11 @@ _: {
           "extensions.formautofill.creditCards.enabled" = false;
           "extensions.formautofill.creditCards.available" = false;
           "extensions.formautofill.creditCards.supported" = "";
+          "extensions.formautofill.heuristics.enabled" = false;
           "browser.formfill.enable" = false;
           "extensions.formautofill.available" = "off";
 
-          # weather
-          "browser.urlbar.weather.featureGate" = false;
-          "browser.newtabpage.activity-stream.showWeather" = false;
-          "browser.newtabpage.activity-stream.system.showWeather" = false;
-
-          # shortcuts/topsites on new tab
-          "browser.newtabpage.activity-stream.feeds.topsites" = false;
-          "browser.newtabpage.activity-stream.improvesearch.topSiteSearchShortcuts" = false;
-
-          # firefox view
-          "browser.tabs.firefox-view" = false;
-          "browser.tabs.firefox-view-next" = false;
-
-          # anti-slop (sponsored suggestions, recommendations, etc)
+          # urlbar (no suggestions, no sponsored, no trending, show full urls)
           "browser.urlbar.suggest.quicksuggest.sponsored" = false;
           "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
           "browser.urlbar.quicksuggest.enabled" = false;
@@ -153,55 +195,91 @@ _: {
           "browser.urlbar.suggest.addons" = false;
           "browser.urlbar.suggest.yelp" = false;
           "browser.urlbar.suggest.topsites" = false;
+          "browser.urlbar.suggest.searches" = false;
+          "browser.urlbar.trimURLs" = false;
+          "browser.urlbar.dnsResolveSingleWordsAfterSearch" = 0;
+          "browser.search.suggest.enabled" = false;
+
+          # anti-slop (recommendations, cfr, discovery)
           "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.addons" = false;
           "browser.newtabpage.activity-stream.asrouter.userprefs.cfr.features" = false;
           "extensions.htmlaboutaddons.recommendations.enabled" = false;
           "extensions.htmlaboutaddons.discover.enabled" = false;
           "extensions.getAddons.showPane" = false;
           "extensions.screenshots.disabled" = true;
+          "browser.discovery.enabled" = false;
+          "browser.aboutwelcome.enabled" = false;
 
-          # bookmarks toolbar
-          "browser.toolbars.bookmarks.visibility" = "always";
+          # firefox view (kill it)
+          "browser.tabs.firefox-view" = false;
+          "browser.tabs.firefox-view-next" = false;
 
-          # userchrome css
-          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+          # disable apis that leak info or are useless
+          # battery status api
+          "dom.battery.enabled" = false;
+          # gamepad api (prevents USB device enumeration)
+          "dom.gamepad.enabled" = false;
+          # beacon api (async analytics transfers)
+          "beacon.enabled" = false;
+          # ping tracking
+          "browser.send_pings" = false;
+          # ad attribution api
+          "dom.private-attribution.submission.enabled" = false;
+          # weather in urlbar
+          "browser.urlbar.weather.featureGate" = false;
 
-          # sync and accounts
-          "identity.fxaccounts.enabled" = false;
-
-          # import button
-          "browser.bookmarks.addedImportButton" = false;
+          # performance
+          # write session data every 30min instead of 15s (saves SSD writes)
+          "browser.sessionstore.interval" = "1800000";
+          # gpu accelerated rendering
+          "gfx.webrender.all" = true;
+          # compact ui mode
+          "browser.compactmode.show" = true;
 
           # misc
-          "browser.send_pings" = false;
-          "dom.battery.enabled" = false;
-          "network.IDN_show_punycode" = true;
           "browser.shell.checkDefaultBrowser" = false;
-          "browser.search.suggest.enabled" = false;
-          "browser.urlbar.suggest.searches" = false;
+          "browser.aboutConfig.showWarning" = false;
+          "browser.disableResetPrompt" = true;
+          "browser.fixup.alternate.enabled" = false;
+          "browser.toolbars.bookmarks.visibility" = "always";
+          "browser.bookmarks.addedImportButton" = false;
+          "identity.fxaccounts.enabled" = false;
+          "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
         };
 
-        # oled black theme
         userChrome = ''
           :root {
-            --toolbar-bgcolor: #000000 !important;
-            --lwt-accent-color: #000000 !important;
-            --lwt-toolbarbutton-icon-fill: #cdd6f4 !important;
+            --toolbar-bgcolor: ${c.bg} !important;
+            --lwt-accent-color: ${c.bg} !important;
+            --lwt-toolbarbutton-icon-fill: ${c.text} !important;
           }
           #navigator-toolbox,
           #TabsToolbar,
           #PersonalToolbar,
           #nav-bar {
-            background-color: #000000 !important;
+            background-color: ${c.bg} !important;
           }
-          #sidebar-box {
+          .tabbrowser-tab[selected] .tab-background {
+            background-color: ${c.accent} !important;
+          }
+          .tabbrowser-tab[selected] .tab-label {
+            color: ${c.bg} !important;
+          }
+          .tabbrowser-tab:not([selected]) .tab-background:hover {
+            background-color: ${c.mantle} !important;
+          }
+          #sidebar-main,
+          #sidebar-launcher-splitter {
             display: none !important;
           }
         '';
 
         userContent = ''
           @-moz-document url("about:newtab"), url("about:home"), url("about:blank") {
-            body { background-color: #000000 !important; }
+            body { background-color: ${c.bg} !important; }
+          }
+          @-moz-document url-prefix("file:///home/fbad/dotfiles/startpage/") {
+            body { background-color: ${c.bg} !important; }
           }
         '';
       };
