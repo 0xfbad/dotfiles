@@ -28,7 +28,7 @@ _: {
       nix-output-monitor # nh uses this for build progress (tree view, download/build status)
       csvlens # like less but for CSV, aligned columns, filtering, search
       navi # interactive cheatsheet tool, fuzzy search commands with arg placeholders
-      carapace # multi-shell completion engine, covers hundreds of commands from one binary
+      # carapace enabled via programs.carapace in zsh module
       wiki-tui # wikipedia in your terminal, fuzzy search, section jumping
       circumflex # hacker news TUI, reader mode extracts article text, threaded comments
 

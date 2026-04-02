@@ -15,24 +15,6 @@ _: {
   }: let
     c = config.colors;
     ch = config.colors.hypr;
-    screenshot = lib.getExe (pkgs.writeShellApplication {
-      name = "screenshot-region";
-      runtimeInputs = with pkgs; [grim slurp wl-clipboard];
-      text = ''grim -g "$(slurp -w 0 -b 00000080 -s 00000000)" - | wl-copy'';
-    });
-
-    screenshotEdit = lib.getExe (pkgs.writeShellApplication {
-      name = "screenshot-edit";
-      runtimeInputs = with pkgs; [grim slurp imagemagick satty];
-      text = ''grim -g "$(slurp -b 00000080 -s 00000000)" - | magick - -shave 1x1 - | satty -f -'';
-    });
-
-    screenshotFull = lib.getExe (pkgs.writeShellApplication {
-      name = "screenshot-full";
-      runtimeInputs = with pkgs; [grim wl-clipboard];
-      text = ''grim -l 0 - | wl-copy'';
-    });
-
     editClipboard = lib.getExe (pkgs.writeShellApplication {
       name = "edit-clipboard";
       runtimeInputs = with pkgs; [wl-clipboard satty];
@@ -41,7 +23,7 @@ _: {
 
     recordToggle = lib.getExe (pkgs.writeShellApplication {
       name = "record-toggle";
-      runtimeInputs = with pkgs; [wf-recorder slurp libnotify wl-clipboard procps coreutils scowl];
+      runtimeInputs = with pkgs; [wl-screenrec slurp libnotify procps coreutils scowl];
       text = ''
         VIDDIR="$HOME/Videos"
         mkdir -p "$VIDDIR"
@@ -51,28 +33,31 @@ _: {
           shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
         }
 
-        if pgrep -x wf-recorder > /dev/null; then
-          pkill -x wf-recorder
+        if pgrep -x wl-screenrec > /dev/null; then
+          pkill -INT -x wl-screenrec
           sleep 0.5
           LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
           if [ -n "$LAST" ]; then
-            notify-send -t 3000 "Recording saved" "your Videos folder as $(basename "$LAST")"
+            notify-send -t 3000 "Recording saved" "$(basename "$LAST")"
           fi
         else
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
           GEOM=$(slurp -b 00000080 -s 00000000) || exit 0
           notify-send -t 2000 "Recording started" "Super+Shift+R to stop"
-          wf-recorder -g "$GEOM" --audio -f "$FILE"
+          wl-screenrec -g "$GEOM" --audio -f "$FILE" &
         fi
       '';
     });
 
     wallpaper = lib.getExe (pkgs.writeShellApplication {
       name = "wallpaper";
-      runtimeInputs = with pkgs; [coreutils swaybg procps hyprland jq findutils];
+      runtimeInputs = with pkgs; [coreutils swww hyprland jq findutils];
       text = ''
         WALL_DIR="$HOME/dotfiles/wallpapers"
+
+        # wait for swww daemon
+        sleep 1
 
         set_wallpapers() {
           mapfile -t walls < <(find "$WALL_DIR" -type f \( -name '*.jpg' -o -name '*.png' \) | shuf)
@@ -81,13 +66,10 @@ _: {
           monitors=$(hyprctl monitors -j)
           mon_count=$(echo "$monitors" | jq 'length')
 
-          pkill -x swaybg 2>/dev/null || true
-          sleep 0.3
-
           for i in $(seq 0 $((mon_count - 1))); do
             mon_name=$(echo "$monitors" | jq -r ".[$i].name")
             idx=$((i % ''${#walls[@]}))
-            swaybg -o "$mon_name" -m fill -i "''${walls[$idx]}" &
+            swww img -o "$mon_name" --fill-color 000000 --transition-type grow --transition-pos 0.5,0.5 --transition-duration 1 --transition-fps 60 "''${walls[$idx]}"
           done
         }
 
@@ -197,16 +179,16 @@ _: {
       menu:
         - key: s
           desc: screenshot region
-          cmd: "${screenshot}"
+          cmd: "grimblast --freeze --notify copy area"
         - key: f
           desc: screenshot full
-          cmd: "${screenshotFull}"
+          cmd: "grimblast --notify copy screen"
         - key: e
           desc: edit clipboard
           cmd: "${editClipboard}"
         - key: p
           desc: screenshot + edit
-          cmd: "${screenshotEdit}"
+          cmd: "grimblast --freeze save area - | satty -f -"
         - key: r
           desc: record (toggle)
           cmd: "${recordToggle}"
@@ -233,6 +215,26 @@ _: {
     mod = "SUPER";
     dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors;
   in {
+    xdg.configFile."hypr/pyprland.toml".text = ''
+      [pyprland]
+      plugins = ["scratchpads"]
+
+      [scratchpads.term]
+      animation = "fromTop"
+      command = "${lib.getExe pkgs.wezterm} start --class dropterm"
+      class = "dropterm"
+      size = "75% 60%"
+      margin = 50
+      lazy = true
+
+      [scratchpads.volume]
+      animation = "fromRight"
+      command = "${lib.getExe pkgs.pavucontrol}"
+      class = "org.pulseaudio.pavucontrol"
+      size = "40% 90%"
+      unfocus = "hide"
+      lazy = true
+    '';
     home.pointerCursor = {
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
@@ -394,6 +396,8 @@ _: {
 
       # startup
       exec-once = walker --gapplication-service
+      exec-once = swww-daemon
+      exec-once = pypr
       exec-once = ${wallpaper}
       exec-once = ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1
       exec-once = ${lib.getExe pkgs.wl-clip-persist} --clipboard regular
@@ -432,7 +436,11 @@ _: {
       bindd = ${mod}, O, pop out, exec, ${popWindow}
       bindd = ${mod}, C, center, centerwindow
 
-      # scratchpad
+      # scratchpads (pyprland)
+      bindd = ${mod}, A, dropdown terminal, exec, pypr toggle term
+      bindd = ${mod} SHIFT, V, volume mixer, exec, pypr toggle volume
+
+      # scratchpad workspace
       bindd = ${mod}, S, scratchpad, togglespecialworkspace, scratchpad
       bindd = ${mod} ALT, S, to scratchpad, movetoworkspacesilent, special:scratchpad
 
@@ -550,10 +558,10 @@ _: {
       bindd = ${mod}, comma, dismiss notification, exec, makoctl dismiss
       bindd = ${mod} SHIFT, comma, dismiss all, exec, makoctl dismiss --all
 
-      # capture
-      bindd = , Print, screenshot region, exec, ${screenshot}
-      bindd = ${mod} SHIFT, S, screenshot + edit, exec, ${screenshotEdit}
-      bindd = ${mod} CTRL, S, screenshot full, exec, ${screenshotFull}
+      # capture (grimblast --freeze uses hyprpicker to freeze screen during selection)
+      bindd = , Print, screenshot region, exec, grimblast --freeze --notify copy area
+      bindd = ${mod} SHIFT, S, screenshot + edit, exec, grimblast --freeze save area - | satty -f -
+      bindd = ${mod} CTRL, S, screenshot full, exec, grimblast --notify copy screen
       bindd = ${mod} SHIFT, E, edit clipboard, exec, ${editClipboard}
       bindd = ${mod} SHIFT, R, record toggle, exec, ${recordToggle}
 

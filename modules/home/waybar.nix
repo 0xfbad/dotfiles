@@ -252,7 +252,7 @@ _: {
           };
 
           "custom/recording" = {
-            exec = "pgrep -x wf-recorder > /dev/null && echo '󰻂 REC' || echo ''";
+            exec = "pgrep -x wl-screenrec > /dev/null && echo '󰻂 REC' || echo ''";
             interval = 1;
             return-type = "";
           };

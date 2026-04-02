@@ -1,5 +1,9 @@
 _: {
   flake.homeModules.zsh = _: {
+    programs.carapace = {
+      enable = true;
+      enableZshIntegration = true;
+    };
     programs.zsh = {
       enable = true;
       autosuggestion.enable = true;

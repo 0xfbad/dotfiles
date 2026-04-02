@@ -44,17 +44,14 @@ _: {
       # screenshots and recording
       satty
       font-awesome
-      slurp
-      grimblast # grim+slurp wrapper with active window, area, monitor modes
-      wayfreeze # freezes screen during screenshot selection so content doesn't shift
+      grimblast # grim+slurp wrapper, --freeze for screen freeze, active/area/output modes
       imagemagick
       wl-clipboard
-      wf-recorder
-      wl-screenrec # hardware-accelerated screen recording, way less overhead than wf-recorder
+      wl-screenrec # hardware-accelerated screen recording via DMA-BUF
       pngquant
 
       # clipboard
-      cliphist # clipboard history manager, stores text and images, pipe through walker
+      cliphist # clipboard history, stores text and images, pipe through walker
 
       # wallpaper
       swww # animated wallpaper transitions (fade, wipe, grow)
