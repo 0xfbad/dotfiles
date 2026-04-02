@@ -561,6 +561,11 @@ _: {
       bindd = , XF86AudioMute, mute, exec, swayosd-client --output-volume mute-toggle
       bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
+      # screen zoom at cursor
+      binde = ${mod} CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor "$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq -r '.float * 1.25 | if . > 10 then 10 else . end')"
+      binde = ${mod} CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor "$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq -r '.float / 1.25 | if . < 1 then 1 else . end')"
+      bindd = ${mod} CTRL, 0, reset zoom, exec, hyprctl keyword cursor:zoom_factor 1
+
       # media keys
       bindd = , XF86AudioPlay, play/pause, exec, ${lib.getExe pkgs.playerctl} play-pause
       bindd = , XF86AudioNext, next track, exec, ${lib.getExe pkgs.playerctl} next
