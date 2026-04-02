@@ -133,7 +133,7 @@ _: {
           height = 26;
           spacing = 0;
 
-          modules-left = ["hyprland/workspaces" "custom/weather" "custom/pomodoro"];
+          modules-left = ["hyprland/workspaces" "custom/weather" "custom/pomodoro" "custom/media"];
           modules-center = ["clock"];
           modules-right = ["custom/caffeine" "custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
 
@@ -243,6 +243,15 @@ _: {
             tooltip-format = "Profile: {profile}";
           };
 
+          "custom/media" = {
+            exec = "${pkgs.playerctl}/bin/playerctl --follow metadata --format '{\"text\": \"{{artist}} - {{title}}\", \"tooltip\": \"{{playerName}}: {{artist}} - {{title}}\", \"class\": \"{{status}}\"}' 2>/dev/null";
+            return-type = "json";
+            max-length = 35;
+            on-click = "${pkgs.playerctl}/bin/playerctl play-pause";
+            on-scroll-up = "${pkgs.playerctl}/bin/playerctl next";
+            on-scroll-down = "${pkgs.playerctl}/bin/playerctl previous";
+          };
+
           "custom/caffeine" = {
             exec = "${caffeineScript} status";
             return-type = "json";
@@ -326,6 +335,19 @@ _: {
         }
 
         #bluetooth.off {
+          color: ${c.surface1};
+        }
+
+        #custom-media {
+          padding: 0 8px;
+          color: ${c.subtext0};
+        }
+
+        #custom-media.Playing {
+          color: ${c.accent};
+        }
+
+        #custom-media.Paused {
           color: ${c.surface1};
         }
 

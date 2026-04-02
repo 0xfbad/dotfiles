@@ -59,6 +59,29 @@ _: {
       lip() {
         pgrep -af "ssh.*-L [0-9]+:localhost:[0-9]+" || echo "no active forwards"
       }
+
+      # git log with fzf and live diff preview
+      gl() {
+        git log --graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+          fzf --ansi --no-sort --reverse \
+            --preview 'grep -o "[a-f0-9]\{7,\}" <<< {} | head -1 | xargs git show --color=always' \
+            --bind "enter:execute(grep -o '[a-f0-9]\{7,\}' <<< {} | head -1 | xargs git show --color=always | less -R)"
+      }
+
+      # browse changed files with per-file diff preview
+      gdf() {
+        git diff --name-only "$@" |
+          fzf --preview "git diff --color=always $* -- {}" --preview-window=right:70%
+      }
+
+      # quick nix package search
+      ns() { nix search nixpkgs "$@" --no-update-lock-file 2>/dev/null | head -40; }
+
+      # mkdir and cd into it
+      mkcd() { mkdir -p "$1" && cd "$1"; }
+
+      # what's listening on a port
+      port() { lsof -i :"$1" 2>/dev/null || echo "nothing on port $1"; }
     '';
   };
 }

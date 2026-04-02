@@ -13,6 +13,10 @@ _: {
           soft-wrap.enable = true;
           auto-save.focus-lost = true;
           indent-guides.render = true;
+          bufferline = "multiple";
+          color-modes = true;
+          idle-timeout = 0;
+          smart-tab.enable = true;
           cursor-shape = {
             insert = "bar";
             normal = "block";

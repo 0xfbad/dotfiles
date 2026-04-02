@@ -23,6 +23,14 @@ _: {
         init.defaultBranch = "main";
         core.fsmonitor = true;
         core.untrackedcache = true;
+        rebase.autoSquash = true;
+        rebase.autoStash = true;
+        merge.conflictstyle = "zdiff3";
+        push.followTags = true;
+        push.useForceIfIncludes = true;
+        fetch.all = true;
+        diff.renames = "copies";
+        help.autocorrect = "prompt";
       };
     };
   };

@@ -558,6 +558,9 @@ _: {
       bindd = ${mod}, comma, dismiss notification, exec, makoctl dismiss
       bindd = ${mod} SHIFT, comma, dismiss all, exec, makoctl dismiss --all
 
+      # color picker (copies hex to clipboard)
+      bindd = ${mod} SHIFT, C, color picker, exec, ${lib.getExe pkgs.hyprpicker} -a -n
+
       # capture (grimblast --freeze uses hyprpicker to freeze screen during selection)
       bindd = , Print, screenshot region, exec, grimblast --freeze --notify copy area
       bindd = ${mod} SHIFT, S, screenshot + edit, exec, grimblast --freeze save area - | satty -f -
