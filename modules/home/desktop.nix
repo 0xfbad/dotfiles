@@ -45,10 +45,22 @@ _: {
       satty
       font-awesome
       slurp
+      grimblast # grim+slurp wrapper with active window, area, monitor modes
+      wayfreeze # freezes screen during screenshot selection so content doesn't shift
       imagemagick
       wl-clipboard
       wf-recorder
+      wl-screenrec # hardware-accelerated screen recording, way less overhead than wf-recorder
       pngquant
+
+      # clipboard
+      cliphist # clipboard history manager, stores text and images, pipe through walker
+
+      # wallpaper
+      swww # animated wallpaper transitions (fade, wipe, grow)
+
+      # hyprland tools
+      pyprland # scratchpads, expose mode, lost window recovery
 
       # gaming
       bottles

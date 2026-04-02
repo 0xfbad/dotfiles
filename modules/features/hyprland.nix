@@ -18,13 +18,13 @@ _: {
     screenshot = lib.getExe (pkgs.writeShellApplication {
       name = "screenshot-region";
       runtimeInputs = with pkgs; [grim slurp wl-clipboard];
-      text = ''grim -g "$(slurp -w 0)" - | wl-copy'';
+      text = ''grim -g "$(slurp -w 0 -b 00000080 -s 00000000)" - | wl-copy'';
     });
 
     screenshotEdit = lib.getExe (pkgs.writeShellApplication {
       name = "screenshot-edit";
       runtimeInputs = with pkgs; [grim slurp imagemagick satty];
-      text = ''grim -g "$(slurp)" - | magick - -shave 1x1 - | satty -f -'';
+      text = ''grim -g "$(slurp -b 00000080 -s 00000000)" - | magick - -shave 1x1 - | satty -f -'';
     });
 
     screenshotFull = lib.getExe (pkgs.writeShellApplication {
@@ -61,7 +61,7 @@ _: {
         else
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
-          GEOM=$(slurp) || exit 0
+          GEOM=$(slurp -b 00000080 -s 00000000) || exit 0
           notify-send -t 2000 "Recording started" "Super+Shift+R to stop"
           wf-recorder -g "$GEOM" --audio -f "$FILE"
         fi
@@ -231,6 +231,7 @@ _: {
     '';
 
     mod = "SUPER";
+    dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors;
   in {
     home.pointerCursor = {
       name = "Bibata-Modern-Classic";
@@ -268,6 +269,19 @@ _: {
     '';
 
     xdg.configFile."hypr/hyprland-nix.conf".text = ''
+      # plugins
+      plugin = ${dynamicCursors}/lib/libhypr-dynamic-cursors.so
+
+      plugin {
+        dynamic-cursors {
+          enabled = true
+          mode = tilt
+          shake {
+            enabled = true
+          }
+        }
+      }
+
       # env
       env = HYPRCURSOR_THEME,Bibata-Modern-Classic
       env = HYPRCURSOR_SIZE,24
@@ -368,6 +382,11 @@ _: {
 
       binds {
         hide_special_on_workspace_change = true
+        workspace_back_and_forth = true
+      }
+
+      general {
+        resize_on_border = true
       }
 
 
@@ -385,6 +404,9 @@ _: {
       windowrule = match:class ^(keybind-popup)$, float on, center on, size 920 700
       windowrule = match:class ^(vlc|mpv|com.obsproject.Studio|zoom|org.kde.kdenlive)$, opacity 1.0 override 1.0 override
       windowrule = match:fullscreen 1, idle_inhibit on
+
+      # PIP (picture-in-picture)
+      windowrule = match:title ^(Picture-in-Picture)$, float on, pin on, move 73% 72%, size 25% 25%
 
       # xwayland video bridge fix
       windowrule = match:class ^(xwaylandvideobridge)$, opacity 0.0 override, no_anim on, no_initial_focus on, max_size 1 1, no_blur on
@@ -537,6 +559,12 @@ _: {
       bindde = , XF86AudioLowerVolume, volume down, exec, swayosd-client --output-volume lower
       bindd = , XF86AudioMute, mute, exec, swayosd-client --output-volume mute-toggle
       bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+
+      # media keys
+      bindd = , XF86AudioPlay, play/pause, exec, ${lib.getExe pkgs.playerctl} play-pause
+      bindd = , XF86AudioNext, next track, exec, ${lib.getExe pkgs.playerctl} next
+      bindd = , XF86AudioPrev, prev track, exec, ${lib.getExe pkgs.playerctl} previous
+      bindd = , XF86AudioStop, stop, exec, ${lib.getExe pkgs.playerctl} stop
     '';
   };
 }
