@@ -2,6 +2,7 @@ _: {
   flake.homeModules.git = {pkgs, ...}: {
     programs.git = {
       enable = true;
+      signing.format = null;
       settings = {
         pull.rebase = true;
         push.autoSetupRemote = true;
@@ -17,6 +18,11 @@ _: {
         tag.sort = "-version:refname";
         rerere.enabled = true;
         rerere.autoupdate = true;
+        fetch.prune = true;
+        fetch.prunetags = true;
+        init.defaultBranch = "main";
+        core.fsmonitor = true;
+        core.untrackedcache = true;
       };
     };
   };

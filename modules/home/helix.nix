@@ -11,12 +11,17 @@ _: {
           scrolloff = 8;
           line-number = "relative";
           soft-wrap.enable = true;
+          auto-save.focus-lost = true;
+          indent-guides.render = true;
           cursor-shape = {
             insert = "bar";
             normal = "block";
             select = "underline";
           };
-          lsp.display-messages = true;
+          lsp = {
+            display-messages = true;
+            display-inlay-hints = true;
+          };
         };
       };
       languages = {

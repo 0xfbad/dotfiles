@@ -2,6 +2,7 @@ _: {
   flake.homeModules.gtk = {pkgs, ...}: {
     gtk = {
       enable = true;
+      gtk4.theme = null;
       theme = {
         name = "catppuccin-mocha-mauve-standard+default";
         package = pkgs.catppuccin-gtk.override {

@@ -8,11 +8,17 @@ _: {
       settings = {
         add_newline = true;
         command_timeout = 200;
-        format = "$directory$git_branch$git_status$nix_shell$character";
+        format = "$directory$git_branch$git_status$nix_shell$cmd_duration$character";
 
         character = {
           success_symbol = "[\\$](bold ${c.accent})";
           error_symbol = "[\\$](bold ${c.red})";
+        };
+
+        cmd_duration = {
+          min_time = 5000;
+          format = "[$duration]($style) ";
+          style = c.surface1;
         };
 
         nix_shell = {

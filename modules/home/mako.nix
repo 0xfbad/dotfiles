@@ -12,12 +12,18 @@ _: {
         padding = "12";
         margin = "10";
         width = 350;
+        max-visible = 5;
         background-color = c.bgAlpha;
         text-color = c.text;
         border-color = c.accent;
         progress-color = "over ${c.surface0}";
         font = "JetBrainsMono Nerd Font 10";
         layer = "overlay";
+
+        "urgency=critical" = {
+          border-color = c.red;
+          default-timeout = 0;
+        };
       };
     };
   };
