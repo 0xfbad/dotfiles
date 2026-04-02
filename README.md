@@ -111,14 +111,11 @@ Features are all optional, just import the ones you want in your host's `configu
 - Trufflehog and gitleaks for secret scanning (trufflehog verifies if leaked creds are still live)
 - age + sops for secret management (age is simple GPG replacement, sops encrypts values in config files leaving keys readable for diffs)
 - My more used cyber tools (nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex, etc)
-- Pomodoro timer in waybar, left-click prompts for task name via walker, shows countdown in the bar, notifies when done, logs sessions to `~/.local/share/pomodoro.log`
-- Weather in waybar via wttr.in, auto-detects location by IP, caches for 15 minutes, hover for full conditions (precipitation, humidity, wind, location)
-- Caffeine toggle in waybar (click to inhibit idle, prevents screen lock/sleep, shows red when active)
-- swww for animated wallpaper transitions (fade, wipe, grow)
-- cliphist for searchable clipboard history (text and images, pipe through walker)
-- hypr-dynamic-cursors plugin (cursor tilts in movement direction, shake-to-find enlargement for multi-monitor)
-- pyprland for scratchpads, expose mode, lost window recovery
-- Media keys bound to playerctl (play/pause/next/prev), workspace_back_and_forth, resize_on_border, PIP window rule
+- Waybar with pomodoro timer (walker prompt for task name, countdown in the bar, logs sessions), weather via wttr.in with detailed tooltip, and caffeine toggle to inhibit idle
+- hypr-dynamic-cursors plugin (cursor tilts in movement direction, shake-to-find when you lose it on multi-monitor)
+- Super+Ctrl+Scroll for screen zoom at cursor position, 10% increments up to 10x
+- Animated wallpaper transitions via swww (fade, wipe, grow)
+- cliphist for searchable clipboard history (text and images, piped through walker)
 - Claude Code and opencode for slopmaxxing
 - Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
 - nh for nixos rebuilds, shows you a diff of what's changing before it applies
@@ -134,56 +131,25 @@ Features are all optional, just import the ones you want in your host's `configu
 - ouch instead of tar/zip/gzip (auto-detects format from extension, `ouch decompress` and `ouch compress` just work)
 - trashy instead of rm (moves to FreeDesktop trash, files show up in Dolphin's trash can too)
 - gping instead of ping (real-time line graph, multiple hosts on same chart)
-- miniserve instead of python -m http.server (file upload, auth, TLS, QR code for URL, single binary)
-- Screenshot annotation with satty, hyprpicker for color picking, hyprsunset for blue light filtering
-- grimblast for convenient screenshot modes (active window, area, monitor), wayfreeze to freeze screen during selection so content doesn't shift
-- wl-screenrec for hardware-accelerated screen recording (DMA-BUF, way less overhead than wf-recorder)
-- Custom Firefox startpage with catppuccin colors, DuckDuckGo search, quick-link categories, and a wallpaper art panel. Generated from nix so the palette stays in sync with everything else
+- miniserve instead of python -m http.server (file upload, auth, TLS, QR code for URL)
+- Screenshot with dark overlay, wayfreeze to freeze screen during selection, grimblast for window/area/monitor modes, satty for annotation, wl-screenrec for hardware-accelerated recording
+- Custom Firefox startpage with catppuccin colors, DuckDuckGo search, quick-link categories, and a wallpaper art panel
 - Screen recordings get random dictionary-word filenames (like `coffee-telescope.mp4`) so you never have to name them
 - Centralized color palette in `colors.nix`, every module references it instead of hardcoding hex values so changing the theme is one file
 - jnv for interactive jq (build filters with live preview instead of guessing)
-- numbat scientific calculator with unit support (`3 meters + 2 feet` just works, rejects dimensionally inconsistent expressions)
+- numbat scientific calculator with unit support (`3 meters + 2 feet` just works, rejects bad dimensions)
 - ast-grep for structural search/replace via tree-sitter (refactor code by pattern, not regex)
-- hyperfine for statistical CLI benchmarking (warmup runs, confidence intervals, comparison tables)
-- tokei for fast code statistics by language
-- broot for interactive tree exploration with fuzzy search
-- fclones for finding duplicate files (progressive hashing, avoids full reads when possible)
-- xh as an httpie replacement (syntax-highlighted HTTP responses, sessions, downloads)
-- bandwhich for real-time bandwidth monitoring by process and connection
-- pueue for background task queues that survive terminal closes
-- process-compose as docker-compose for bare processes (YAML config with dependency ordering, health checks, TUI)
 - tailspin for zero-config log highlighting (pipe anything through `tspin`, auto-detects dates/IPs/UUIDs/severity)
-- lazyjournal TUI for browsing journalctl, docker logs, and plain log files
-- glow for rendering markdown in the terminal with a file browser
-- vhs for recording deterministic terminal GIFs from scripts
-- `clip` alias strips trailing newline before copying to clipboard
-- `termbin` alias pipes terminal output to termbin.com for instant sharing
-- `pwdc` copies current directory to clipboard
-- `dupe` opens a new terminal in the same directory
-- Helix auto-saves on focus lost, indent guides, LSP inlay hints for type annotations
-- Git auto-prunes stale remote branches on fetch, fsmonitor for faster git status on large repos
-- Starship shows command duration for anything over 5 seconds
-- FZF with catppuccin mocha colors, Ctrl+T for file finder with bat preview, Alt+C for dir jumper with eza tree preview
-- Ctrl+X Ctrl+E opens current shell command in helix for editing long commands
-- Ctrl+Z toggles between suspend and resume (no more typing fg)
-- Desktop notification when a command takes over 30 seconds (useful when you're in another zellij pane)
-- Named directories (`~dots`, `~dl`, `~proj`) for quick navigation
-- Atuin in compact mode with session-only up arrow (Ctrl+R still searches everything)
-- nix-output-monitor for build progress when using nh (tree view of what's building/downloading)
+- process-compose as docker-compose for bare processes (YAML config with dependency ordering, TUI)
+- pueue for background task queues that survive terminal closes
 - scooter for interactive project-wide find-and-replace with helix integration
-- watchexec for file watching (auto-ignores .git, coalesces rapid events, `watchexec -e rs cargo test`)
 - mods for piping anything through an LLM (`cat log | mods "what's wrong"`)
-- freeze for generating pretty code/terminal screenshots as PNG/SVG
-- presenterm for markdown presentations in terminal (images in wezterm, code highlighting, speaker notes)
-- csvlens for inspecting CSV data (aligned columns, filtering, search)
-- hurl for HTTP request testing using plain text files (chain requests, assert responses)
+- FZF themed with catppuccin mocha, bat previews on file search, eza tree previews on dir jump
+- Ctrl+X Ctrl+E opens your current shell command in helix for editing long one-liners
+- Double-Esc prepends sudo to the current command (oh-my-zsh sudo plugin)
+- Desktop notification when a command takes over 30 seconds (useful when you're in another zellij pane)
 - harlequin SQL IDE in terminal (autocomplete, highlighting, Postgres/DuckDB/SQLite)
-- navi interactive cheatsheet (fuzzy search commands with arg placeholders, prompts for each arg)
-- carapace multi-shell completion engine (covers hundreds of commands from one binary)
-- wiki-tui for browsing Wikipedia in terminal, circumflex for Hacker News with reader mode
-- woomer for screen zoom/magnify/pan (presentations, reading small text)
-- Dark overlay during screenshot selection instead of the default lightening
-- Mako caps visible notifications at 5, critical urgency gets red border and stays until dismissed
+- navi interactive cheatsheet (fuzzy search commands, prompts for each arg)
 - iwd backend for NetworkManager (faster wifi scans, works with impala TUI)
 
 ## aliases
