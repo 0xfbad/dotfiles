@@ -15,6 +15,9 @@
 
     # nix
     nix.settings.warn-dirty = false;
+    nix.settings.download-attempts = 5;
+    nix.settings.connect-timeout = 10;
+    nix.settings.stalled-download-timeout = 30;
     programs.nix-ld.enable = true;
     programs.nix-index-database.comma.enable = true;
     programs.nh = {
@@ -192,14 +195,6 @@
     programs.wireshark = {
       enable = true;
       package = pkgs.wireshark;
-    };
-
-    # let trippy send raw packets without sudo
-    security.wrappers.trip = {
-      source = "${pkgs.trippy}/bin/trip";
-      capabilities = "cap_net_raw+ep";
-      owner = "root";
-      group = "root";
     };
 
     # dolphin file manager needs this for "open with" outside plasma
