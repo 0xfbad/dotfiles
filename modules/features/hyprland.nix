@@ -340,7 +340,7 @@ _: {
         animation = windows, 1, 3, quick, popin 80%
         animation = fade, 1, 3, quick
         animation = workspaces, 0
-        animation = zoomFactor, 1, 6, easeOut
+        animation = zoomFactor, 0
       }
 
       # scrolling layout (niri-like)
@@ -563,9 +563,9 @@ _: {
       bindd = , XF86AudioMute, mute, exec, swayosd-client --output-volume mute-toggle
       bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
-      # screen zoom at cursor (toggle between 1x and 2x)
-      bindd = ${mod} CTRL, mouse_down, zoom in, exec, hyprctl keyword cursor:zoom_factor 5.0
-      bindd = ${mod} CTRL, mouse_up, zoom out, exec, hyprctl keyword cursor:zoom_factor 1.0
+      # screen zoom at cursor (10% increments, 1.0 to 10.0)
+      binde = ${mod} CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor "$(awk "BEGIN{v=$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq '.float')+0.1; printf \"%.1f\", (v>10?10:v)}")"
+      binde = ${mod} CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor "$(awk "BEGIN{v=$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq '.float')-0.1; printf \"%.1f\", (v<1?1:v)}")"
 
       # media keys
       bindd = , XF86AudioPlay, play/pause, exec, ${lib.getExe pkgs.playerctl} play-pause
