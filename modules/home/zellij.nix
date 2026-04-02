@@ -6,6 +6,10 @@ _: {
         theme = "catppuccin-mocha";
         default_layout = "compact";
         show_startup_tips = false;
+        copy_on_select = true;
+        pane_frames = false;
+        # scrollback opens in helix
+        scrollback_editor = "hx";
       };
     };
   };

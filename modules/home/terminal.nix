@@ -1,5 +1,11 @@
 _: {
   flake.homeModules.terminal = {pkgs, ...}: {
+    # broot needs home-manager integration for the br shell function
+    programs.broot = {
+      enable = true;
+      enableZshIntegration = true;
+    };
+
     home.packages = with pkgs; [
       # fonts
       nerd-fonts.jetbrains-mono
@@ -47,7 +53,7 @@ _: {
       dust
       imv
       fclones # finds duplicate files, hashes progressively to skip full reads
-      broot # interactive tree explorer, fuzzy search, cd into selection via br
+      # broot is enabled via programs.broot above for the br shell function
       trashy # modern rm, moves to FreeDesktop trash so Dolphin can recover files
       ouch # modern tar/zip/gzip, auto-detects format from extension
 
@@ -96,14 +102,12 @@ _: {
       process-compose # like docker-compose for bare processes, YAML config, TUI
       tailspin # pipe any log through tspin, auto-highlights dates/IPs/UUIDs/severity
       watchexec # modern entr, file watcher that auto-ignores .git, coalesces events
-      woomer # screen zoom/magnify/pan with flashlight mode
 
       # fun
       cowsay
       vhs # records terminal GIFs from scripts, deterministic output
       glow # renders markdown in the terminal with a file browser TUI
-      freeze # generates pretty PNG/SVG screenshots of code or terminal output
-      presenterm # markdown presentations in terminal, images, code highlighting
+      charm-freeze # generates pretty PNG/SVG screenshots of code or terminal output
     ];
 
     xdg.mimeApps = {

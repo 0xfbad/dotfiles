@@ -395,6 +395,7 @@ _: {
       exec-once = ${wallpaper}
       exec-once = ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1
       exec-once = ${lib.getExe pkgs.wl-clip-persist} --clipboard regular
+      exec-once = wl-paste --watch cliphist store
       exec-once = ${lib.getExe pkgs.hyprdim} --no-dim-when-only --persist --strength 30 --duration 800
 
       # window rules
@@ -534,7 +535,7 @@ _: {
 
       # launcher and tools
       bindd = ${mod}, Space, launcher, exec, walker
-      bindd = ${mod} CTRL, V, clipboard, exec, walker --provider clipboard
+      bindd = ${mod} CTRL, V, clipboard, exec, cliphist list | walker --dmenu | cliphist decode | wl-copy
       bindd = ${mod} CTRL, L, lock, exec, hyprlock
       bindd = ${mod}, Escape, power menu, exec, ${powerMenu}
       bindd = ${mod}, backslash, toggle layout, exec, ${layoutToggle}

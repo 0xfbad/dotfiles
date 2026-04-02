@@ -27,7 +27,7 @@ _: {
       };
       oh-my-zsh = {
         enable = true;
-        plugins = [];
+        plugins = ["sudo"];
       };
       initContent = ''
         # completion
