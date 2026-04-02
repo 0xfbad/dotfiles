@@ -77,19 +77,6 @@ _: {
         zle -N edit-command-line
         bindkey '^X^E' edit-command-line
 
-        # ctrl-\ toggles between suspend and fg (ctrl-z is taken by zellij)
-        _fg_toggle() {
-          if [[ $#BUFFER -eq 0 ]]; then
-            BUFFER="fg"
-            zle accept-line
-          else
-            zle push-input
-            zle clear-screen
-          fi
-        }
-        zle -N _fg_toggle
-        bindkey '^\' _fg_toggle
-
         # copy last command to clipboard
         alias lcc='fc -ln -1 | sed "s/^\s*//" | wl-copy'
 
