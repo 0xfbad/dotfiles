@@ -562,8 +562,8 @@ _: {
       bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
       # screen zoom at cursor (10% increments, floors at 1.0)
-      binde = ${mod} CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor "$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq -r '.float + 0.1 | . * 10 | round / 10')"
-      binde = ${mod} CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor "$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq -r '.float - 0.1 | if . < 1 then 1 else . * 10 | round / 10 end')"
+      binde = ${mod} CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor "$(hyprctl getoption cursor:zoom_factor | awk '/float/{printf "%.1f", $2 + 0.1}')"
+      binde = ${mod} CTRL, mouse_up, exec, hyprctl keyword cursor:zoom_factor "$(hyprctl getoption cursor:zoom_factor | awk '/float/{v=$2 - 0.1; printf "%.1f", (v < 1 ? 1 : v)}')"
 
       # media keys
       bindd = , XF86AudioPlay, play/pause, exec, ${lib.getExe pkgs.playerctl} play-pause

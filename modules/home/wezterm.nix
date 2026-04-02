@@ -34,10 +34,10 @@ _: {
             { key = "v", mods = "CTRL|SHIFT", action = wezterm.action.PasteFrom("Clipboard") },
           },
           window_padding = {
-            left = 0,
-            right = 0,
-            top = 0,
-            bottom = 0,
+            left = 3,
+            right = 3,
+            top = 3,
+            bottom = 3,
           },
         }
       '';
