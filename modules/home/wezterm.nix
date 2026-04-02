@@ -36,8 +36,10 @@ _: {
           window_padding = {
             left = 3,
             right = 3,
-            top = 2,
-            bottom = 0,
+          },
+          window_content_alignment = {
+            horizontal = "Left",
+            vertical = "Bottom",
           },
         }
       '';
