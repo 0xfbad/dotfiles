@@ -564,7 +564,7 @@ _: {
       bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
       # screen zoom at cursor (toggle between 1x and 2x)
-      bindd = ${mod} CTRL, mouse_down, zoom in, exec, hyprctl keyword cursor:zoom_factor 2.0
+      bindd = ${mod} CTRL, mouse_down, zoom in, exec, hyprctl keyword cursor:zoom_factor 5.0
       bindd = ${mod} CTRL, mouse_up, zoom out, exec, hyprctl keyword cursor:zoom_factor 1.0
 
       # media keys
