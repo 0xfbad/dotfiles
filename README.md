@@ -34,7 +34,7 @@ modules/
     helix.nix                  editor config, nixd + nil + harper + hyprls
     git.nix                    git settings (rebase, histogram diffs, rerere, verbose commits, difftastic)
     shell-functions.nix        ff (fzf+bat), git worktree helpers, ssh port forwarding
-    waybar.nix                 status bar, weather, pomodoro timer, catppuccin OLED
+    waybar.nix                 status bar, weather, pomodoro, caffeine toggle, catppuccin OLED
     mako.nix                   notification daemon
     walker.nix                 app launcher, clipboard, calculator, emoji, websearch
     swayosd.nix                volume/brightness OSD
@@ -112,7 +112,13 @@ Features are all optional, just import the ones you want in your host's `configu
 - age + sops for secret management (age is simple GPG replacement, sops encrypts values in config files leaving keys readable for diffs)
 - My more used cyber tools (nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex, etc)
 - Pomodoro timer in waybar, left-click prompts for task name via walker, shows countdown in the bar, notifies when done, logs sessions to `~/.local/share/pomodoro.log`
-- Weather in waybar via wttr.in, auto-detects location by IP, caches for 15 minutes, hover for full conditions
+- Weather in waybar via wttr.in, auto-detects location by IP, caches for 15 minutes, hover for full conditions (precipitation, humidity, wind, location)
+- Caffeine toggle in waybar (click to inhibit idle, prevents screen lock/sleep, shows red when active)
+- swww for animated wallpaper transitions (fade, wipe, grow)
+- cliphist for searchable clipboard history (text and images, pipe through walker)
+- hypr-dynamic-cursors plugin (cursor tilts in movement direction, shake-to-find enlargement for multi-monitor)
+- pyprland for scratchpads, expose mode, lost window recovery
+- Media keys bound to playerctl (play/pause/next/prev), workspace_back_and_forth, resize_on_border, PIP window rule
 - Claude Code and opencode for slopmaxxing
 - Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
 - nh for nixos rebuilds, shows you a diff of what's changing before it applies
@@ -125,7 +131,13 @@ Features are all optional, just import the ones you want in your host's `configu
 - btop with GPU monitoring
 - sshfs for mounting remote dirs over SSH
 - Gaming stack: proton-ge, gamescope, gamemode, mangohud overlay. `gamemoderun mangohud %command%` in steam launch options
+- ouch instead of tar/zip/gzip (auto-detects format from extension, `ouch decompress` and `ouch compress` just work)
+- trashy instead of rm (moves to FreeDesktop trash, files show up in Dolphin's trash can too)
+- gping instead of ping (real-time line graph, multiple hosts on same chart)
+- miniserve instead of python -m http.server (file upload, auth, TLS, QR code for URL, single binary)
 - Screenshot annotation with satty, hyprpicker for color picking, hyprsunset for blue light filtering
+- grimblast for convenient screenshot modes (active window, area, monitor), wayfreeze to freeze screen during selection so content doesn't shift
+- wl-screenrec for hardware-accelerated screen recording (DMA-BUF, way less overhead than wf-recorder)
 - Custom Firefox startpage with catppuccin colors, DuckDuckGo search, quick-link categories, and a wallpaper art panel. Generated from nix so the palette stays in sync with everything else
 - Screen recordings get random dictionary-word filenames (like `coffee-telescope.mp4`) so you never have to name them
 - Centralized color palette in `colors.nix`, every module references it instead of hardcoding hex values so changing the theme is one file
@@ -148,6 +160,30 @@ Features are all optional, just import the ones you want in your host's `configu
 - `termbin` alias pipes terminal output to termbin.com for instant sharing
 - `pwdc` copies current directory to clipboard
 - `dupe` opens a new terminal in the same directory
+- Helix auto-saves on focus lost, indent guides, LSP inlay hints for type annotations
+- Git auto-prunes stale remote branches on fetch, fsmonitor for faster git status on large repos
+- Starship shows command duration for anything over 5 seconds
+- FZF with catppuccin mocha colors, Ctrl+T for file finder with bat preview, Alt+C for dir jumper with eza tree preview
+- Ctrl+X Ctrl+E opens current shell command in helix for editing long commands
+- Ctrl+Z toggles between suspend and resume (no more typing fg)
+- Desktop notification when a command takes over 30 seconds (useful when you're in another zellij pane)
+- Named directories (`~dots`, `~dl`, `~proj`) for quick navigation
+- Atuin in compact mode with session-only up arrow (Ctrl+R still searches everything)
+- nix-output-monitor for build progress when using nh (tree view of what's building/downloading)
+- scooter for interactive project-wide find-and-replace with helix integration
+- watchexec for file watching (auto-ignores .git, coalesces rapid events, `watchexec -e rs cargo test`)
+- mods for piping anything through an LLM (`cat log | mods "what's wrong"`)
+- freeze for generating pretty code/terminal screenshots as PNG/SVG
+- presenterm for markdown presentations in terminal (images in wezterm, code highlighting, speaker notes)
+- csvlens for inspecting CSV data (aligned columns, filtering, search)
+- hurl for HTTP request testing using plain text files (chain requests, assert responses)
+- harlequin SQL IDE in terminal (autocomplete, highlighting, Postgres/DuckDB/SQLite)
+- navi interactive cheatsheet (fuzzy search commands with arg placeholders, prompts for each arg)
+- carapace multi-shell completion engine (covers hundreds of commands from one binary)
+- wiki-tui for browsing Wikipedia in terminal, circumflex for Hacker News with reader mode
+- woomer for screen zoom/magnify/pan (presentations, reading small text)
+- Dark overlay during screenshot selection instead of the default lightening
+- Mako caps visible notifications at 5, critical urgency gets red border and stays until dismissed
 - iwd backend for NetworkManager (faster wifi scans, works with impala TUI)
 
 ## aliases
@@ -168,6 +204,7 @@ Features are all optional, just import the ones you want in your host's `configu
 - `termbin` - pipe output to termbin.com for instant pastebin
 - `dupe` - open new terminal in same directory
 - `watch` - viddy (watch with diff highlighting)
+- `lcc` - copy last command to clipboard
 - `ff` - fzf file finder with bat preview, opens in editor
 - `ga` / `gd` - git worktree add/remove
 - `fip` / `dip` / `lip` - ssh port forward/disconnect/list
