@@ -30,9 +30,88 @@ _: {
         plugins = [];
       };
       initContent = ''
+        # completion
         zstyle ':completion:*' menu select
         zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+        zstyle ':completion:*' list-colors ''${(s.:.)LS_COLORS}
+        zstyle ':completion:*' group-name '''
+        zstyle ':completion:*:descriptions' format '%F{yellow}-- %d --%f'
+        zstyle ':completion:*:warnings' format '%F{red}no matches%f'
+        zstyle ':completion:*' squeeze-slashes true
+
+        # shell options
         setopt menu_complete
+        setopt auto_cd
+        setopt auto_pushd
+        setopt pushd_ignore_dups
+        setopt pushd_silent
+        setopt interactive_comments
+        setopt hist_ignore_all_dups
+        setopt hist_find_no_dups
+        setopt hist_reduce_blanks
+        setopt hist_verify
+        setopt no_flow_control
+
+        HISTSIZE=100000
+        SAVEHIST=100000
+
+        # fzf catppuccin mocha
+        export FZF_DEFAULT_OPTS=" \
+          --color=bg+:#313244,spinner:#f5e0dc,hl:#f38ba8 \
+          --color=fg:#cdd6f4,header:#f38ba8,info:#cba6f7,pointer:#f5e0dc \
+          --color=marker:#b4befe,fg+:#cdd6f4,prompt:#cba6f7,hl+:#f38ba8 \
+          --color=selected-bg:#45475a,border:#6c7086 \
+          --layout=reverse --border=rounded --height=40%"
+
+        export FZF_DEFAULT_COMMAND='fd --type f --hidden --exclude .git'
+        export FZF_CTRL_T_COMMAND='fd --type f --hidden --exclude .git'
+        export FZF_CTRL_T_OPTS="--preview 'bat --color=always --style=numbers --line-range=:200 {}'"
+        export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
+        export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always --level=2 {}'"
+
+        # silence direnv loading messages
+        export DIRENV_LOG_FORMAT=
+
+        # edit command line in $EDITOR with ctrl-x ctrl-e
+        autoload -U edit-command-line
+        zle -N edit-command-line
+        bindkey '^X^E' edit-command-line
+
+        # ctrl-z toggles between suspend and fg
+        _ctrl_z_toggle() {
+          if [[ $#BUFFER -eq 0 ]]; then
+            BUFFER="fg"
+            zle accept-line
+          else
+            zle push-input
+            zle clear-screen
+          fi
+        }
+        zle -N _ctrl_z_toggle
+        bindkey '^Z' _ctrl_z_toggle
+
+        # copy last command to clipboard
+        alias lcc='fc -ln -1 | sed "s/^\s*//" | wl-copy'
+
+        # named directories
+        hash -d dots=~/dotfiles
+        hash -d dl=~/Downloads
+        hash -d proj=~/projects
+
+        # notification for long-running commands (>30s)
+        _cmd_timer_preexec() { _cmd_start=$EPOCHSECONDS; _cmd_name=$1; }
+        _cmd_timer_precmd() {
+          if [[ -n "$_cmd_start" ]]; then
+            local elapsed=$(( EPOCHSECONDS - _cmd_start ))
+            if (( elapsed > 30 )); then
+              notify-send "command finished (''${elapsed}s)" "$_cmd_name"
+            fi
+            unset _cmd_start _cmd_name
+          fi
+        }
+        autoload -U add-zsh-hook
+        add-zsh-hook preexec _cmd_timer_preexec
+        add-zsh-hook precmd _cmd_timer_precmd
 
         optimize-video() {
           local input="$1"
