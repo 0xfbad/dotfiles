@@ -19,6 +19,11 @@ _: {
         gc = "NH_NOM=0 nh clean all --keep 3 --keep-since 7d";
         cc = "claude --dangerously-skip-permissions";
         qalc = "qalc -s 'autocalc' -s 'decimal comma off'";
+        clip = "perl -p -e 'chomp if eof' | wl-copy";
+        pwdc = "pwd | wl-copy";
+        termbin = "nc termbin.com 9999";
+        dupe = "setsid wezterm start --cwd \"$(pwd)\"";
+        watch = "viddy";
       };
       oh-my-zsh = {
         enable = true;

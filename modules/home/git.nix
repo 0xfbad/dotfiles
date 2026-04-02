@@ -1,5 +1,5 @@
 _: {
-  flake.homeModules.git = _: {
+  flake.homeModules.git = {pkgs, ...}: {
     programs.git = {
       enable = true;
       settings = {
@@ -8,6 +8,9 @@ _: {
         diff.algorithm = "histogram";
         diff.colorMoved = "plain";
         diff.mnemonicPrefix = true;
+        diff.tool = "difftastic";
+        difftool.prompt = false;
+        "difftool \"difftastic\"".cmd = "${pkgs.difftastic}/bin/difft \"$LOCAL\" \"$REMOTE\"";
         commit.verbose = true;
         branch.sort = "-committerdate";
         column.ui = "auto";

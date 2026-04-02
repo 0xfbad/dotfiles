@@ -194,6 +194,14 @@
       package = pkgs.wireshark;
     };
 
+    # let trippy send raw packets without sudo
+    security.wrappers.trip = {
+      source = "${pkgs.trippy}/bin/trip";
+      capabilities = "cap_net_raw+ep";
+      owner = "root";
+      group = "root";
+    };
+
     # dolphin file manager needs this for "open with" outside plasma
     environment.etc."xdg/menus/applications.menu".source = "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 

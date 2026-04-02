@@ -5,6 +5,100 @@ _: {
     ...
   }: let
     c = config.colors;
+
+    pomodoroScript = pkgs.writeShellScript "pomodoro" ''
+      STATE="/tmp/pomodoro"
+      LOG="$HOME/.local/share/pomodoro.log"
+      mkdir -p "$(dirname "$LOG")"
+
+      case "$1" in
+        start)
+          # walker prompt for task name
+          task=$(${pkgs.walker}/bin/walker --dmenu --placeholder "what are you working on?")
+          [ -z "$task" ] && exit 0
+          echo "$(date +%s) $(( $(date +%s) + 1500 )) $task" > "$STATE"
+          echo "$(date '+%Y-%m-%d %H:%M') - $task" >> "$LOG"
+          ;;
+        stop)
+          if [ -f "$STATE" ]; then
+            read -r start end task < "$STATE"
+            elapsed=$(( $(date +%s) - start ))
+            elapsed_min=$(( elapsed / 60 ))
+            ${pkgs.libnotify}/bin/notify-send "Pomodoro cancelled" "$task ($elapsed_min min)"
+            echo "$(date '+%Y-%m-%d %H:%M') - $task (cancelled after ''${elapsed_min}min)" >> "$LOG"
+            rm -f "$STATE"
+          fi
+          ;;
+        status)
+          if [ ! -f "$STATE" ]; then
+            echo '{"text": "󰔟", "tooltip": "click to start pomodoro", "class": "idle"}'
+            exit 0
+          fi
+
+          read -r start end task < "$STATE"
+          now=$(date +%s)
+
+          if [ "$now" -ge "$end" ]; then
+            elapsed=$(( end - start ))
+            elapsed_min=$(( elapsed / 60 ))
+            rm -f "$STATE"
+            ${pkgs.libnotify}/bin/notify-send -u critical "Pomodoro done" "$task (''${elapsed_min}min), take a break"
+            echo '{"text": "󰔟", "tooltip": "click to start pomodoro", "class": "idle"}'
+            exit 0
+          fi
+
+          remaining=$(( end - now ))
+          min=$(( remaining / 60 ))
+          sec=$(( remaining % 60 ))
+          printf '{"text": "󰔟 %02d:%02d %s", "tooltip": "%s", "class": "active"}\n' "$min" "$sec" "$task" "$task"
+          ;;
+      esac
+    '';
+
+    weatherScript = pkgs.writeShellScript "weather" ''
+      CACHE="/tmp/waybar-weather"
+      CACHE_SCRIPT="/tmp/waybar-weather-script"
+      MAX_AGE=900
+
+      # invalidate cache when the script changes (e.g. after a rebuild)
+      SELF="$(readlink -f "$0")"
+      if [ -f "$CACHE_SCRIPT" ] && [ "$(cat "$CACHE_SCRIPT")" != "$SELF" ]; then
+        rm -f "$CACHE"
+      fi
+      echo "$SELF" > "$CACHE_SCRIPT"
+
+      if [ -f "$CACHE" ]; then
+        age=$(( $(date +%s) - $(stat -c %Y "$CACHE") ))
+        if [ "$age" -lt "$MAX_AGE" ]; then
+          cat "$CACHE"
+          exit 0
+        fi
+      fi
+
+      json=$(${pkgs.curl}/bin/curl -sf "wttr.in/?format=j1" 2>/dev/null)
+      ip=$(${pkgs.curl}/bin/curl -sf "https://ipecho.net/plain" 2>/dev/null)
+
+      if [ -z "$json" ]; then
+        echo '{"text": "󰖐 --", "tooltip": "weather unavailable"}'
+        exit 0
+      fi
+
+      # current hour index for hourly forecast data
+      hour_idx=$(( $(date +%-H) / 3 ))
+
+      echo "$json" | ${pkgs.jq}/bin/jq -c --arg ip "$ip" --argjson hi "$hour_idx" '
+        def d(f): (f // "n/a") | if . == "" then "n/a" else . end;
+        .current_condition[0] as $c |
+        .nearest_area[0] as $a |
+        .weather[0].hourly[$hi] as $h |
+        ({"113":"󰖙","116":"󰖐","119":"󰖐","122":"󰖐","143":"󰖑","176":"󰖗","179":"󰙿","182":"󰖒","185":"󰖒","200":"󰖓","227":"󰼶","230":"󰼶","248":"󰖑","260":"󰖑","263":"󰖗","266":"󰖗","281":"󰖒","284":"󰖒","293":"󰖗","296":"󰖗","299":"󰖖","302":"󰖖","305":"󰖖","308":"󰖖","311":"󰖒","314":"󰖒","317":"󰙿","320":"󰙿","323":"󰙿","326":"󰙿","329":"󰼶","332":"󰼶","335":"󰼶","338":"󰼶","350":"󰖒","353":"󰖗","356":"󰖖","359":"󰖖","362":"󰖒","365":"󰖒","368":"󰙿","371":"󰼶","374":"󰖒","377":"󰖒","386":"󰖓","389":"󰖓","392":"󰙿","395":"󰼶"}[$c.weatherCode] // "󰖐") as $icon |
+        (d($a.areaName[0].value) + ", " + d($a.region[0].value)) as $loc |
+        {
+          text: "\($icon) \(d($c.temp_F))°F",
+          tooltip: "\(d($c.weatherDesc[0].value)) \(d($c.temp_F))°F (feels \(d($c.FeelsLikeF))°F)\nprecipitation: \(d($h.chanceofrain))% (\(d($c.precipInches))in)\nhumidity: \(d($c.humidity))%\nwind: \(d($c.windspeedMiles))mph \(d($c.winddir16Point))\n\n\($loc) (\($ip // "n/a"))"
+        }
+      ' | tee "$CACHE"
+    '';
   in {
     programs.waybar = {
       enable = true;
@@ -16,7 +110,7 @@ _: {
           height = 26;
           spacing = 0;
 
-          modules-left = ["hyprland/workspaces"];
+          modules-left = ["hyprland/workspaces" "custom/weather" "custom/pomodoro"];
           modules-center = ["clock"];
           modules-right = ["custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
 
@@ -34,6 +128,22 @@ _: {
             format = "{:%a %b %d  %H:%M:%S}";
             interval = 1;
             tooltip = false;
+          };
+
+          "custom/weather" = {
+            exec = "${weatherScript} status";
+            return-type = "json";
+            interval = 900;
+            tooltip = true;
+          };
+
+          "custom/pomodoro" = {
+            exec = "${pomodoroScript} status";
+            return-type = "json";
+            interval = 1;
+            on-click = "${pomodoroScript} start";
+            on-click-right = "${pomodoroScript} stop";
+            tooltip = true;
           };
 
           cpu = {
@@ -155,6 +265,20 @@ _: {
         #clock {
           padding: 0 10px;
           color: ${c.text};
+        }
+
+        #custom-weather {
+          padding: 0 8px;
+          color: ${c.subtext0};
+        }
+
+        #custom-pomodoro {
+          padding: 0 8px;
+          color: ${c.surface1};
+        }
+
+        #custom-pomodoro.active {
+          color: ${c.accent};
         }
 
         #cpu, #memory, #pulseaudio, #network, #bluetooth, #battery, #power-profiles-daemon, #tray {

@@ -32,9 +32,9 @@ modules/
     desktop.nix                packages (browsers, media, comms, gaming, video editing)
     development.nix            packages (LSPs, dev tools, security, ai), direnv
     helix.nix                  editor config, nixd + nil + harper + hyprls
-    git.nix                    git settings (rebase, histogram diffs, rerere, verbose commits)
+    git.nix                    git settings (rebase, histogram diffs, rerere, verbose commits, difftastic)
     shell-functions.nix        ff (fzf+bat), git worktree helpers, ssh port forwarding
-    waybar.nix                 status bar, catppuccin OLED
+    waybar.nix                 status bar, weather, pomodoro timer, catppuccin OLED
     mako.nix                   notification daemon
     walker.nix                 app launcher, clipboard, calculator, emoji, websearch
     swayosd.nix                volume/brightness OSD
@@ -85,7 +85,7 @@ Features are all optional, just import the ones you want in your host's `configu
 - Wezterm + zellij (basically better tmux, sane config, built-in layouts)
 - Yazi for file browsing (more modern ranger with image previews)
 - Helix with LSPs for like 10 languages, nixd for NixOS/home-manager option completion, harper for grammar checking in markdown and git commits, hyprls for hyprland config diagnostics
-- Git config with histogram diffs, colorMoved (highlights moved code differently from changed code), rerere (remembers how you resolved conflicts and auto-applies next time), verbose commits so you see the diff in your editor, push.autoSetupRemote so you never type --set-upstream again
+- Git config with histogram diffs, colorMoved (highlights moved code differently from changed code), rerere (remembers how you resolved conflicts and auto-applies next time), verbose commits so you see the diff in your editor, push.autoSetupRemote so you never type --set-upstream again. Difftastic as `git difftool` for structural diffs that understand syntax via tree-sitter
 - `ff` function: fzf + bat preview, finds and opens files. `ga`/`gd` for git worktree add/remove. `fip`/`dip`/`lip` for SSH port forwarding
 - Atuin for shell history (searchable, syncs across machines if you want)
 - Zoxide instead of cd (learns your frequent dirs, `cd foo` jumps to ~/whatever/foo)
@@ -93,6 +93,13 @@ Features are all optional, just import the ones you want in your host's `configu
 - Bat instead of cat (syntax highlighting, git diff integration, batman for man pages)
 - Eza instead of ls (icons, git status, tree view)
 - Dust instead of du (visual disk usage bars, sorted by size)
+- sd instead of sed (normal regex syntax, no escaping nonsense)
+- procs instead of ps (tree view, per-process ports, docker container awareness)
+- doggo instead of dig (colored output, DoH/DoT, JSON mode)
+- duf instead of df (grouped table view by device type, adjusts to terminal width)
+- viddy instead of watch (diff highlighting between runs, history scrollback)
+- choose instead of cut/awk (human-friendly field selection, negative indexing)
+- trippy instead of traceroute (real-time latency graphs per hop, multi-protocol)
 - Lazydocker for Docker TUI, bluetui and impala for bluetooth and wifi TUIs
 - Greetd login with system specs on screen (CPU, RAM, GPU, disk, IP)
 - Keybind cheat sheet popup on Super+Shift+? via wezterm
@@ -101,7 +108,11 @@ Features are all optional, just import the ones you want in your host's `configu
 - Bibata cursor theme
 - Cowsay greeting that changes based on time of day
 - Some shell functions for quickly optimizing videos and images (`optimize-video`, `optimize-image`)
+- Trufflehog and gitleaks for secret scanning (trufflehog verifies if leaked creds are still live)
+- age + sops for secret management (age is simple GPG replacement, sops encrypts values in config files leaving keys readable for diffs)
 - My more used cyber tools (nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex, etc)
+- Pomodoro timer in waybar, left-click prompts for task name via walker, shows countdown in the bar, notifies when done, logs sessions to `~/.local/share/pomodoro.log`
+- Weather in waybar via wttr.in, auto-detects location by IP, caches for 15 minutes, hover for full conditions
 - Claude Code and opencode for slopmaxxing
 - Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
 - nh for nixos rebuilds, shows you a diff of what's changing before it applies
@@ -118,6 +129,25 @@ Features are all optional, just import the ones you want in your host's `configu
 - Custom Firefox startpage with catppuccin colors, DuckDuckGo search, quick-link categories, and a wallpaper art panel. Generated from nix so the palette stays in sync with everything else
 - Screen recordings get random dictionary-word filenames (like `coffee-telescope.mp4`) so you never have to name them
 - Centralized color palette in `colors.nix`, every module references it instead of hardcoding hex values so changing the theme is one file
+- jnv for interactive jq (build filters with live preview instead of guessing)
+- numbat scientific calculator with unit support (`3 meters + 2 feet` just works, rejects dimensionally inconsistent expressions)
+- ast-grep for structural search/replace via tree-sitter (refactor code by pattern, not regex)
+- hyperfine for statistical CLI benchmarking (warmup runs, confidence intervals, comparison tables)
+- tokei for fast code statistics by language
+- broot for interactive tree exploration with fuzzy search
+- fclones for finding duplicate files (progressive hashing, avoids full reads when possible)
+- xh as an httpie replacement (syntax-highlighted HTTP responses, sessions, downloads)
+- bandwhich for real-time bandwidth monitoring by process and connection
+- pueue for background task queues that survive terminal closes
+- process-compose as docker-compose for bare processes (YAML config with dependency ordering, health checks, TUI)
+- tailspin for zero-config log highlighting (pipe anything through `tspin`, auto-detects dates/IPs/UUIDs/severity)
+- lazyjournal TUI for browsing journalctl, docker logs, and plain log files
+- glow for rendering markdown in the terminal with a file browser
+- vhs for recording deterministic terminal GIFs from scripts
+- `clip` alias strips trailing newline before copying to clipboard
+- `termbin` alias pipes terminal output to termbin.com for instant sharing
+- `pwdc` copies current directory to clipboard
+- `dupe` opens a new terminal in the same directory
 - iwd backend for NetworkManager (faster wifi scans, works with impala TUI)
 
 ## aliases
@@ -133,6 +163,11 @@ Features are all optional, just import the ones you want in your host's `configu
 - `open` - xdg-open
 - `cc` - claude code (skip permissions)
 - `qalc` - libqalculate with autocalc mode
+- `clip` - copy to clipboard with trailing newline stripped
+- `pwdc` - copy current working directory to clipboard
+- `termbin` - pipe output to termbin.com for instant pastebin
+- `dupe` - open new terminal in same directory
+- `watch` - viddy (watch with diff highlighting)
 - `ff` - fzf file finder with bat preview, opens in editor
 - `ga` / `gd` - git worktree add/remove
 - `fip` / `dip` / `lip` - ssh port forward/disconnect/list

@@ -13,6 +13,7 @@ _: {
       # version control
       gh
       gitui
+      difftastic # modern git diff, parses ASTs via tree-sitter, shows semantic changes
 
       # python
       python314
@@ -62,6 +63,12 @@ _: {
       typst
       tinymist
 
+      # security and secret scanning
+      trufflehog # scans git repos for leaked secrets, tests if they're still live
+      gitleaks # lighter secret scanner for git history, good for pre-commit hooks
+      age # modern GPG replacement, no keyrings, just encrypts files, SSH keys
+      sops # encrypts values in YAML/JSON but leaves keys readable for diffs
+
       # security and pentesting
       nmap
       wireshark
@@ -90,10 +97,21 @@ _: {
 
       # parser tools
       tree-sitter
+      ast-grep # structural search/replace via tree-sitter, match code by pattern
+      scooter # interactive find-and-replace TUI, toggle individual replacements, helix integration
+
+      # benchmarking and analysis
+      hyperfine # benchmarks CLI commands, warmup runs, confidence intervals
+      tokei # code stats by language (lines, blanks, comments), faster than cloc
+
+      # http testing
+      hurl # HTTP request runner using plain text files, chain requests, assert responses
+      harlequin # SQL IDE in terminal, autocomplete, highlighting, Postgres/DuckDB/SQLite
 
       # ai
       claude-code
       opencode
+      mods # charm's LLM pipe tool, cat log | mods "what's wrong", works with any provider
 
       # ide for notebooks
       jetbrains.pycharm
