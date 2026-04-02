@@ -55,6 +55,29 @@ _: {
       esac
     '';
 
+    caffeineScript = pkgs.writeShellScript "caffeine" ''
+      STATE="/tmp/caffeine"
+      case "$1" in
+        toggle)
+          if [ -f "$STATE" ]; then
+            kill "$(cat "$STATE")" 2>/dev/null
+            rm -f "$STATE"
+          else
+            ${pkgs.systemd}/bin/systemd-inhibit --what=idle --who=caffeine --why=manual --mode=block sleep infinity &
+            echo $! > "$STATE"
+          fi
+          ;;
+        status)
+          if [ -f "$STATE" ] && kill -0 "$(cat "$STATE")" 2>/dev/null; then
+            echo '{"text": "󰅶", "tooltip": "caffeine on, click to disable", "class": "active"}'
+          else
+            rm -f "$STATE" 2>/dev/null
+            echo '{"text": "󰛊", "tooltip": "caffeine off, click to enable", "class": "idle"}'
+          fi
+          ;;
+      esac
+    '';
+
     weatherScript = pkgs.writeShellScript "weather" ''
       CACHE="/tmp/waybar-weather"
       CACHE_SCRIPT="/tmp/waybar-weather-script"
@@ -112,7 +135,7 @@ _: {
 
           modules-left = ["hyprland/workspaces" "custom/weather" "custom/pomodoro"];
           modules-center = ["clock"];
-          modules-right = ["custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
+          modules-right = ["custom/caffeine" "custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
 
           "hyprland/workspaces" = {
             format = "{icon}";
@@ -220,6 +243,14 @@ _: {
             tooltip-format = "Profile: {profile}";
           };
 
+          "custom/caffeine" = {
+            exec = "${caffeineScript} status";
+            return-type = "json";
+            interval = 2;
+            on-click = "${caffeineScript} toggle";
+            tooltip = true;
+          };
+
           "custom/recording" = {
             exec = "pgrep -x wf-recorder > /dev/null && echo '󰻂 REC' || echo ''";
             interval = 1;
@@ -296,6 +327,15 @@ _: {
 
         #bluetooth.off {
           color: ${c.surface1};
+        }
+
+        #custom-caffeine {
+          padding: 0 8px;
+          color: ${c.surface1};
+        }
+
+        #custom-caffeine.active {
+          color: ${c.red};
         }
 
         #custom-recording {
