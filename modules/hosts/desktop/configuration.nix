@@ -28,6 +28,9 @@
     networking.wireless.iwd.enable = true;
     networking.networkmanager.wifi.backend = "iwd";
 
+    # always run at max performance
+    powerManagement.cpuFreqGovernor = "performance";
+
     boot.loader.grub = {
       enable = true;
       device = "/dev/nvme0n1";
