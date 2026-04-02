@@ -36,8 +36,8 @@ _: {
           window_padding = {
             left = 3,
             right = 3,
-            top = 3,
-            bottom = 3,
+            top = 2,
+            bottom = 0,
           },
         }
       '';
