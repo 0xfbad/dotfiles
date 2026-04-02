@@ -8,7 +8,6 @@ _: {
         show_startup_tips = false;
         copy_on_select = true;
         pane_frames = false;
-        styled_underlines = true;
         # scrollback opens in helix
         scrollback_editor = "hx";
       };
