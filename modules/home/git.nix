@@ -2,6 +2,16 @@ _: {
   flake.homeModules.git = {pkgs, ...}: {
     # gitui's libgit2 needs a real ssh-agent, run ssh-add after first login
     services.ssh-agent.enable = true;
+    programs.ssh = {
+      enable = true;
+      extraConfig = ''
+        Host *
+          Compression yes
+          ControlMaster auto
+          ControlPath ~/.ssh/master-%C
+          ControlPersist 600  # seconds before idle socket cleanup
+      '';
+    };
     programs.git = {
       enable = true;
       signing.format = null;
