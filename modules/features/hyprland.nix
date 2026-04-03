@@ -15,6 +15,51 @@ _: {
   }: let
     c = config.colors;
     ch = config.colors.hypr;
+
+    presentationToggle = lib.getExe (pkgs.writeShellApplication {
+      name = "presentation-toggle";
+      runtimeInputs = with pkgs; [hyprland jq libnotify];
+      text = ''
+        state_file="/tmp/hypr-presentation-state"
+        state=$(cat "$state_file" 2>/dev/null || echo "extend")
+
+        main=$(hyprctl monitors -j | jq -r '.[0].name')
+        mapfile -t all_mons < <(hyprctl monitors all -j | jq -r '.[].name')
+        if [ "''${#all_mons[@]}" -lt 2 ]; then
+          notify-send -t 3000 "presentation" "no external monitor detected"
+          exit 0
+        fi
+
+        externals=("''${all_mons[@]:1}")
+
+        case "$state" in
+          extend)
+            for ext in "''${externals[@]}"; do
+              hyprctl keyword monitor "$ext, preferred, auto, 1, mirror, $main"
+            done
+            echo "mirror" > "$state_file"
+            notify-send -t 3000 "presentation" "mirroring $main"
+            ;;
+          mirror)
+            for ext in "''${externals[@]}"; do
+              hyprctl keyword monitor "$ext, preferred, auto-up, 1"
+            done
+            echo "extend" > "$state_file"
+            notify-send -t 3000 "presentation" "extended above"
+            ;;
+        esac
+      '';
+    });
+
+    # uses impala (iwd) if available, falls back to wlctl (networkmanager)
+    wifiTui = pkgs.writeShellScript "wifi-tui" ''
+      if systemctl is-active --quiet iwd 2>/dev/null; then
+        exec ${pkgs.impala}/bin/impala
+      else
+        exec ${pkgs.wlctl}/bin/wlctl
+      fi
+    '';
+
     editClipboard = lib.getExe (pkgs.writeShellApplication {
       name = "edit-clipboard";
       runtimeInputs = with pkgs; [wl-clipboard satty];
@@ -137,7 +182,7 @@ _: {
          Super + J                toggle split              Super + Alt   + =      next preset width
          Super + G                toggle group              Super + Alt   + -      prev preset width
          Super + O                pop out                   Super + Home           focus first
-         Super + P                pseudo tile               Super + End            focus last
+         Super + P                presentation              Super + End            focus last
          Super + C                center                    Super + Shift + Home   fit visible
                                                             Super + Shift + End    fit all
        FOCUS
@@ -203,7 +248,7 @@ _: {
           cmd: "${lib.getExe pkgs.wezterm} start -- bluetui"
         - key: w
           desc: wifi
-          cmd: "${lib.getExe pkgs.wezterm} start -- impala"
+          cmd: "${lib.getExe pkgs.wezterm} start --class wifi-tui -- ${wifiTui}"
         - key: d
           desc: docker
           cmd: "${lib.getExe pkgs.wezterm} start -- lazydocker"
@@ -289,7 +334,7 @@ _: {
       env = HYPRCURSOR_SIZE,24
       env = XCURSOR_THEME,Bibata-Modern-Classic
       env = XCURSOR_SIZE,24
-      env = GTK_THEME,catppuccin-mocha-mauve-standard+default
+      env = GTK_THEME,catppuccin-mocha-mauve-standard
       env = QT_QPA_PLATFORMTHEME,kde
       env = QT_STYLE_OVERRIDE,kvantum
       env = QT_WAYLAND_DISABLE_WINDOWDECORATION,1
@@ -315,6 +360,7 @@ _: {
         touchpad {
           natural_scroll = true
           tap-to-click = true
+          disable_while_typing = true
         }
       }
 
@@ -412,7 +458,7 @@ _: {
       # window rules
       windowrule = match:class .*, suppress_event maximize
       windowrule = match:title ^(Open|Save|Save As|File Upload), float on, center on
-      windowrule = match:class ^(btop|bluetui|impala)$, float on, center on, size 875 600
+      windowrule = match:class ^(btop|bluetui|impala|wifi-tui|wlctl)$, float on, center on, size 875 600
       windowrule = match:class ^(keybind-popup)$, float on, center on, size 920 700
       windowrule = match:class ^(vlc|mpv|com.obsproject.Studio|zoom|org.kde.kdenlive)$, opacity 1.0 override 1.0 override
       windowrule = match:fullscreen 1, idle_inhibit on
@@ -430,12 +476,11 @@ _: {
 
       # windows
       bindd = ${mod}, W, close, killactive
-      bindd = ${mod}, F, fullscreen, fullscreen, 0
-      bindd = ${mod} CTRL, F, tiled fullscreen, fullscreenstate, 0 2
-      bindd = ${mod} ALT, F, full width, fullscreen, 1
+      bindd = ${mod}, F, fullscreen, fullscreen, 1
+      bindd = ${mod} CTRL, F, true fullscreen, fullscreen, 0
       bindd = ${mod}, T, float, togglefloating
       bindd = ${mod}, J, toggle split, layoutmsg, togglesplit
-      bindd = ${mod}, P, pseudo, pseudo
+      bindd = ${mod}, P, presentation toggle, exec, ${presentationToggle}
       bindd = ${mod}, G, group, togglegroup
       bindd = ${mod} ALT, G, ungroup, moveoutofgroup
       bindd = ${mod}, O, pop out, exec, ${popWindow}
@@ -577,7 +622,18 @@ _: {
       bindde = , XF86AudioRaiseVolume, volume up, exec, swayosd-client --output-volume raise
       bindde = , XF86AudioLowerVolume, volume down, exec, swayosd-client --output-volume lower
       bindd = , XF86AudioMute, mute, exec, swayosd-client --output-volume mute-toggle
-      bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+      bindd = , XF86AudioMicMute, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle
+      bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle
+
+      # brightness (swayosd)
+      bindde = , XF86MonBrightnessUp, brightness up, exec, swayosd-client --brightness raise
+      bindde = , XF86MonBrightnessDown, brightness down, exec, swayosd-client --brightness lower
+
+      # calculator
+      bindd = , XF86Calculator, calculator, exec, ${lib.getExe pkgs.qalculate-gtk}
+
+      # presentation mode (cycles: extend above -> mirror -> off)
+      bindd = , XF86Display, presentation toggle, exec, ${presentationToggle}
 
       # screen zoom at cursor (10% increments, 1.0 to 10.0)
       binde = ${mod} CTRL, mouse_down, exec, hyprctl keyword cursor:zoom_factor "$(awk "BEGIN{v=$(hyprctl getoption cursor:zoom_factor -j | ${pkgs.jq}/bin/jq '.float')+0.1; printf \"%.1f\", (v>10?10:v)}")"
