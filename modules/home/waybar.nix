@@ -109,7 +109,9 @@ _: {
       # current hour index for hourly forecast data
       hour_idx=$(( $(date +%-H) / 3 ))
 
-      echo "$json" | ${pkgs.jq}/bin/jq -c --arg ip "$ip" --argjson hi "$hour_idx" '
+      updated=$(date '+%H:%M')
+
+      echo "$json" | ${pkgs.jq}/bin/jq -c --arg ip "$ip" --argjson hi "$hour_idx" --arg updated "$updated" '
         def d(f): (f // "n/a") | if . == "" then "n/a" else . end;
         .current_condition[0] as $c |
         .nearest_area[0] as $a |
@@ -118,7 +120,7 @@ _: {
         (d($a.areaName[0].value) + ", " + d($a.region[0].value)) as $loc |
         {
           text: "\($icon) \(d($c.temp_F))°F",
-          tooltip: "\(d($c.weatherDesc[0].value)) \(d($c.temp_F))°F (feels \(d($c.FeelsLikeF))°F)\nprecipitation: \(d($h.chanceofrain))% (\(d($c.precipInches))in)\nhumidity: \(d($c.humidity))%\nwind: \(d($c.windspeedMiles))mph \(d($c.winddir16Point))\n\n\($loc) (\($ip // "n/a"))"
+          tooltip: "\(d($c.weatherDesc[0].value)) \(d($c.temp_F))°F (feels \(d($c.FeelsLikeF))°F)\nprecipitation: \(d($h.chanceofrain))% (\(d($c.precipInches))in)\nhumidity: \(d($c.humidity))%\nwind: \(d($c.windspeedMiles))mph \(d($c.winddir16Point))\n\n\($loc) (\($ip // "n/a"))\nupdated \($updated)"
         }
       ' | tee "$CACHE"
     '';
