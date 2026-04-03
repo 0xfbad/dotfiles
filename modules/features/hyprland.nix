@@ -299,9 +299,14 @@ _: {
       env = XDG_CURRENT_DESKTOP,Hyprland
       env = XDG_SESSION_DESKTOP,Hyprland
 
+      # dark overlay for grimblast/slurp region selection
+      # -b background, -c border, -s selection fill, -w border width (RRGGBBAA)
+      env = SLURP_ARGS,-b 00000080 -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2
+
       # input
       input {
         kb_layout = us
+        kb_options = caps:escape
         repeat_rate = 40
         repeat_delay = 250
         follow_mouse = 1
