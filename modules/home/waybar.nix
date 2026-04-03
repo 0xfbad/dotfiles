@@ -131,6 +131,45 @@ _: {
       ' | tee "$CACHE"
     '';
 
+    networkScript = pkgs.writeShellScript "waybar-network" ''
+      info=$(${pkgs.networkmanager}/bin/nmcli -t device show 2>/dev/null | command grep -A50 '(connected)' | head -25)
+
+      conn=$(echo "$info" | command grep 'GENERAL.CONNECTION:' | head -1 | cut -d: -f2-)
+      dev=$(echo "$info" | command grep 'GENERAL.DEVICE:' | head -1 | cut -d: -f2-)
+      mac=$(echo "$info" | command grep 'GENERAL.HWADDR:' | head -1 | cut -d: -f2-)
+      addr=$(echo "$info" | command grep 'IP4.ADDRESS' | head -1 | cut -d: -f2-)
+      gw=$(echo "$info" | command grep 'IP4.GATEWAY:' | head -1 | cut -d: -f2-)
+      dns=$(echo "$info" | command grep 'IP4.DNS' | sed 's/.*://' | paste -sd ', ')
+      domain=$(echo "$info" | command grep 'IP4.DOMAIN' | head -1 | cut -d: -f2-)
+      ipv6=$(echo "$info" | command grep 'IP6.ADDRESS' | head -1 | cut -d: -f2-)
+      type=$(echo "$info" | command grep 'GENERAL.TYPE:' | head -1 | cut -d: -f2-)
+
+      ip=$(echo "$addr" | cut -d/ -f1)
+
+      if [ -z "$conn" ] || [ -z "$ip" ]; then
+        printf '{"text": "󰤭 disconnected", "tooltip": "no connection", "class": "disconnected"}\n'
+        exit 0
+      fi
+
+      if [ "$type" = "wifi" ]; then
+        signal=$(${pkgs.networkmanager}/bin/nmcli -t -f IN-USE,SIGNAL dev wifi list 2>/dev/null | command grep '^\*' | cut -d: -f2)
+        freq=$(${pkgs.iw}/bin/iw dev "$dev" info 2>/dev/null | command grep 'channel' | sed 's/.*(\(.*\) MHz.*/\1/')
+        band=""
+        if [ -n "$freq" ]; then
+          if [ "$freq" -lt 3000 ] 2>/dev/null; then band="2.4GHz"
+          elif [ "$freq" -lt 6000 ] 2>/dev/null; then band="5GHz"
+          else band="6GHz"; fi
+        fi
+        text="󰤨 $conn (''${signal}%''${band:+ $band}) $ip"
+        tooltip="interface       $dev\nssid            $conn (''${signal}% on ''${band:-unknown})\naddress         $addr\ngateway         $gw\ndns             $dns''${domain:+\ndomain          $domain}\nmac             $mac''${ipv6:+\nipv6            $ipv6}"
+      else
+        text="󰈀 $ip"
+        tooltip="interface       $dev\nconnection      $conn\naddress         $addr\ngateway         $gw\ndns             $dns''${domain:+\ndomain          $domain}\nmac             $mac''${ipv6:+\nipv6            $ipv6}"
+      fi
+
+      printf '{"text": "%s", "tooltip": "%s", "class": "%s"}\n' "$text" "$tooltip" "$type"
+    '';
+
     # uses impala (iwd) if available, falls back to wlctl (networkmanager)
     wifiTui = pkgs.writeShellScript "wifi-tui" ''
       if systemctl is-active --quiet iwd 2>/dev/null; then
@@ -152,7 +191,7 @@ _: {
 
           modules-left = ["hyprland/workspaces" "custom/weather" "custom/pomodoro" "custom/media"];
           modules-center = ["clock"];
-          modules-right = ["custom/caffeine" "custom/recording" "tray" "bluetooth" "network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
+          modules-right = ["custom/caffeine" "custom/recording" "bluetooth" "custom/network" "pulseaudio" "pulseaudio#mic" "cpu" "memory" "power-profiles-daemon" "battery"];
 
           "hyprland/workspaces" = {
             format = "{icon}";
@@ -222,14 +261,11 @@ _: {
             tooltip-format = "Mic: {source_volume}%";
           };
 
-          network = {
-            format-wifi = "󰤨 {essid} {signalStrength}% ({ipaddr})";
-            format-ethernet = "󰈀 {ipaddr}";
-            format-disconnected = "󰤭 disconnected";
-            tooltip-format-wifi = "{signalStrength}%  {bandwidthUpBits}  {bandwidthDownBits}";
-            tooltip-format-ethernet = "{ifname}: {ipaddr}/{cidr}";
-            on-click = "${pkgs.wezterm}/bin/wezterm start --class wifi-tui -- ${wifiTui}";
+          "custom/network" = {
+            exec = "${networkScript}";
+            return-type = "json";
             interval = 5;
+            on-click = "${pkgs.wezterm}/bin/wezterm start --class wifi-tui -- ${wifiTui}";
           };
 
           battery = {
@@ -282,11 +318,6 @@ _: {
             interval = 1;
             return-type = "";
           };
-
-          tray = {
-            icon-size = 12;
-            spacing = 8;
-          };
         }
       ];
 
@@ -338,7 +369,7 @@ _: {
           color: ${c.accent};
         }
 
-        #cpu, #memory, #pulseaudio, #network, #bluetooth, #battery, #power-profiles-daemon, #tray {
+        #cpu, #memory, #pulseaudio, #custom-network, #bluetooth, #battery, #power-profiles-daemon {
           padding: 0 8px;
           color: ${c.text};
         }
@@ -347,7 +378,7 @@ _: {
           color: ${c.surface1};
         }
 
-        #network.disconnected {
+        #custom-network.disconnected {
           color: ${c.surface1};
         }
 
