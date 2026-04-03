@@ -51,6 +51,8 @@ modules/
     zellij.nix                 multiplexer
     starship.nix               prompt (mauve accent, git status)
     zoxide.nix                 smart cd
+    startpage.nix              custom firefox homepage, catppuccin palette
+    dolphin.nix                file manager config
     btop.nix                   system monitor
     tealdeer.nix               tldr
     mangohud.nix               gaming overlay
@@ -84,9 +86,9 @@ Features are all optional, just import the ones you want in your host's `configu
 - Monitor config lives in a mutable `monitors.conf` that gets sourced by the nix-managed config, so hyprmon TUI can save monitor layouts and they survive rebuilds
 - Wezterm + zellij (basically better tmux, sane config, built-in layouts)
 - Yazi for file browsing (more modern ranger with image previews)
-- Helix with LSPs for like 10 languages, nixd for NixOS/home-manager option completion, harper for grammar checking in markdown and git commits, hyprls for hyprland config diagnostics
-- Git config with histogram diffs, colorMoved (highlights moved code differently from changed code), rerere (remembers how you resolved conflicts and auto-applies next time), verbose commits so you see the diff in your editor, push.autoSetupRemote so you never type --set-upstream again. Difftastic as `git difftool` for structural diffs that understand syntax via tree-sitter
-- `ff` function: fzf + bat preview, finds and opens files. `ga`/`gd` for git worktree add/remove. `fip`/`dip`/`lip` for SSH port forwarding
+- Helix with LSPs for like 10 languages, nixd for NixOS/home-manager option completion, harper for grammar checking in markdown and git commits, hyprls for hyprland config diagnostics. Statusline changes color per mode, instant completions, tab bar for multiple buffers, indent guides, inlay hints for type annotations
+- Git config with histogram diffs, colorMoved, rerere (remembers conflict resolutions), zdiff3 conflict markers (shows original base alongside both sides), autoSquash + autoStash on rebase, force-push safety net, typo autocorrect. Difftastic as `git difftool` for structural diffs via tree-sitter
+- `gl` function: fzf-powered git log with live diff preview per commit. `gdf` for browsing changed files with per-file diffs. `ff` for fzf + bat file finder. `ga`/`gd` for git worktree add/remove. `fip`/`dip`/`lip` for SSH port forwarding
 - Atuin for shell history (searchable, syncs across machines if you want)
 - Zoxide instead of cd (learns your frequent dirs, `cd foo` jumps to ~/whatever/foo)
 - Starship prompt with mauve accent, truncated directory, italic git branch
@@ -103,7 +105,7 @@ Features are all optional, just import the ones you want in your host's `configu
 - Lazydocker for Docker TUI, bluetui and impala for bluetooth and wifi TUIs
 - Greetd login with system specs on screen (CPU, RAM, GPU, disk, IP)
 - Keybind cheat sheet popup on Super+Shift+? via wezterm
-- Wallpaper rotation from ~/dotfiles/wallpapers/, different image per monitor, shuffles every 30 minutes
+- Wallpaper rotation from ~/dotfiles/wallpapers/ via swww, different image per monitor, grow-from-center transitions, shuffles every 30 minutes
 - Dolphin file manager with full catppuccin kdeglobals color scheme and Kvantum theming
 - Bibata cursor theme
 - Cowsay greeting that changes based on time of day
@@ -132,7 +134,11 @@ Features are all optional, just import the ones you want in your host's `configu
 - trashy instead of rm (moves to FreeDesktop trash, files show up in Dolphin's trash can too)
 - gping instead of ping (real-time line graph, multiple hosts on same chart)
 - miniserve instead of python -m http.server (file upload, auth, TLS, QR code for URL)
-- Screenshot with dark overlay, wayfreeze to freeze screen during selection, grimblast for window/area/monitor modes, satty for annotation, wl-screenrec for hardware-accelerated recording
+- Screenshots via grimblast with --freeze (screen freezes during selection so content doesn't shift), dark overlay, window/area/monitor modes, satty for annotation, wl-screenrec for hardware-accelerated recording
+- Super+Shift+C color picker, copies hex to clipboard
+- Now-playing in waybar via playerctl, shows artist and title, click to play/pause, scroll to skip
+- pyprland scratchpads: dropdown terminal (Super+A slides from top), volume mixer (Super+Shift+V slides from right, auto-hides on focus loss)
+- carapace for shell completions across hundreds of commands from a single binary
 - Custom Firefox startpage with catppuccin colors, DuckDuckGo search, quick-link categories, and a wallpaper art panel
 - Screen recordings get random dictionary-word filenames (like `coffee-telescope.mp4`) so you never have to name them
 - Centralized color palette in `colors.nix`, every module references it instead of hardcoding hex values so changing the theme is one file
@@ -172,6 +178,11 @@ Features are all optional, just import the ones you want in your host's `configu
 - `watch` - viddy (watch with diff highlighting)
 - `lcc` - copy last command to clipboard
 - `ff` - fzf file finder with bat preview, opens in editor
+- `gl` - fzf git log with live diff preview
+- `gdf` - browse changed files with per-file diffs
+- `ns` - quick nix package search
+- `mkcd` - mkdir + cd in one
+- `port` - what's listening on a port
 - `ga` / `gd` - git worktree add/remove
 - `fip` / `dip` / `lip` - ssh port forward/disconnect/list
 
