@@ -38,6 +38,7 @@ _: {
       settings.Resolve = {
         FallbackDNS = "127.0.0.1 ::1";
         LLMNR = false;
+        MulticastDNS = false;
       };
     };
   };
