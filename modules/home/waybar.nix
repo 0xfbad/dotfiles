@@ -132,10 +132,15 @@ _: {
     '';
 
     networkScript = pkgs.writeShellScript "waybar-network" ''
-      info=$(${pkgs.networkmanager}/bin/nmcli -t device show 2>/dev/null | command grep -A50 '(connected)' | head -25)
+      # prefer ethernet over wifi
+      dev=$(${pkgs.networkmanager}/bin/nmcli -t -f TYPE,DEVICE,STATE device status 2>/dev/null | command grep ':connected$' | sort -t: -k1,1 | head -1 | cut -d: -f2)
+      if [ -z "$dev" ]; then
+        printf '{"text": "󰤭 disconnected", "tooltip": "no connection", "class": "disconnected"}\n'
+        exit 0
+      fi
+      info=$(${pkgs.networkmanager}/bin/nmcli -t device show "$dev" 2>/dev/null)
 
       conn=$(echo "$info" | command grep 'GENERAL.CONNECTION:' | head -1 | cut -d: -f2-)
-      dev=$(echo "$info" | command grep 'GENERAL.DEVICE:' | head -1 | cut -d: -f2-)
       mac=$(echo "$info" | command grep 'GENERAL.HWADDR:' | head -1 | cut -d: -f2-)
       addr=$(echo "$info" | command grep 'IP4.ADDRESS' | head -1 | cut -d: -f2-)
       gw=$(echo "$info" | command grep 'IP4.GATEWAY:' | head -1 | cut -d: -f2-)
@@ -160,7 +165,7 @@ _: {
           elif [ "$freq" -lt 6000 ] 2>/dev/null; then band="5GHz"
           else band="6GHz"; fi
         fi
-        text="󰤨 $conn (''${signal}%''${band:+ $band}) $ip"
+        text="󰤨 $conn (''${signal}%) $ip"
         tooltip="interface       $dev\nssid            $conn (''${signal}% on ''${band:-unknown})\naddress         $addr\ngateway         $gw\ndns             $dns''${domain:+\ndomain          $domain}\nmac             $mac''${ipv6:+\nipv6            $ipv6}"
       else
         text="󰈀 $ip"
