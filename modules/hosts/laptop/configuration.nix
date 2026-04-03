@@ -20,16 +20,16 @@
     ];
 
     nixpkgs.config.allowUnfree = true;
-    nixpkgs.overlays = [inputs.nix-matlab.overlay];
+    nixpkgs.overlays = [
+      inputs.nix-matlab.overlay
+      (final: prev: {wlctl = inputs.wlctl.packages.${final.system}.default;})
+    ];
 
     networking.hostName = "laptop";
 
-    # iwd for impala wifi TUI
-    networking.wireless.iwd.enable = true;
-    networking.networkmanager.wifi.backend = "iwd";
-
-    # disable wifi 6 (HE) - iwd can't handle HE on this intel ax card
-    networking.wireless.iwd.settings.General.EnableHE = false;
+    # iwd broken on intel ax card, using wpa_supplicant instead
+    networking.wireless.iwd.enable = false;
+    networking.networkmanager.wifi.backend = "wpa_supplicant";
 
     services.power-profiles-daemon.enable = true;
 
