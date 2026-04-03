@@ -12,11 +12,14 @@ _: {
       };
     };
 
-    # register hyprland with uwsm properly
+    # nixpkgs commit 9128dd3 made the hyprland module wire UWSM to launch
+    # the Hyprland binary directly, skipping start-hyprland which sets up
+    # XDG_CURRENT_DESKTOP and portal integration. without it, screen sharing
+    # and some electron apps break silently.
     programs.uwsm.waylandCompositors.hyprland = {
       prettyName = "Hyprland";
       comment = "Hyprland compositor managed by UWSM";
-      binPath = "/run/current-system/sw/bin/Hyprland";
+      binPath = "/run/current-system/sw/bin/start-hyprland";
     };
 
     # prevent late boot messages from printing over tuigreet
