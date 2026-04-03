@@ -101,7 +101,7 @@ _: {
       json=$(${pkgs.curl}/bin/curl -sf "wttr.in/?format=j1" 2>/dev/null)
       ip=$(${pkgs.curl}/bin/curl -sf "https://ipecho.net/plain" 2>/dev/null)
 
-      if [ -z "$json" ]; then
+      if [ -z "$json" ] || [ "$json" = "null" ]; then
         echo '{"text": "󰖐 --", "tooltip": "weather unavailable"}'
         exit 0
       fi
