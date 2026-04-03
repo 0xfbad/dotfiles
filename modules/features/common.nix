@@ -28,6 +28,24 @@
     };
     system.stateVersion = "24.11";
 
+    # keep build deps in store so nix develop doesn't re-download after GC
+    nix.settings.keep-outputs = true;
+    nix.settings.keep-env-derivations = true;
+
+    # auto GC when disk gets tight instead of failing mid-build
+    nix.settings.min-free = 5368709120; # 5 GB
+    nix.settings.max-free = 21474836480; # 20 GB
+
+    # kill channels and the global flake registry, pin all inputs to local store
+    # so nix run nixpkgs#, nix run home-manager#, etc. resolve instantly from lockfile
+    nix.settings.flake-registry = "";
+    nix.channel.enable = false;
+    nix.registry = builtins.mapAttrs (_: flake: {flake = flake;}) inputs;
+    nix.nixPath = ["nixpkgs=flake:nixpkgs"];
+
+    # strip default packages (perl, rsync, strace)
+    environment.defaultPackages = [];
+
     # boot (shared settings, bootloader is host-specific)
     # logs scroll normally, greetd covers them when it starts
 
@@ -213,8 +231,32 @@
     # wayland env vars for electron apps
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
-    # faster shutdown for hung services
-    systemd.settings.Manager.DefaultTimeoutStopSec = "5s";
+    # systemd manager settings
+    systemd.settings.Manager = {
+      DefaultTimeoutStopSec = "5s";
+      DefaultOOMPolicy = "stop";
+      StatusUnitFormat = "combined";
+      RuntimeWatchdogSec = "15"; # seconds before hard-reset on hang
+      RebootWatchdogSec = "30"; # seconds to wait for clean reboot
+      KexecWatchdogSec = "60"; # seconds to wait for kexec
+    };
+
+    # systemd-oomd acts on memory pressure before the kernel OOM killer fires
+    # without the slice settings it's a no-op, these tell it what to actually watch
+    systemd.oomd = {
+      enable = true;
+      enableRootSlice = true;
+      enableSystemSlice = true;
+      enableUserSlices = true;
+    };
+
+    # gpt-auto-generator is redundant on NixOS (declarative fileSystems)
+    # and causes spurious "Failed to dissect" errors during rebuild
+    systemd.suppressedSystemUnits = ["systemd-gpt-auto-generator.service"];
+
+    # caps lock as escape (TTY, xwayland)
+    services.xserver.xkb.options = "caps:escape";
+    console.useXkbConfig = true;
 
     # ollama
     services.ollama.enable = true;
