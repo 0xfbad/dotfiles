@@ -4,6 +4,7 @@ Personal dotfiles for NixOS and every other hipster riced app I use via home-man
 
 Inspiration and things stolen from some other cool dotfiles:
 - https://github.com/JakeGinesin/nix-config
+- NSS, not public :( (you know who u are, thx for nixpilling me and answering all my dumb questions)
 
 ## layout
 
@@ -75,7 +76,8 @@ Features are all optional, just import the ones you want in your host's `configu
 
 ## cool stuff about this setup
 
-- DNS over HTTPS via dnscrypt-proxy (no local or ISP snooping)
+- SSH ControlMaster multiplexes connections to the same host over one socket, so your second ssh is instant (no handshake, no auth). ControlPersist keeps it alive for 10 minutes after disconnect, compression on by default
+- DNS over HTTPS via dnscrypt-proxy (no local or ISP snooping), mDNS and LLMNR disabled so your hostname doesn't leak on local networks
 - OLEDmaxxing theme, everything is fully black with catppuccin mocha mauve accent on every app that supports it
 - Hyprland with niri-style scrolling layout by default (infinite horizontal columns, cycle column widths with Super+Alt+=/-, scroll viewport with Super+[/]), Super+\\ toggles back to dwindle
 - Modular desktop shell inspired by [Omarchy](https://github.com/basecamp/omarchy): waybar, mako notifications, walker launcher (clipboard history, calc, emoji, websearch all built in), swayosd for volume/brightness popups, hyprlock + hypridle for lock and auto-sleep
@@ -122,6 +124,12 @@ Features are all optional, just import the ones you want in your host's `configu
 - Comma via nix-index-database (i.e. `, supertuxkart` instead of `nix shell nixpkgs#supertuxkart`)
 - nh for nixos rebuilds, shows you a diff of what's changing before it applies
 - `rebuild` and `update` aliases run `nix flake check` (alejandra + statix) before applying so you never deploy broken config
+- Nix store auto-GC kicks in at 5GB free and cleans up to 20GB, so builds don't fail on a full disk and you don't have to remember to run gc manually
+- Channels completely killed, global flake registry disabled, all flake inputs pinned to the lockfile via nix registry so `nix run nixpkgs#`, `nix run home-manager#`, etc. resolve instantly from local store
+- systemd-oomd watching root, system, and user slices so it catches memory pressure before the kernel OOM killer randomly murders your browser
+- Watchdog timers (15s runtime, 30s reboot, 60s kexec) auto-recover a hung system, gpt-auto-generator suppressed since NixOS manages mounts declaratively
+- Caps lock remapped to escape system-wide (TTY, xwayland, Hyprland)
+- Network services don't restart during `nixos-rebuild switch` (no more SSH drops mid-rebuild), boot doesn't wait for network on desktop
 - nix-ld so you can run random binaries without the "interpreter not found" song and dance
 - Jujutsu (jj) alongside git, modern VCS with undo, auto-commit working copy, colocated with git repos
 - Ripdrag for dragging files out of the terminal into GUI apps
