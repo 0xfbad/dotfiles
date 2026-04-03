@@ -11,10 +11,16 @@ _: {
       LOG="$HOME/.local/share/pomodoro.log"
       mkdir -p "$(dirname "$LOG")"
 
+      today=$(date '+%Y-%m-%d')
+
       case "$1" in
         start)
-          # walker prompt for task name
-          task=$(${pkgs.walker}/bin/walker --dmenu --placeholder "what are you working on?")
+          # show today's sessions as selectable items, or type a new task
+          recent=""
+          if [ -f "$LOG" ]; then
+            recent=$(command grep "^$today" "$LOG" | command grep -v 'cancelled' | sed 's/^[^ ]* [^ ]* - //' | tac | awk '!seen[$0]++')
+          fi
+          task=$(printf "%s" "$recent" | ${pkgs.walker}/bin/walker --dmenu --placeholder "what are you working on?")
           [ -z "$task" ] && exit 0
           echo "$(date +%s) $(( $(date +%s) + 1500 )) $task" > "$STATE"
           echo "$(date '+%Y-%m-%d %H:%M') - $task" >> "$LOG"
