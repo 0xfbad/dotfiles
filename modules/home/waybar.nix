@@ -15,10 +15,10 @@ _: {
 
       case "$1" in
         start)
-          # show today's sessions as selectable items, or type a new task
+          # show recent tasks as selectable items, deduped, newest first
           recent=""
           if [ -f "$LOG" ]; then
-            recent=$(command grep "^$today" "$LOG" | command grep -v 'cancelled' | sed 's/^[^ ]* [^ ]* - //' | tac | awk '!seen[$0]++')
+            recent=$(command grep -v 'cancelled' "$LOG" | sed 's/^[^ ]* [^ ]* - //' | tac | awk '!seen[$0]++' | head -15)
           fi
           task=$(printf "%s" "$recent" | ${pkgs.walker}/bin/walker --dmenu --placeholder "what are you working on?")
           [ -z "$task" ] && exit 0
