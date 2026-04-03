@@ -1,6 +1,7 @@
 _: {
   flake.homeModules.starship = {config, ...}: let
     c = config.colors;
+    langStyle = c.surface1;
   in {
     programs.starship = {
       enable = true;
@@ -8,7 +9,11 @@ _: {
       settings = {
         add_newline = true;
         command_timeout = 200;
-        format = "$directory$git_branch$git_status$nix_shell$cmd_duration$character";
+        format = "$all";
+        right_format = "";
+
+        # second line is just the prompt
+        line_break.disabled = false;
 
         character = {
           success_symbol = "[\\$](bold ${c.accent})";
@@ -23,9 +28,53 @@ _: {
 
         nix_shell = {
           format = "[($name )](${c.surface1})";
+          symbol = "";
           impure_msg = "[impure](bold ${c.red})";
           pure_msg = "";
         };
+
+        # no emoji symbols, just the language name and version
+        python = {
+          symbol = "";
+          format = "[py $version]($style) ";
+          style = langStyle;
+        };
+        rust = {
+          symbol = "";
+          format = "[rs $version]($style) ";
+          style = langStyle;
+        };
+        golang = {
+          symbol = "";
+          format = "[go $version]($style) ";
+          style = langStyle;
+        };
+        zig = {
+          symbol = "";
+          format = "[zig $version]($style) ";
+          style = langStyle;
+        };
+        nodejs = {
+          symbol = "";
+          format = "[node $version]($style) ";
+          style = langStyle;
+        };
+        typst = {
+          symbol = "";
+          format = "[typst $version]($style) ";
+          style = langStyle;
+        };
+        docker_context = {
+          symbol = "";
+          format = "[docker $context]($style) ";
+          style = langStyle;
+        };
+
+        # hide stuff we don't need on the prompt
+        package.disabled = true;
+        aws.disabled = true;
+        gcloud.disabled = true;
+        azure.disabled = true;
 
         directory = {
           truncation_length = 2;
