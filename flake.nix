@@ -20,6 +20,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    wlctl = {
+      url = "github:aashish-thapa/wlctl";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # don't follow nixpkgs here, keeps flakehub cache hits
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };

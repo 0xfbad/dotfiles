@@ -20,7 +20,10 @@
     ];
 
     nixpkgs.config.allowUnfree = true;
-    nixpkgs.overlays = [inputs.nix-matlab.overlay];
+    nixpkgs.overlays = [
+      inputs.nix-matlab.overlay
+      (final: prev: {wlctl = inputs.wlctl.packages.${final.system}.default;})
+    ];
 
     networking.hostName = "desktop";
 

@@ -367,7 +367,8 @@
         "nix-index-database": "nix-index-database",
         "nix-matlab": "nix-matlab",
         "nixpkgs": "nixpkgs_3",
-        "treefmt": "treefmt"
+        "treefmt": "treefmt",
+        "wlctl": "wlctl"
       }
     },
     "treefmt": {
@@ -387,6 +388,26 @@
       "original": {
         "owner": "numtide",
         "repo": "treefmt-nix",
+        "type": "github"
+      }
+    },
+    "wlctl": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1774058250,
+        "narHash": "sha256-UBcztvI20YGx+tR1z4LQlQijPcQseK7b71LX2UOyALg=",
+        "owner": "aashish-thapa",
+        "repo": "wlctl",
+        "rev": "2b52131a75ef3b26af8fc165a5c03625110e85af",
+        "type": "github"
+      },
+      "original": {
+        "owner": "aashish-thapa",
+        "repo": "wlctl",
         "type": "github"
       }
     }

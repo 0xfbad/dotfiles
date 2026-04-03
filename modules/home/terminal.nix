@@ -102,6 +102,7 @@ _: {
       process-compose # like docker-compose for bare processes, YAML config, TUI
       tailspin # pipe any log through tspin, auto-highlights dates/IPs/UUIDs/severity
       watchexec # modern entr, file watcher that auto-ignores .git, coalesces events
+      wlctl
 
       # fun
       cowsay
