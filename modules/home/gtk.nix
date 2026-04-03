@@ -4,7 +4,7 @@ _: {
       enable = true;
       gtk4.theme = null;
       theme = {
-        name = "catppuccin-mocha-mauve-standard+default";
+        name = "catppuccin-mocha-mauve-standard";
         package = pkgs.catppuccin-gtk.override {
           accents = ["mauve"];
           variant = "mocha";
@@ -153,7 +153,7 @@ _: {
 
     dconf.settings."org/gnome/desktop/interface" = {
       color-scheme = "prefer-dark";
-      gtk-theme = "catppuccin-mocha-mauve-standard+default";
+      gtk-theme = "catppuccin-mocha-mauve-standard";
     };
   };
 }
