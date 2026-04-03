@@ -130,6 +130,15 @@ _: {
         }
       ' | tee "$CACHE"
     '';
+
+    # uses impala (iwd) if available, falls back to wlctl (networkmanager)
+    wifiTui = pkgs.writeShellScript "wifi-tui" ''
+      if systemctl is-active --quiet iwd 2>/dev/null; then
+        exec ${pkgs.impala}/bin/impala
+      else
+        exec ${pkgs.wlctl}/bin/wlctl
+      fi
+    '';
   in {
     programs.waybar = {
       enable = true;
@@ -219,7 +228,7 @@ _: {
             format-disconnected = "󰤭 disconnected";
             tooltip-format-wifi = "{signalStrength}%  {bandwidthUpBits}  {bandwidthDownBits}";
             tooltip-format-ethernet = "{ifname}: {ipaddr}/{cidr}";
-            on-click = "${pkgs.wezterm}/bin/wezterm start --class impala -- impala";
+            on-click = "${pkgs.wezterm}/bin/wezterm start --class wifi-tui -- ${wifiTui}";
             interval = 5;
           };
 
