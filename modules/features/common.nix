@@ -40,7 +40,7 @@
     # so nix run nixpkgs#, nix run home-manager#, etc. resolve instantly from lockfile
     nix.settings.flake-registry = "";
     nix.channel.enable = false;
-    nix.registry = builtins.mapAttrs (_: flake: {flake = flake;}) inputs;
+    nix.registry = builtins.mapAttrs (_: flake: {inherit flake;}) inputs;
     nix.nixPath = ["nixpkgs=flake:nixpkgs"];
 
     # strip default packages (perl, rsync, strace)
