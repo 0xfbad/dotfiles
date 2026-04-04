@@ -60,6 +60,44 @@ _: {
       fi
     '';
 
+    screenshotArea = lib.getExe (pkgs.writeShellApplication {
+      name = "screenshot-area";
+      runtimeInputs = with pkgs; [wayfreeze grim slurp wl-clipboard libnotify];
+      text = ''
+        wayfreeze --hide-cursor &
+        PID=$!
+        sleep 0.1
+        # shellcheck disable=SC2086
+        GEOM=$(slurp $SLURP_ARGS) || { kill "$PID"; exit 0; }
+        grim -g "$GEOM" - | wl-copy -t image/png
+        kill "$PID"
+        notify-send -t 2000 "Screenshot" "copied to clipboard"
+      '';
+    });
+
+    screenshotEdit = lib.getExe (pkgs.writeShellApplication {
+      name = "screenshot-edit";
+      runtimeInputs = with pkgs; [wayfreeze grim slurp satty libnotify];
+      text = ''
+        wayfreeze --hide-cursor &
+        PID=$!
+        sleep 0.1
+        # shellcheck disable=SC2086
+        GEOM=$(slurp $SLURP_ARGS) || { kill "$PID"; exit 0; }
+        grim -g "$GEOM" - | satty -f -
+        kill "$PID"
+      '';
+    });
+
+    screenshotFull = lib.getExe (pkgs.writeShellApplication {
+      name = "screenshot-full";
+      runtimeInputs = with pkgs; [grim wl-clipboard libnotify];
+      text = ''
+        grim - | wl-copy -t image/png
+        notify-send -t 2000 "Screenshot" "full screen copied to clipboard"
+      '';
+    });
+
     editClipboard = lib.getExe (pkgs.writeShellApplication {
       name = "edit-clipboard";
       runtimeInputs = with pkgs; [wl-clipboard satty];
@@ -83,12 +121,12 @@ _: {
           sleep 0.5
           LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
           if [ -n "$LAST" ]; then
-            notify-send -t 3000 "Recording saved" "$(basename "$LAST")"
+            notify-send -t 3000 "Recording saved to videos" "named as $(basename "$LAST")"
           fi
         else
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
-          GEOM=$(slurp -b 00000080 -s 00000000) || exit 0
+          GEOM=$(slurp -b 000000CC -s 00000000) || exit 0
           notify-send -t 2000 "Recording started" "Super+Shift+R to stop"
           wl-screenrec -g "$GEOM" --audio -f "$FILE" &
         fi
@@ -148,9 +186,9 @@ _: {
 
     powerMenu = lib.getExe (pkgs.writeShellApplication {
       name = "power-menu";
-      runtimeInputs = with pkgs; [coreutils hyprland systemd walker];
+      runtimeInputs = with pkgs; [coreutils hyprland systemd fuzzel];
       text = ''
-        choice=$(printf "lock\nsuspend\nreboot\nlogout\nshutdown" | walker --dmenu)
+        choice=$(printf "lock\nsuspend\nreboot\nlogout\nshutdown" | fuzzel --dmenu)
         case "$choice" in
           lock) hyprlock ;;
           suspend) systemctl suspend ;;
@@ -344,9 +382,12 @@ _: {
       env = XDG_CURRENT_DESKTOP,Hyprland
       env = XDG_SESSION_DESKTOP,Hyprland
 
-      # dark overlay for grimblast/slurp region selection
+      # dark overlay for slurp region selection
       # -b background, -c border, -s selection fill, -w border width (RRGGBBAA)
-      env = SLURP_ARGS,-b 00000080 -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2
+      env = SLURP_ARGS,-b 000000CC -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2
+
+      # prevent slurp selection border from bleeding into screenshots
+      layerrule = no_anim on, match:namespace selection
 
       # input
       input {
@@ -446,7 +487,6 @@ _: {
 
 
       # startup
-      exec-once = walker --gapplication-service
       exec-once = swww-daemon
       exec-once = pypr
       exec-once = ${wallpaper}
@@ -454,6 +494,7 @@ _: {
       exec-once = ${lib.getExe pkgs.wl-clip-persist} --clipboard regular
       exec-once = wl-paste --watch cliphist store
       exec-once = ${lib.getExe pkgs.hyprdim} --no-dim-when-only --persist --strength 30 --duration 800
+      # quickshell managed by systemd user service
 
       # window rules
       windowrule = match:class .*, suppress_event maximize
@@ -594,10 +635,11 @@ _: {
       bindm = ${mod}, mouse:273, resizewindow
 
       # launcher and tools
-      bindd = ${mod}, Space, launcher, exec, walker
-      bindd = ${mod} CTRL, V, clipboard, exec, cliphist list | walker --dmenu | cliphist decode | wl-copy
+      bindd = ${mod}, Space, launcher, global, quickshell:toggle-launcher
+      bindd = ${mod} CTRL, V, clipboard, exec, cliphist list | ${pkgs.fuzzel}/bin/fuzzel --dmenu | cliphist decode | wl-copy
       bindd = ${mod} CTRL, L, lock, exec, hyprlock
-      bindd = ${mod}, Escape, power menu, exec, ${powerMenu}
+      bindd = ${mod}, Escape, power menu, global, quickshell:toggle-session
+      bindd = ${mod} SHIFT, W, wallpaper picker, global, quickshell:toggle-wallpicker
       bindd = ${mod}, backslash, toggle layout, exec, ${layoutToggle}
 
       # which-key
@@ -605,29 +647,30 @@ _: {
       bind = ${mod} SHIFT, slash, exec, ${lib.getExe keybindPopup}
 
       # notifications
-      bindd = ${mod}, comma, dismiss notification, exec, makoctl dismiss
-      bindd = ${mod} SHIFT, comma, dismiss all, exec, makoctl dismiss --all
+      bindd = ${mod}, comma, dismiss notification, global, quickshell:dismiss-notif
+      bindd = ${mod} SHIFT, comma, dismiss all, global, quickshell:dismiss-all-notif
+      bindd = ${mod}, N, notification panel, global, quickshell:toggle-notif-panel
 
       # color picker (copies hex to clipboard)
       bindd = ${mod} SHIFT, C, color picker, exec, ${lib.getExe pkgs.hyprpicker} -a -n
 
-      # capture (grimblast --freeze uses hyprpicker to freeze screen during selection)
-      bindd = , Print, screenshot region, exec, grimblast --freeze --notify copy area
-      bindd = ${mod} SHIFT, S, screenshot + edit, exec, grimblast --freeze save area - | satty -f -
-      bindd = ${mod} CTRL, S, screenshot full, exec, grimblast --notify copy screen
+      # capture (wayfreeze hides cursor and avoids window border artifacts)
+      bindd = , Print, screenshot region, exec, ${screenshotArea}
+      bindd = ${mod} SHIFT, S, screenshot + edit, exec, ${screenshotEdit}
+      bindd = ${mod} CTRL, S, screenshot full, exec, ${screenshotFull}
       bindd = ${mod} SHIFT, E, edit clipboard, exec, ${editClipboard}
       bindd = ${mod} SHIFT, R, record toggle, exec, ${recordToggle}
 
-      # audio (swayosd)
-      bindde = , XF86AudioRaiseVolume, volume up, exec, swayosd-client --output-volume raise
-      bindde = , XF86AudioLowerVolume, volume down, exec, swayosd-client --output-volume lower
-      bindd = , XF86AudioMute, mute, exec, swayosd-client --output-volume mute-toggle
-      bindd = , XF86AudioMicMute, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle
-      bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle && swayosd-client --input-volume mute-toggle
+      # audio (quickshell osd detects changes via pipewire)
+      bindde = , XF86AudioRaiseVolume, volume up, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+
+      bindde = , XF86AudioLowerVolume, volume down, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
+      bindd = , XF86AudioMute, mute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+      bindd = , XF86AudioMicMute, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
+      bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
-      # brightness (swayosd)
-      bindde = , XF86MonBrightnessUp, brightness up, exec, swayosd-client --brightness raise
-      bindde = , XF86MonBrightnessDown, brightness down, exec, swayosd-client --brightness lower
+      # brightness (quickshell osd detects changes via polling)
+      bindde = , XF86MonBrightnessUp, brightness up, exec, ${pkgs.brightnessctl}/bin/brightnessctl set +5%
+      bindde = , XF86MonBrightnessDown, brightness down, exec, ${pkgs.brightnessctl}/bin/brightnessctl set 5%-
 
       # calculator
       bindd = , XF86Calculator, calculator, exec, ${lib.getExe pkgs.qalculate-gtk}
