@@ -1,2 +1,5 @@
 wallpapers/
 startpage/index.html
+result
+*.md
+!README.md
