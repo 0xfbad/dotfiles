@@ -4,13 +4,15 @@ _: {
     services.ssh-agent.enable = true;
     programs.ssh = {
       enable = true;
-      extraConfig = ''
-        Host *
-          Compression yes
-          ControlMaster auto
-          ControlPath ~/.ssh/master-%C
-          ControlPersist 600  # seconds before idle socket cleanup
-      '';
+      enableDefaultConfig = false;
+      matchBlocks."*" = {
+        compression = true;
+        extraOptions = {
+          ControlMaster = "auto";
+          ControlPath = "~/.ssh/master-%C";
+          ControlPersist = "600";
+        };
+      };
     };
     programs.git = {
       enable = true;
