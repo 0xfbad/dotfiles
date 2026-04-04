@@ -102,20 +102,6 @@ _: {
         hash -d dl=~/Downloads
         hash -d proj=~/projects
 
-        # notification for long-running commands (>30s)
-        _cmd_timer_preexec() { _cmd_start=$EPOCHSECONDS; _cmd_name=$1; }
-        _cmd_timer_precmd() {
-          if [[ -n "$_cmd_start" ]]; then
-            local elapsed=$(( EPOCHSECONDS - _cmd_start ))
-            if (( elapsed > 30 )); then
-              notify-send "command finished (''${elapsed}s)" "$_cmd_name"
-            fi
-            unset _cmd_start _cmd_name
-          fi
-        }
-        autoload -U add-zsh-hook
-        add-zsh-hook preexec _cmd_timer_preexec
-        add-zsh-hook precmd _cmd_timer_precmd
 
         optimize-video() {
           local input="$1"
