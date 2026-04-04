@@ -165,7 +165,7 @@ _: {
           elif [ "$freq" -lt 6000 ] 2>/dev/null; then band="5GHz"
           else band="6GHz"; fi
         fi
-        text="󰤨 $conn (''${signal}%) $ip"
+        text="󰤨 $conn ''${signal}% ($ip)"
         tooltip="interface       $dev\nssid            $conn (''${signal}% on ''${band:-unknown})\naddress         $addr\ngateway         $gw\ndns             $dns''${domain:+\ndomain          $domain}\nmac             $mac''${ipv6:+\nipv6            $ipv6}"
       else
         text="󰈀 $ip"
