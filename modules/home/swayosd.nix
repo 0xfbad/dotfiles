@@ -1,7 +1,3 @@
 _: {
-  flake.homeModules.swayosd = _: {
-    services.swayosd = {
-      enable = true;
-    };
-  };
+  flake.homeModules.swayosd = _: {};
 }
