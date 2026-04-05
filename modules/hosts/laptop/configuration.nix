@@ -27,10 +27,6 @@
 
     networking.hostName = "laptop";
 
-    # iwd broken on intel ax card, using wpa_supplicant instead
-    networking.wireless.iwd.enable = false;
-    networking.networkmanager.wifi.backend = "wpa_supplicant";
-
     services.power-profiles-daemon.enable = true;
 
     boot.loader.systemd-boot.enable = true;

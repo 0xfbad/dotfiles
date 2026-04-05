@@ -15,7 +15,7 @@ modules/
   formatting.nix              treefmt, alejandra, statix
   hosts/
     desktop/                   RTX 3090, dual monitor, GRUB, intel cpu, xpadneo
-    laptop/                    Discrete RTX 4090, systemd-boot, LUKS, intel cpu, iwd
+    laptop/                    Discrete RTX 4090, systemd-boot, LUKS, intel cpu
   features/
     hyprland.nix               compositor, scrolling layout, keybinds, wallpaper, window rules
     greetd.nix                 tuigreet + uwsm
@@ -81,7 +81,7 @@ Features are all optional, just import the ones you want in your host's `configu
 - OLEDmaxxing theme, everything is fully black with catppuccin mocha mauve accent on every app that supports it
 - Hyprland with niri-style scrolling layout by default (infinite horizontal columns, cycle column widths with Super+Alt+=/-, scroll viewport with Super+[/]), Super+\\ toggles back to dwindle
 - Modular desktop shell inspired by [Omarchy](https://github.com/basecamp/omarchy): waybar, mako notifications, walker launcher (clipboard history, calc, emoji, websearch all built in), swayosd for volume/brightness popups, hyprlock + hypridle for lock and auto-sleep
-- wlr-which-key on Super+D for quick actions (screenshots, recording, bluetui, impala wifi, lazydocker, hyprmon monitor config, volume mixer, dolphin)
+- wlr-which-key on Super+D for quick actions (screenshots, recording, bluetui, wlctl wifi, lazydocker, hyprmon monitor config, volume mixer, dolphin)
 - Walker launcher on Super+Space with `$` prefix for clipboard history, `=` for calculator, `@` for websearch
 - Scratchpad workspace (Super+S), window groups (Super+G), pop-out float+pin (Super+O)
 - hyprdim auto-dims inactive windows so you can tell what's focused without borders, wl-clip-persist keeps clipboard alive after closing the source app
@@ -104,7 +104,7 @@ Features are all optional, just import the ones you want in your host's `configu
 - viddy instead of watch (diff highlighting between runs, history scrollback)
 - choose instead of cut/awk (human-friendly field selection, negative indexing)
 - trippy instead of traceroute (real-time latency graphs per hop, multi-protocol)
-- Lazydocker for Docker TUI, bluetui and impala for bluetooth and wifi TUIs
+- Lazydocker for Docker TUI, bluetui and wlctl for bluetooth and wifi TUIs
 - Greetd login with system specs on screen (CPU, RAM, GPU, disk, IP)
 - Keybind cheat sheet popup on Super+Shift+? via wezterm
 - Wallpaper rotation from ~/dotfiles/wallpapers/ via swww, different image per monitor, grow-from-center transitions, shuffles every 30 minutes
@@ -164,7 +164,6 @@ Features are all optional, just import the ones you want in your host's `configu
 - Desktop notification when a command takes over 30 seconds (useful when you're in another zellij pane)
 - harlequin SQL IDE in terminal (autocomplete, highlighting, Postgres/DuckDB/SQLite)
 - navi interactive cheatsheet (fuzzy search commands, prompts for each arg)
-- iwd backend for NetworkManager (faster wifi scans, works with impala TUI)
 
 ## aliases
 

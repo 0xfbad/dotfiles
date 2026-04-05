@@ -27,10 +27,6 @@
 
     networking.hostName = "desktop";
 
-    # iwd for impala wifi TUI
-    networking.wireless.iwd.enable = true;
-    networking.networkmanager.wifi.backend = "iwd";
-
     # always run at max performance
     powerManagement.cpuFreqGovernor = "performance";
 
