@@ -637,9 +637,8 @@ _: {
       bindd = ${mod} SHIFT, W, wallpaper picker, global, quickshell:toggle-wallpicker
       bindd = ${mod}, backslash, toggle layout, exec, ${layoutToggle}
 
-      # which-key
-      bindd = ${mod}, D, which-key menu, exec, ${lib.getExe pkgs.wlr-which-key} ${whichKeyConfig}
-      bind = ${mod} SHIFT, slash, exec, ${lib.getExe keybindPopup}
+      # which-key cheatsheet (quickshell native)
+      bindd = ${mod}, D, which-key menu, global, quickshell:toggle-cheatsheet
 
       # notifications
       bindd = ${mod}, comma, dismiss notification, global, quickshell:dismiss-notif
