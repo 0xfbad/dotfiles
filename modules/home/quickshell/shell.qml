@@ -53,9 +53,9 @@ ShellRoot {
   // design tokens
   readonly property real pillRadius: 12
   readonly property real pillHeight: 32
-  readonly property real iconSize: 15
+  readonly property real iconSize: 18
   readonly property real textSize: 12.5
-  readonly property string iconFont: "JetBrainsMono Nerd Font"
+  readonly property string iconFont: "Material Symbols Rounded"
   readonly property string textFont: "JetBrains Mono"
 
   SystemClock { id: clock; precision: SystemClock.Seconds }
@@ -70,14 +70,14 @@ ShellRoot {
   readonly property int volPercent: Math.round(volValue * 100)
   readonly property bool volActive: !volMuted && volPercent > 0
   readonly property string volIcon: {
-    if (volMuted) return "󰝟";
-    if (volPercent >= 70) return "󰕾";
-    if (volPercent >= 30) return "󰖀";
-    if (volPercent > 0) return "󰕿";
-    return "󰝟";
+    if (volMuted) return "volume_off";
+    if (volPercent >= 70) return "volume_up";
+    if (volPercent >= 30) return "volume_down";
+    if (volPercent > 0) return "volume_mute";
+    return "volume_off";
   }
   readonly property bool micMuted: !!source?.audio?.muted
-  readonly property string micIcon: micMuted ? "󰍭" : "󰍬"
+  readonly property string micIcon: micMuted ? "mic_off" : "mic"
   readonly property real micVolValue: source?.audio?.volume ?? 0
   readonly property int micVolPercent: Math.round(micVolValue * 100)
 
@@ -87,6 +87,15 @@ ShellRoot {
   readonly property bool batCharging: {
     let s = UPower.displayDevice.state;
     return s === UPowerDeviceState.Charging || s === UPowerDeviceState.FullyCharged || s === UPowerDeviceState.PendingCharge;
+  }
+  readonly property string batIcon: {
+    if (batCharging) return "battery_charging_full";
+    if (batPercent >= 90) return "battery_full";
+    if (batPercent >= 70) return "battery_5_bar";
+    if (batPercent >= 50) return "battery_4_bar";
+    if (batPercent >= 30) return "battery_3_bar";
+    if (batPercent >= 10) return "battery_2_bar";
+    return "battery_alert";
   }
 
   // bluetooth
@@ -104,6 +113,24 @@ ShellRoot {
   readonly property string mediaTitle: activePlayer?.trackTitle ?? ""
   readonly property string mediaArtist: activePlayer?.trackArtist ?? ""
   readonly property bool mediaPlaying: !!activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
+
+  // audio visualizer (cava)
+  property var cavaBars: [0,0,0,0,0,0,0,0,0,0,0,0]
+  Process {
+    id: cavaProc
+    command: root.scripts.cava ? [root.scripts.cava] : ["true"]
+    running: root.scriptsLoaded && root.mediaActive
+    stdout: SplitParser {
+      onRead: data => {
+        let vals = data.trim().split(";").map(v => parseInt(v) || 0);
+        if (vals.length >= 12) root.cavaBars = vals;
+      }
+    }
+  }
+  // restart cava when media becomes active again
+  onMediaActiveChanged: {
+    if (mediaActive && scriptsLoaded && !cavaProc.running) cavaProc.running = true;
+  }
 
   // wifi + power
   property string wifiIcon: ""
@@ -146,11 +173,11 @@ ShellRoot {
   property var pomodoroRecent: []
   readonly property bool pomodoroActive: pomodoroEndTime > 0 && clock.date.getTime() / 1000 < pomodoroEndTime
   readonly property string pomodoroText: {
-    if (!pomodoroActive) return "󰔧";
+    if (!pomodoroActive) return "";
     let remaining = Math.max(0, pomodoroEndTime - clock.date.getTime() / 1000);
     let min = Math.floor(remaining / 60);
     let sec = Math.floor(remaining % 60);
-    return "󰔧 " + String(min).padStart(2, '0') + ":" + String(sec).padStart(2, '0');
+    return String(min).padStart(2, '0') + ":" + String(sec).padStart(2, '0');
   }
 
   function startPomodoro(task) {
@@ -176,6 +203,14 @@ ShellRoot {
     pomodoroTask = "";
   }
 
+  function removeRecentPomodoro(task) {
+    root.pomodoroRecent = root.pomodoroRecent.filter(t => t !== task);
+    // remove matching lines from log so they don't reappear on reload
+    Quickshell.execDetached(["bash", "-c",
+      "f=$HOME/.local/share/pomodoro.log; [ -f \"$f\" ] && { while IFS= read -r line; do t=\"${line#* - }\"; case \"$t\" in \"$1\"|\"$1 (cancelled\"*) ;; *) printf '%s\\n' \"$line\" ;; esac; done < \"$f\" > \"$f.tmp\" && mv \"$f.tmp\" \"$f\"; }",
+      "_", task]);
+  }
+
   Timer {
     running: root.pomodoroEndTime > 0
     interval: 1000; repeat: true
@@ -198,7 +233,7 @@ ShellRoot {
   }
 
   // caffeine
-  property string caffeineIcon: "󰛚"
+  property string caffeineIcon: "local_cafe"
   property bool caffeineActive: false
 
   // misc
@@ -406,7 +441,7 @@ ShellRoot {
         let norm = val / 100;
         if (root.lastBrightness >= 0 && Math.abs(norm - root.lastBrightness) > 0.005) {
           root.osdValue = norm;
-          root.osdIcon = norm > 0.7 ? "󰐀" : (norm > 0.3 ? "󰏿" : "󰏾");
+          root.osdIcon = norm > 0.7 ? "brightness_high" : (norm > 0.3 ? "brightness_medium" : "brightness_low");
           root.osdVisible = true;
           osdHideTimer.restart();
         }

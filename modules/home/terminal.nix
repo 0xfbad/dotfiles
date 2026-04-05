@@ -9,6 +9,7 @@ _: {
     home.packages = with pkgs; [
       # fonts
       nerd-fonts.jetbrains-mono
+      material-symbols
       noto-fonts
       noto-fonts-cjk-sans
       noto-fonts-color-emoji

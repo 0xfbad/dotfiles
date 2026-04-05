@@ -31,11 +31,11 @@ PanelWindow {
 
       Repeater {
         model: [
-          { icon: "󰌾", label: "Lock", cmd: "hyprlock" },
-          { icon: "󰤄", label: "Suspend", cmd: "systemctl suspend" },
-          { icon: "󰍃", label: "Logout", cmd: "hyprctl dispatch exit" },
-          { icon: "󰜉", label: "Reboot", cmd: "systemctl reboot" },
-          { icon: "󰐥", label: "Shutdown", cmd: "systemctl poweroff" }
+          { icon: "lock", label: "Lock", cmd: "hyprlock" },
+          { icon: "dark_mode", label: "Suspend", cmd: "systemctl suspend" },
+          { icon: "logout", label: "Logout", cmd: "hyprctl dispatch exit" },
+          { icon: "restart_alt", label: "Reboot", cmd: "systemctl reboot" },
+          { icon: "power_settings_new", label: "Shutdown", cmd: "systemctl poweroff" }
         ]
 
         delegate: Rectangle {

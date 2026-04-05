@@ -214,7 +214,7 @@ PanelWindow {
           anchors.fill: parent; anchors.leftMargin: 14; anchors.rightMargin: 14; spacing: 8
 
           Text {
-            text: "󰍉"; font.family: root.iconFont; font.pixelSize: 16
+            text: "search"; font.family: root.iconFont; font.pixelSize: 18
             color: root.colSubtext0; anchors.verticalCenter: parent.verticalCenter
           }
 
@@ -248,7 +248,7 @@ PanelWindow {
           }
 
           Text {
-            text: "󰅖"; font.family: root.iconFont; font.pixelSize: 14
+            text: "close"; font.family: root.iconFont; font.pixelSize: 16
             color: root.colSubtext0; anchors.verticalCenter: parent.verticalCenter
             visible: searchInput.text !== ""
             opacity: clearMouse.containsMouse ? 0.7 : 1.0

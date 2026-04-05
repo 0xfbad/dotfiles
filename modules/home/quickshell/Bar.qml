@@ -28,6 +28,12 @@ PanelWindow {
       .sort((a, b) => a.id - b.id);
   }
 
+  // settings popup state (mic, bt, wifi, vol revealed on hover)
+  property bool settingsOpen: false
+  property bool _popupHovered: false
+  Timer { id: expandTimer; interval: 250; onTriggered: bar.settingsOpen = true }
+  Timer { id: collapseTimer; interval: 400; onTriggered: { if (!arrowHover.hovered && !bar._popupHovered) bar.settingsOpen = false; } }
+
   // clock
   Rectangle {
     id: clockBox
@@ -59,8 +65,8 @@ PanelWindow {
       radius: root.pillRadius + 2
       border.width: 1; border.color: Qt.rgba(root.colText.r, root.colText.g, root.colText.b, 0.05)
       Layout.preferredHeight: 40; Layout.preferredWidth: leftLayout.implicitWidth + 16
+      Layout.maximumWidth: bar.width / 2 - clockBox.width / 2 - 16
       clip: true
-      Behavior on Layout.preferredWidth { NumberAnimation { duration: 300; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.3, 0, 0, 1, 1, 1] } }
 
       MouseArea {
         anchors.fill: parent; acceptedButtons: Qt.NoButton
@@ -71,7 +77,7 @@ PanelWindow {
       }
 
       RowLayout {
-        id: leftLayout; anchors.centerIn: parent; spacing: 6
+        id: leftLayout; anchors.verticalCenter: parent.verticalCenter; anchors.left: parent.left; anchors.leftMargin: 8; spacing: 6
 
         // workspaces
         Item {
@@ -173,10 +179,16 @@ PanelWindow {
           Behavior on color { ColorAnimation { duration: 200 } }
           RowLayout { id: pomRow; anchors.centerIn: parent; spacing: 4
             Text {
-              text: root.pomodoroText
-              font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Bold
+              text: "timer"
+              font.family: root.iconFont; font.pixelSize: root.iconSize
               color: root.pomodoroActive ? root.colAccent : root.colSurface1
               Behavior on color { ColorAnimation { duration: 200 } }
+            }
+            Text {
+              visible: root.pomodoroActive
+              text: root.pomodoroText
+              font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Bold
+              color: root.colAccent
             }
           }
           MouseArea {
@@ -191,24 +203,48 @@ PanelWindow {
           }
         }
 
-        // media
+        // media visualizer
         Rectangle {
           visible: root.mediaActive
-          Layout.preferredWidth: root.mediaActive ? mediaRow.implicitWidth + 20 : 0
-          Layout.preferredHeight: 28; radius: 8; color: "transparent"; clip: true
+          Layout.preferredWidth: root.mediaActive ? cavaViz.width + 16 : 0
+          Layout.preferredHeight: 28; radius: 8
+          color: mediaMouse.containsMouse ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
+          clip: true
           Behavior on Layout.preferredWidth { NumberAnimation { duration: 400; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.35, 0, 0, 1, 1, 1] } }
-          RowLayout { id: mediaRow; anchors.centerIn: parent; spacing: 6
-            Text {
-              text: { let s = root.mediaArtist ? root.mediaArtist + " - " + root.mediaTitle : root.mediaTitle; return s.length > 35 ? s.substring(0, 33) + ".." : s; }
-              font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Bold
-              color: root.mediaPlaying ? root.colAccent : root.colSurface1
-              Behavior on color { ColorAnimation { duration: 200 } }
+          Behavior on color { ColorAnimation { duration: 150 } }
+
+          Item {
+            id: cavaViz
+            anchors.centerIn: parent
+            width: 12 * 2 + 11 * 1.5; height: 18
+
+            Repeater {
+              model: root.cavaBars
+              Rectangle {
+                required property int index
+                required property var modelData
+                x: index * 3.5
+                y: parent.height - height
+                width: 2; radius: 1
+                height: Math.max(3, modelData / 100 * parent.height)
+                color: root.mediaPlaying ? root.colAccent : root.colSurface1
+                Behavior on height { NumberAnimation { duration: 80 } }
+                Behavior on color { ColorAnimation { duration: 200 } }
+              }
             }
           }
+
           MouseArea {
-            anchors.fill: parent; hoverEnabled: true
-            onClicked: { if (root.activePlayer) root.activePlayer.togglePlaying(); }
-            onEntered: root.showTooltip("media - " + (root.mediaPlaying ? "playing" : "paused") + "\nclick to play/pause", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+            id: mediaMouse; anchors.fill: parent; hoverEnabled: true
+            acceptedButtons: Qt.LeftButton | Qt.RightButton
+            onClicked: mouse => {
+              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol]);
+              else if (root.activePlayer) root.activePlayer.togglePlaying();
+            }
+            onEntered: {
+              let title = root.mediaArtist ? root.mediaArtist + " - " + root.mediaTitle : (root.mediaTitle || "media");
+              root.showTooltip(title + "\n" + (root.mediaPlaying ? "playing" : "paused") + "\nclick to play/pause, right-click for mixer", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6);
+            }
             onExited: root.hideTooltip()
           }
         }
@@ -219,15 +255,150 @@ PanelWindow {
 
     // right island
     Rectangle {
+      id: rightIsland
       color: Qt.rgba(root.colBg.r, root.colBg.g, root.colBg.b, 0.75)
       radius: root.pillRadius + 2
       border.width: 1; border.color: Qt.rgba(root.colText.r, root.colText.g, root.colText.b, 0.05)
       Layout.preferredHeight: 40; Layout.preferredWidth: rightLayout.implicitWidth + 16
+      Layout.maximumWidth: bar.width / 2 - clockBox.width / 2 - 16
       clip: true
-      Behavior on Layout.preferredWidth { NumberAnimation { duration: 300; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.3, 0, 0, 1, 1, 1] } }
 
       RowLayout {
-        id: rightLayout; anchors.centerIn: parent; spacing: 6
+        id: rightLayout; anchors.verticalCenter: parent.verticalCenter; anchors.right: parent.right; anchors.rightMargin: 8; spacing: 6
+
+        // settings arrow, hover or click to reveal settings panel
+        Rectangle {
+          Layout.preferredWidth: 20; Layout.preferredHeight: 28; radius: 8
+          color: arrowHover.hovered || bar.settingsOpen ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
+          Behavior on color { ColorAnimation { duration: 150 } }
+          HoverHandler { id: arrowHover }
+          Connections {
+            target: arrowHover
+            function onHoveredChanged() {
+              if (arrowHover.hovered) { collapseTimer.stop(); if (!bar.settingsOpen) expandTimer.restart(); }
+              else if (!bar._popupHovered) { expandTimer.stop(); collapseTimer.restart(); }
+            }
+          }
+          Text {
+            anchors.centerIn: parent
+            text: bar.settingsOpen ? "chevron_right" : "chevron_left"
+            font.family: root.iconFont; font.pixelSize: 16
+            color: arrowHover.hovered || bar.settingsOpen ? root.colSubtext0 : root.colSurface1
+            Behavior on color { ColorAnimation { duration: 150 } }
+          }
+          MouseArea {
+            anchors.fill: parent
+            onClicked: { bar.settingsOpen = !bar.settingsOpen; if (!bar.settingsOpen) expandTimer.stop(); }
+          }
+        }
+
+        // hidden settings (icon-only, revealed by arrow)
+        Item {
+          id: hiddenGroup; clip: true
+          Layout.preferredWidth: bar.settingsOpen ? hiddenRow.implicitWidth : 0
+          Layout.preferredHeight: 28
+          opacity: bar.settingsOpen ? 1 : 0
+          Behavior on Layout.preferredWidth { NumberAnimation { duration: 300; easing.type: Easing.BezierSpline; easing.bezierCurve: [0.3, 0, 0, 1, 1, 1] } }
+          Behavior on opacity { NumberAnimation { duration: 200 } }
+
+          HoverHandler { id: hiddenHover }
+          Connections {
+            target: hiddenHover
+            function onHoveredChanged() {
+              bar._popupHovered = hiddenHover.hovered;
+              if (hiddenHover.hovered) collapseTimer.stop();
+              else if (!arrowHover.hovered) collapseTimer.restart();
+            }
+          }
+
+          Row {
+            id: hiddenRow; anchors.verticalCenter: parent.verticalCenter; spacing: 6
+
+            // mic
+            Rectangle {
+              property bool hovered: micMouse.containsMouse
+              width: micRow.implicitWidth + 20; height: root.pillHeight; radius: root.pillRadius
+              color: root.micMuted ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.15) : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
+              Behavior on color { ColorAnimation { duration: 150 } }
+              RowLayout { id: micRow; anchors.centerIn: parent; spacing: 6
+                Text { text: root.micIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.micMuted ? root.colRed : root.colText }
+                Text { visible: !root.micMuted; text: root.micVolPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; color: root.colText }
+              }
+              MouseArea {
+                id: micMouse; hoverEnabled: true; anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: mouse => {
+                  if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol, "-t", "4"]);
+                  else if (root.source?.audio) root.source.audio.muted = !root.source.audio.muted;
+                }
+                onWheel: wheel => { let a = root.source?.audio; if (!a) return; a.volume = Math.max(0, Math.min(1, a.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))); if (a.muted) a.muted = false; }
+                onEntered: { root.tooltipText = Qt.binding(() => "mic " + root.micVolPercent + "%" + (root.micMuted ? " (muted)" : "") + "\nscroll to adjust, click to mute\nright-click for settings"); root.tooltipScreen = bar.screen; root.tooltipX = parent.mapToItem(null, parent.width/2, 0).x + 6; root.tooltipVisible = false; tooltipTimer.restart(); }
+                onExited: root.hideTooltip()
+              }
+            }
+
+            // bluetooth
+            Rectangle {
+              property bool hovered: btMouse.containsMouse
+              width: btRow.implicitWidth + 20; height: root.pillHeight; radius: root.pillRadius
+              color: root.btOn ? Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.2) : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
+              Behavior on color { ColorAnimation { duration: 200 } }
+              RowLayout { id: btRow; anchors.centerIn: parent; spacing: 6
+                Text { text: root.btEnabled ? (root.btOn ? "bluetooth_connected" : "bluetooth") : "bluetooth_disabled"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.btOn ? root.colAccent : root.colSubtext0 }
+                Text { visible: root.btOn && root.btDevice !== ""; text: root.btDevice; font.family: root.textFont; font.pixelSize: root.textSize; color: root.colText; maximumLineCount: 1; Layout.maximumWidth: 100; elide: Text.ElideRight }
+              }
+              MouseArea {
+                id: btMouse; hoverEnabled: true; anchors.fill: parent
+                onClicked: Quickshell.execDetached([root.scripts.wezterm, "start", "--class", "bluetui", "--", "bluetui"])
+                onEntered: root.showTooltip("bluetooth" + (root.btOn ? " - " + root.btDevice : "") + "\nclick to manage", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+                onExited: root.hideTooltip()
+              }
+            }
+
+            // wifi
+            Rectangle {
+              property bool hovered: wifiMouse.containsMouse
+              width: wifiRow.implicitWidth + 20; height: root.pillHeight; radius: root.pillRadius
+              color: root.wifiOn ? Qt.rgba(root.colBlue.r, root.colBlue.g, root.colBlue.b, 0.2) : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
+              Behavior on color { ColorAnimation { duration: 200 } }
+              RowLayout { id: wifiRow; anchors.centerIn: parent; spacing: 6
+                Text { text: root.wifiIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.wifiOn ? root.colBlue : root.colSubtext0 }
+                Text { visible: root.wifiOn && root.wifiSsid !== ""; text: root.wifiSsid; font.family: root.textFont; font.pixelSize: root.textSize; color: root.colText; Layout.maximumWidth: 100; elide: Text.ElideRight }
+                Text { visible: root.wifiOn && root.wifiSignal !== "0"; text: root.wifiSignal + "%"; font.family: root.textFont; font.pixelSize: 10; color: root.colSubtext0 }
+                Text { visible: root.wifiOn && root.wifiIp !== ""; text: root.wifiIp; font.family: root.textFont; font.pixelSize: 10; color: root.colSubtext0 }
+              }
+              MouseArea {
+                id: wifiMouse; hoverEnabled: true; anchors.fill: parent
+                onClicked: Quickshell.execDetached([root.scripts.wezterm, "start", "--class", "wifi-tui", "--", root.scripts.wifiTui])
+                onEntered: root.showTooltip("network\nclick to manage", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+                onExited: root.hideTooltip()
+              }
+            }
+
+            // volume
+            Rectangle {
+              property bool hovered: volMouse.containsMouse
+              width: volRow.implicitWidth + 20; height: root.pillHeight; radius: root.pillRadius
+              color: root.volMuted ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.15) : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
+              Behavior on color { ColorAnimation { duration: 200 } }
+              RowLayout { id: volRow; anchors.centerIn: parent; spacing: 6
+                Text { text: root.volIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.volMuted ? root.colRed : root.colText }
+                Text { visible: !root.volMuted; text: root.volPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; color: root.colText }
+              }
+              MouseArea {
+                id: volMouse; hoverEnabled: true; anchors.fill: parent
+                acceptedButtons: Qt.LeftButton | Qt.RightButton
+                onClicked: mouse => {
+                  if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol, "-t", "3"]);
+                  else if (root.sink?.audio) root.sink.audio.muted = !root.sink.audio.muted;
+                }
+                onWheel: wheel => { let a = root.sink?.audio; if (!a) return; a.volume = Math.max(0, Math.min(1, a.volume + (wheel.angleDelta.y > 0 ? 0.05 : -0.05))); if (a.muted) a.muted = false; }
+                onEntered: { root.tooltipText = Qt.binding(() => "vol " + root.volPercent + "%" + (root.volMuted ? " (muted)" : "") + "\nscroll to adjust, click to mute\nright-click for settings"); root.tooltipScreen = bar.screen; root.tooltipX = parent.mapToItem(null, parent.width/2, 0).x + 6; root.tooltipVisible = false; tooltipTimer.restart(); }
+                onExited: root.hideTooltip()
+              }
+            }
+          }
+        }
 
         // caffeine
         Rectangle {
@@ -248,128 +419,8 @@ PanelWindow {
           visible: root.recording
           Layout.preferredWidth: root.recording ? recRow.implicitWidth + 16 : 0; Layout.preferredHeight: 28; radius: 8; color: "transparent"
           RowLayout { id: recRow; anchors.centerIn: parent; spacing: 4
-            Text { text: "󰋲"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colRed }
+            Text { text: "fiber_manual_record"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colRed }
             Text { text: "REC"; font.family: root.textFont; font.pixelSize: 11; font.weight: Font.Bold; color: root.colRed }
-          }
-        }
-
-        // mic
-        Rectangle {
-          id: micPill
-          property bool hovered: micMouse.containsMouse
-          Layout.preferredWidth: micRow.implicitWidth + 20; Layout.preferredHeight: root.pillHeight; radius: root.pillRadius
-          color: root.micMuted ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.15) : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
-          Behavior on color { ColorAnimation { duration: 150 } }
-          RowLayout { id: micRow; anchors.centerIn: parent; spacing: 6
-            Text { text: root.micIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.micMuted ? root.colRed : root.colText }
-            Text { visible: !root.micMuted; text: root.micVolPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Normal; color: root.colText }
-          }
-          MouseArea {
-            id: micMouse; hoverEnabled: true; anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: mouse => {
-              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol, "-t", "4"]);
-              else if (root.source?.audio) root.source.audio.muted = !root.source.audio.muted;
-            }
-            onWheel: wheel => {
-              let audio = root.source?.audio;
-              if (!audio) return;
-              let step = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
-              audio.volume = Math.max(0, Math.min(1, audio.volume + step));
-              if (audio.muted) audio.muted = false;
-            }
-            onEntered: root.showTooltip("microphone - input audio\nscroll to adjust volume\nclick to mute/unmute\nright-click for settings", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
-            onExited: root.hideTooltip()
-          }
-        }
-
-        // bluetooth
-        Rectangle {
-          id: btPill
-          property bool hovered: btMouse.containsMouse
-          Layout.preferredWidth: btRow.implicitWidth + 20; Layout.preferredHeight: root.pillHeight; radius: root.pillRadius
-          color: hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55)
-          scale: hovered ? 1.02 : 1.0
-          Behavior on scale { NumberAnimation { duration: 150 } }
-          Behavior on color { ColorAnimation { duration: 200 } }
-          Rectangle {
-            anchors.fill: parent; radius: root.pillRadius
-            opacity: root.btOn ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 300 } }
-            gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0; color: root.colAccent } GradientStop { position: 1; color: Qt.lighter(root.colAccent, 1.3) } }
-          }
-          RowLayout { id: btRow; anchors.centerIn: parent; spacing: 0
-            Text { text: root.btEnabled ? (root.btOn ? "󰂱" : "󰂯") : "󰂲"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.btOn ? root.colBg : root.colSubtext0 }
-          }
-          MouseArea {
-            id: btMouse; hoverEnabled: true; anchors.fill: parent
-            onClicked: Quickshell.execDetached([root.scripts.wezterm, "start", "--class", "bluetui", "--", "bluetui"])
-            onEntered: root.showTooltip("bluetooth - wireless devices\nclick to manage", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
-            onExited: root.hideTooltip()
-          }
-        }
-
-        // wifi
-        Rectangle {
-          id: wifiPill
-          property bool hovered: wifiMouse.containsMouse
-          Layout.preferredWidth: wifiRow.implicitWidth + 20; Layout.preferredHeight: root.pillHeight; radius: root.pillRadius
-          color: hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55)
-          scale: hovered ? 1.02 : 1.0
-          Behavior on scale { NumberAnimation { duration: 150 } }
-          Behavior on color { ColorAnimation { duration: 200 } }
-          Rectangle {
-            anchors.fill: parent; radius: root.pillRadius
-            opacity: root.wifiOn ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 300 } }
-            gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0; color: root.colBlue } GradientStop { position: 1; color: Qt.lighter(root.colBlue, 1.3) } }
-          }
-          RowLayout { id: wifiRow; anchors.centerIn: parent; spacing: root.wifiOn ? 6 : 0
-            Text { text: root.wifiIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.wifiOn ? root.colBg : root.colSubtext0 }
-            Text { visible: root.wifiOn && root.wifiSsid !== ""; text: root.wifiSsid; font.family: root.textFont; font.pixelSize: root.textSize; color: root.colBg; Layout.maximumWidth: 100; elide: Text.ElideRight }
-            Text { visible: root.wifiOn && root.wifiSignal !== "0"; text: root.wifiSignal + "%"; font.family: root.textFont; font.pixelSize: 10; color: Qt.rgba(root.colBg.r, root.colBg.g, root.colBg.b, 0.7) }
-            Text { visible: root.wifiOn && root.wifiIp !== ""; text: root.wifiIp; font.family: root.textFont; font.pixelSize: 10; color: Qt.rgba(root.colBg.r, root.colBg.g, root.colBg.b, 0.7) }
-          }
-          MouseArea {
-            id: wifiMouse; hoverEnabled: true; anchors.fill: parent
-            onClicked: Quickshell.execDetached([root.scripts.wezterm, "start", "--class", "wifi-tui", "--", root.scripts.wifiTui])
-            onEntered: root.showTooltip("network - connection status\nclick to manage", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
-            onExited: root.hideTooltip()
-          }
-        }
-
-        // volume
-        Rectangle {
-          id: volPill
-          property bool hovered: volMouse.containsMouse
-          Layout.preferredWidth: volRow.implicitWidth + 20; Layout.preferredHeight: root.pillHeight; radius: root.pillRadius
-          color: hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55)
-          scale: hovered ? 1.02 : 1.0
-          Behavior on scale { NumberAnimation { duration: 150 } }
-          Behavior on color { ColorAnimation { duration: 200 } }
-          Rectangle {
-            anchors.fill: parent; radius: root.pillRadius
-            opacity: root.volActive ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 300 } }
-            gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0; color: root.colPeach } GradientStop { position: 1; color: Qt.lighter(root.colPeach, 1.3) } }
-          }
-          RowLayout { id: volRow; anchors.centerIn: parent; spacing: 6
-            Text { text: root.volIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.volActive ? root.colBg : root.colSubtext0 }
-            Text { visible: !root.volMuted; text: root.volPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Normal; color: root.volActive ? root.colBg : root.colText }
-          }
-          MouseArea {
-            id: volMouse; hoverEnabled: true; anchors.fill: parent
-            acceptedButtons: Qt.LeftButton | Qt.RightButton
-            onClicked: mouse => {
-              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol, "-t", "3"]);
-              else if (root.sink?.audio) root.sink.audio.muted = !root.sink.audio.muted;
-            }
-            onWheel: wheel => {
-              let audio = root.sink?.audio;
-              if (!audio) return;
-              let step = wheel.angleDelta.y > 0 ? 0.05 : -0.05;
-              audio.volume = Math.max(0, Math.min(1, audio.volume + step));
-              if (audio.muted) audio.muted = false;
-            }
-            onEntered: root.showTooltip("volume - speaker output\nscroll to adjust\nclick to mute/unmute\nright-click for settings", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
-            onExited: root.hideTooltip()
           }
         }
 
@@ -382,12 +433,12 @@ PanelWindow {
           Behavior on scale { NumberAnimation { duration: 150 } }
           Behavior on color { ColorAnimation { duration: 200 } }
           RowLayout { id: sysRow; anchors.centerIn: parent; spacing: 6
-            Text { text: "󰘚"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colText }
-            Text { text: root.cpuPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
-            Text { visible: root.cpuTemp > 0; text: root.cpuTemp + "°"; font.family: root.textFont; font.pixelSize: 10; color: root.cpuTemp >= 80 ? root.colRed : root.colSurface1 }
+            Text { text: "speed"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colText }
+            Text { text: root.cpuPercent + "%"; Layout.preferredWidth: 34; horizontalAlignment: Text.AlignRight; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
+            Text { visible: root.cpuTemp > 0; text: root.cpuTemp + "\u00B0"; font.family: root.textFont; font.pixelSize: 10; color: root.cpuTemp >= 80 ? root.colRed : root.colSurface1 }
             Rectangle { width: 1; height: 14; color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.5) }
-            Text { text: "󰍛"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colText }
-            Text { text: root.memPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
+            Text { text: "memory"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colText }
+            Text { text: root.memPercent + "%"; Layout.preferredWidth: 34; horizontalAlignment: Text.AlignRight; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
           }
           MouseArea {
             id: sysMouse; hoverEnabled: true; anchors.fill: parent
@@ -403,19 +454,16 @@ PanelWindow {
           visible: root.hasBattery
           property bool hovered: batMouse.containsMouse
           Layout.preferredWidth: root.hasBattery ? batRow.implicitWidth + 20 : 0; Layout.preferredHeight: root.pillHeight; radius: root.pillRadius
-          color: hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55)
+          property color batColor: root.batCharging ? root.colGreen : (root.batPercent >= 70 ? root.colBlue : (root.batPercent >= 30 ? root.colYellow : root.colRed))
+          color: (root.batCharging || root.batPercent <= 20)
+            ? Qt.rgba(batPill.batColor.r, batPill.batColor.g, batPill.batColor.b, 0.2)
+            : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
           scale: hovered ? 1.02 : 1.0
           Behavior on scale { NumberAnimation { duration: 150 } }
           Behavior on color { ColorAnimation { duration: 200 } }
-          property color batColor: root.batCharging ? root.colGreen : (root.batPercent >= 70 ? root.colBlue : (root.batPercent >= 30 ? root.colYellow : root.colRed))
-          Rectangle {
-            anchors.fill: parent; radius: root.pillRadius
-            opacity: (root.batCharging || root.batPercent <= 20) ? 1 : 0; Behavior on opacity { NumberAnimation { duration: 300 } }
-            gradient: Gradient { orientation: Gradient.Horizontal; GradientStop { position: 0; color: batPill.batColor } GradientStop { position: 1; color: Qt.lighter(batPill.batColor, 1.3) } }
-          }
           RowLayout { id: batRow; anchors.centerIn: parent; spacing: 6
-            Text { text: "󰁹"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: (root.batCharging || root.batPercent <= 20) ? root.colBg : batPill.batColor }
-            Text { text: root.batPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: (root.batCharging || root.batPercent <= 20) ? root.colBg : batPill.batColor }
+            Text { text: root.batIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: batPill.batColor }
+            Text { text: root.batPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: (root.batCharging || root.batPercent <= 20) ? batPill.batColor : root.colText }
           }
           MouseArea {
             id: batMouse; hoverEnabled: true; anchors.fill: parent
@@ -429,7 +477,7 @@ PanelWindow {
           Layout.preferredWidth: 28; Layout.preferredHeight: 28; radius: 8
           color: bellMouse.containsMouse ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
           Behavior on color { ColorAnimation { duration: 150 } }
-          Text { anchors.centerIn: parent; text: root.unreadCount > 0 ? "󰂚" : "󰂜"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.unreadCount > 0 ? root.colAccent : root.colSurface1; Behavior on color { ColorAnimation { duration: 200 } } }
+          Text { anchors.centerIn: parent; text: root.unreadCount > 0 ? "notifications_active" : "notifications"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.unreadCount > 0 ? root.colAccent : root.colSurface1; Behavior on color { ColorAnimation { duration: 200 } } }
           Rectangle {
             visible: root.unreadCount > 0; anchors.top: parent.top; anchors.right: parent.right; anchors.topMargin: 2; anchors.rightMargin: 2
             width: 14; height: 14; radius: 7; color: root.colRed
@@ -438,7 +486,7 @@ PanelWindow {
           MouseArea {
             id: bellMouse; hoverEnabled: true; anchors.fill: parent
             onClicked: { root.notifPanelOpen = !root.notifPanelOpen; if (root.notifPanelOpen) root.unreadCount = 0; }
-            onEntered: root.showTooltip("notifications - alert history\nclick to open panel", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+            onEntered: root.showTooltip("notifications\nclick to open panel", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
             onExited: root.hideTooltip()
           }
         }
@@ -604,7 +652,7 @@ PanelWindow {
               Layout.fillWidth: true; spacing: 4
               Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.time; font.family: root.textFont; font.pixelSize: 11; color: root.colSubtext0 }
               Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.icon; font.family: root.iconFont; font.pixelSize: 22; color: root.colYellow }
-              Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.temp + "°"; font.family: root.textFont; font.pixelSize: 13; color: root.colText }
+              Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.temp + "\u00B0"; font.family: root.textFont; font.pixelSize: 13; color: root.colText }
             }
           }
 
@@ -615,7 +663,7 @@ PanelWindow {
             Layout.fillWidth: true; spacing: 4
             Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Tomorrow"; font.family: root.textFont; font.pixelSize: 11; color: root.colSubtext0 }
             Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.weatherTomorrow?.icon ?? ""; font.family: root.iconFont; font.pixelSize: 22; color: root.colYellow }
-            Text { anchors.horizontalCenter: parent.horizontalCenter; text: (root.weatherTomorrow?.high ?? "") + "°/" + (root.weatherTomorrow?.low ?? "") + "°"; font.family: root.textFont; font.pixelSize: 12; color: root.colText }
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: (root.weatherTomorrow?.high ?? "") + "\u00B0/" + (root.weatherTomorrow?.low ?? "") + "\u00B0"; font.family: root.textFont; font.pixelSize: 12; color: root.colText }
           }
         }
 
@@ -759,16 +807,33 @@ PanelWindow {
               model: root.pomodoroRecent.slice(0, 8)
               delegate: Rectangle {
                 required property var modelData
+                property bool hovered: recentMouse.containsMouse || delMouse.containsMouse
                 width: parent.width; height: 32; radius: 8
-                color: recentMouse.containsMouse ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
+                color: hovered ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
                 Behavior on color { ColorAnimation { duration: 100 } }
+
+                MouseArea {
+                  id: recentMouse; anchors.fill: parent; hoverEnabled: true
+                  onClicked: root.startPomodoro(modelData)
+                }
+
                 Text {
-                  anchors { fill: parent; leftMargin: 10; rightMargin: 10 }
+                  anchors { left: parent.left; right: delBtn.left; top: parent.top; bottom: parent.bottom; leftMargin: 10; rightMargin: 4 }
                   verticalAlignment: Text.AlignVCenter
                   text: modelData; font.family: root.textFont; font.pixelSize: 12; color: root.colSubtext0
                   elide: Text.ElideRight
                 }
-                MouseArea { id: recentMouse; anchors.fill: parent; hoverEnabled: true; onClicked: root.startPomodoro(modelData) }
+
+                Rectangle {
+                  id: delBtn
+                  anchors { right: parent.right; verticalCenter: parent.verticalCenter; rightMargin: 6 }
+                  width: 20; height: 20; radius: 10
+                  visible: hovered
+                  color: delMouse.containsMouse ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.2) : "transparent"
+                  Behavior on color { ColorAnimation { duration: 100 } }
+                  Text { anchors.centerIn: parent; text: "close"; font.family: root.iconFont; font.pixelSize: 14; color: delMouse.containsMouse ? root.colRed : root.colSurface1; Behavior on color { ColorAnimation { duration: 100 } } }
+                  MouseArea { id: delMouse; anchors.fill: parent; hoverEnabled: true; onClicked: root.removeRecentPomodoro(modelData) }
+                }
               }
             }
           }
@@ -776,4 +841,5 @@ PanelWindow {
       }
     }
   }
+
 }

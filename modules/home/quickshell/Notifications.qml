@@ -46,7 +46,7 @@ Item {
             anchors { right: parent.right; top: parent.top; margins: 8 }
             width: 20; height: 20; radius: 10
             color: closeMouse.containsMouse ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.2) : "transparent"
-            Text { anchors.centerIn: parent; text: "󰅖"; font.family: root.iconFont; font.pixelSize: 12; color: root.colSubtext0 }
+            Text { anchors.centerIn: parent; text: "close"; font.family: root.iconFont; font.pixelSize: 12; color: root.colSubtext0 }
             MouseArea { id: closeMouse; hoverEnabled: true; anchors.fill: parent; onClicked: toastModel.remove(index) }
           }
         }
@@ -124,7 +124,7 @@ Item {
               id: hClose; anchors { right: parent.right; top: parent.top; margins: 6 }
               width: 18; height: 18; radius: 9
               color: hcMouse.containsMouse ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.2) : "transparent"
-              Text { anchors.centerIn: parent; text: "󰅖"; font.family: root.iconFont; font.pixelSize: 10; color: root.colSurface1 }
+              Text { anchors.centerIn: parent; text: "close"; font.family: root.iconFont; font.pixelSize: 10; color: root.colSurface1 }
               MouseArea { id: hcMouse; hoverEnabled: true; anchors.fill: parent; onClicked: notifHistory.remove(index) }
             }
           }

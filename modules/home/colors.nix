@@ -15,6 +15,10 @@ _: {
         text = "#cdd6f4";
         accent = "#cba6f7";
         red = "#f38ba8";
+        blue = "#89b4fa";
+        peach = "#fab387";
+        green = "#a6e3a1";
+        yellow = "#f9e2af";
 
         # hyprland uses rgb() without # prefix
         hypr = {
