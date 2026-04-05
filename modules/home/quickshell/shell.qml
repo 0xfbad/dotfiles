@@ -4,7 +4,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Hyprland
-import Quickshell.Services.SystemTray
 import Quickshell.Services.Pipewire
 import Quickshell.Services.UPower
 import Quickshell.Services.Mpris
@@ -52,7 +51,7 @@ ShellRoot {
 
   // design tokens
   readonly property real pillRadius: 12
-  readonly property real pillHeight: 32
+  readonly property real pillHeight: 28
   readonly property real iconSize: 18
   readonly property real textSize: 12.5
   readonly property string iconFont: "Material Symbols Rounded"
@@ -113,6 +112,52 @@ ShellRoot {
   readonly property string mediaTitle: activePlayer?.trackTitle ?? ""
   readonly property string mediaArtist: activePlayer?.trackArtist ?? ""
   readonly property bool mediaPlaying: !!activePlayer && activePlayer.playbackState === MprisPlaybackState.Playing
+  readonly property string mediaArtUrl: activePlayer?.trackArtUrl ?? ""
+  property string mediaArtLocal: ""
+
+  // download album art to local file for ColorQuantizer (can't load URLs)
+  onMediaArtUrlChanged: {
+    if (mediaArtUrl === "") { mediaArtLocal = ""; return; }
+    if (mediaArtUrl.startsWith("file://")) { mediaArtLocal = mediaArtUrl; return; }
+    artDownloader.running = true;
+  }
+  Process {
+    id: artDownloader
+    command: ["bash", "-c", "f=/tmp/qs-album-art-$(echo \"$1\" | md5sum | cut -d' ' -f1).jpg; [ -f \"$f\" ] && echo \"$f\" || { curl -sf -o \"$f\" \"$1\" && echo \"$f\" || echo ''; }", "_", root.mediaArtUrl]
+    stdout: SplitParser {
+      onRead: data => { let p = data.trim(); if (p) root.mediaArtLocal = "file://" + p; }
+    }
+  }
+
+  // media popout
+  property var mediaPopoutScreen: null
+  readonly property bool mediaPopoutOpen: mediaPopoutScreen !== null
+
+  ColorQuantizer {
+    id: artColorizer
+    source: root.mediaArtLocal
+    depth: 0
+    rescaleSize: 64
+  }
+  readonly property color mediaDominant: {
+    let c = artColorizer.colors?.[0];
+    if (!c) return root.colAccent;
+    return Qt.rgba(c.r * 0.5 + colAccent.r * 0.5, c.g * 0.5 + colAccent.g * 0.5, c.b * 0.5 + colAccent.b * 0.5, 1);
+  }
+
+  // position tracking for media popout
+  Timer {
+    running: root.mediaPlaying && root.mediaPopoutOpen
+    interval: 1000; repeat: true
+    onTriggered: { if (root.activePlayer) root.activePlayer.positionChanged(); }
+  }
+
+  function formatTime(seconds) {
+    if (isNaN(seconds) || seconds < 0) return "0:00";
+    let m = Math.floor(seconds / 60);
+    let s = Math.floor(seconds % 60);
+    return m + ":" + String(s).padStart(2, '0');
+  }
 
   // audio visualizer (cava)
   property var cavaBars: [0,0,0,0,0,0,0,0,0,0,0,0]
@@ -147,6 +192,25 @@ ShellRoot {
   property int cpuTemp: -1
   property var lastCpuStats: null
 
+  // network
+  property var netRxHistory: []
+  property var netTxHistory: []
+  property real netRxSpeed: 0
+  property real netTxSpeed: 0
+  property real netRxSession: 0
+  property real netTxSession: 0
+  property var lastNetBytes: null
+  property var sysPopoutScreen: null
+  readonly property bool sysPopoutOpen: sysPopoutScreen !== null
+
+  function formatBytes(b) {
+    if (b >= 1073741824) return (b / 1073741824).toFixed(1) + " GB";
+    if (b >= 1048576) return (b / 1048576).toFixed(1) + " MB";
+    if (b >= 1024) return (b / 1024).toFixed(0) + " KB";
+    return Math.round(b) + " B";
+  }
+  function formatSpeed(bps) { return formatBytes(bps) + "/s"; }
+
   // weather
   property string weatherIcon: ""
   property string weatherTemp: "--"
@@ -165,12 +229,34 @@ ShellRoot {
   property var weatherPopoutScreen: null
   readonly property bool weatherPopoutOpen: weatherPopoutScreen !== null
 
-  // pomodoro
+  // pomodoro + todo
   property real pomodoroEndTime: 0
   property string pomodoroTask: ""
   property var pomodoroPopoutScreen: null
   readonly property bool pomodoroPopoutOpen: pomodoroPopoutScreen !== null
   property var pomodoroRecent: []
+  property int pomodoroTab: 0
+  property var todoItems: []
+  readonly property int todoIncomplete: todoItems.filter(t => !t.done).length
+
+  function saveTodos() {
+    let json = JSON.stringify(root.todoItems);
+    Quickshell.execDetached(["bash", "-c",
+      "printf '%s' \"$1\" > $HOME/.local/share/quickshell-todos.json.tmp && mv $HOME/.local/share/quickshell-todos.json.tmp $HOME/.local/share/quickshell-todos.json",
+      "_", json]);
+  }
+  function addTodo(text) {
+    root.todoItems = [...root.todoItems, {id: Date.now().toString(), text: text, done: false}];
+    saveTodos();
+  }
+  function toggleTodo(id) {
+    root.todoItems = root.todoItems.map(t => t.id === id ? Object.assign({}, t, {done: !t.done}) : t);
+    saveTodos();
+  }
+  function removeTodo(id) {
+    root.todoItems = root.todoItems.filter(t => t.id !== id);
+    saveTodos();
+  }
   readonly property bool pomodoroActive: pomodoroEndTime > 0 && clock.date.getTime() / 1000 < pomodoroEndTime
   readonly property string pomodoroText: {
     if (!pomodoroActive) return "";
@@ -232,9 +318,59 @@ ShellRoot {
     }
   }
 
+  // load todos on startup
+  Process {
+    running: true
+    command: ["bash", "-c", "cat $HOME/.local/share/quickshell-todos.json 2>/dev/null || echo '[]'"]
+    stdout: SplitParser {
+      onRead: data => { try { root.todoItems = JSON.parse(data.trim()); } catch(e) {} }
+    }
+  }
+
   // caffeine
   property string caffeineIcon: "local_cafe"
   property bool caffeineActive: false
+
+  // workspace window type icons
+  property var wsWindowIcons: ({})
+
+  readonly property var classIconMap: ({
+    "firefox": "web", "chromium": "web", "brave": "web", "librewolf": "web",
+    "kitty": "terminal", "wezterm": "terminal", "foot": "terminal", "Alacritty": "terminal",
+    "code": "code", "codium": "code", "zed": "code", "neovide": "code",
+    "dolphin": "folder", "nautilus": "folder", "thunar": "folder",
+    "steam": "sports_esports",
+    "spotify": "music_note", "tidal-hifi": "music_note",
+    "discord": "chat", "vesktop": "chat", "telegram-desktop": "chat",
+    "gimp": "photo_library", "inkscape": "photo_library",
+    "obs": "videocam",
+    "pavucontrol": "graphic_eq",
+    "btop": "monitor_heart",
+  })
+
+  Process {
+    id: wsIconProc
+    command: ["hyprctl", "clients", "-j"]
+    stdout: StdioCollector {
+      onStreamFinished: {
+        try {
+          let clients = JSON.parse(wsIconProc.stdout.text);
+          let icons = {};
+          for (let c of clients) {
+            let ws = c.workspace?.id ?? -1;
+            if (ws <= 0) continue;
+            if (!icons[ws]) icons[ws] = [];
+            let cls = (c.class || "").toLowerCase();
+            let icon = root.classIconMap[cls];
+            if (!icon && cls.includes(".")) icon = root.classIconMap[cls.split(".").pop()];
+            if (icon && !icons[ws].includes(icon)) icons[ws].push(icon);
+          }
+          root.wsWindowIcons = icons;
+        } catch(e) {}
+      }
+    }
+  }
+  Timer { interval: 3000; running: true; repeat: true; triggeredOnStart: true; onTriggered: { if (!wsIconProc.running) wsIconProc.running = true } }
 
   // misc
   property bool recording: false
@@ -243,6 +379,7 @@ ShellRoot {
   property real lastBrightness: -1
 
   // overlay state
+  property bool cheatsheetOpen: false
   property bool launcherOpen: false
   property string launcherSearch: ""
   property int launcherIndex: 0
@@ -304,6 +441,7 @@ ShellRoot {
   }
 
   // global shortcuts
+  GlobalShortcut { appid: "quickshell"; name: "toggle-cheatsheet"; onPressed: root.cheatsheetOpen = !root.cheatsheetOpen }
   GlobalShortcut { appid: "quickshell"; name: "toggle-launcher"; onPressed: { root.launcherOpen = !root.launcherOpen; if (root.launcherOpen) { root.launcherSearch = ""; root.launcherIndex = 0; } } }
   GlobalShortcut { appid: "quickshell"; name: "toggle-session"; onPressed: root.sessionOpen = !root.sessionOpen }
   GlobalShortcut { appid: "quickshell"; name: "toggle-wallpicker"; onPressed: root.wallpickerOpen = !root.wallpickerOpen }
@@ -352,6 +490,33 @@ ShellRoot {
     }
   }
   Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true; onTriggered: cpuMemProc.running = true }
+
+  // network throughput from /proc/net/dev
+  Process {
+    id: netProc
+    command: ["bash", "-c", "awk 'NR>2 && !/lo:/{rx+=$2; tx+=$10} END{print rx, tx}' /proc/net/dev"]
+    stdout: SplitParser {
+      onRead: data => {
+        let parts = data.trim().split(" ");
+        let rx = parseInt(parts[0]) || 0;
+        let tx = parseInt(parts[1]) || 0;
+        let now = Date.now() / 1000;
+        if (root.lastNetBytes) {
+          let dt = now - root.lastNetBytes.time;
+          if (dt > 0) {
+            root.netRxSpeed = Math.max(0, (rx - root.lastNetBytes.rx) / dt);
+            root.netTxSpeed = Math.max(0, (tx - root.lastNetBytes.tx) / dt);
+            root.netRxSession += Math.max(0, rx - root.lastNetBytes.rx);
+            root.netTxSession += Math.max(0, tx - root.lastNetBytes.tx);
+            root.netRxHistory = [...root.netRxHistory, root.netRxSpeed].slice(-60);
+            root.netTxHistory = [...root.netTxHistory, root.netTxSpeed].slice(-60);
+          }
+        }
+        root.lastNetBytes = { rx: rx, tx: tx, time: now };
+      }
+    }
+  }
+  Timer { interval: 2000; running: true; repeat: true; triggeredOnStart: true; onTriggered: { if (!netProc.running) netProc.running = true } }
 
   // wifi + power, longer interval since nmcli is slow
   Process {
@@ -472,6 +637,7 @@ ShellRoot {
   Launcher {}
   SessionMenu {}
   WallpaperPicker {}
+  Cheatsheet {}
   // tooltip overlay, x positioned via mapToItem from bar pills
   Variants {
     model: Quickshell.screens
@@ -480,7 +646,7 @@ ShellRoot {
       screen: modelData
       visible: root.tooltipVisible && root.tooltipScreen === modelData && root.tooltipText !== ""
       anchors { top: true; left: true; right: true }
-      margins { top: 42 }
+      margins { top: 38 }
       exclusiveZone: -1
       implicitHeight: ttBox.height + 4
       color: "transparent"
