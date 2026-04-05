@@ -114,28 +114,11 @@ PanelWindow {
                   Behavior on color { ColorAnimation { duration: 200 } }
                 }
 
-                // window type icons for occupied workspaces
-                Row {
+                Rectangle {
                   anchors.horizontalCenter: parent.horizontalCenter
-                  anchors.bottom: parent.bottom; anchors.bottomMargin: 1
-                  spacing: 1
+                  anchors.bottom: parent.bottom; anchors.bottomMargin: 2
+                  width: 4; height: 4; radius: 2; color: root.colSubtext0
                   visible: wsPill.isOccupied && !wsPill.isActive
-
-                  Repeater {
-                    model: (root.wsWindowIcons[wsPill.modelData.id] || []).slice(0, 3)
-                    Text {
-                      required property var modelData
-                      text: modelData
-                      font.family: root.iconFont; font.pixelSize: 7
-                      color: root.colSubtext0
-                    }
-                  }
-
-                  // fallback dot when no icons resolved
-                  Rectangle {
-                    visible: (root.wsWindowIcons[wsPill.modelData.id] || []).length === 0
-                    width: 4; height: 4; radius: 2; color: root.colSubtext0
-                  }
                 }
 
                 MouseArea {
