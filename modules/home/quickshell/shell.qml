@@ -131,15 +131,18 @@ ShellRoot {
   property string weatherLastUpdated: ""
   property string weatherPubIp: ""
   property string weatherRain: ""
-  property var weatherForecast: []
   property var weatherHourly: []
   property var weatherTomorrow: null
-  property bool weatherPopoutOpen: false
+  property string weatherError: ""
+  property int weatherRetries: 0
+  property var weatherPopoutScreen: null
+  readonly property bool weatherPopoutOpen: weatherPopoutScreen !== null
 
   // pomodoro
   property real pomodoroEndTime: 0
   property string pomodoroTask: ""
-  property bool pomodoroPopoutOpen: false
+  property var pomodoroPopoutScreen: null
+  readonly property bool pomodoroPopoutOpen: pomodoroPopoutScreen !== null
   property var pomodoroRecent: []
   readonly property bool pomodoroActive: pomodoroEndTime > 0 && clock.date.getTime() / 1000 < pomodoroEndTime
   readonly property string pomodoroText: {
@@ -153,7 +156,7 @@ ShellRoot {
   function startPomodoro(task) {
     pomodoroTask = task;
     pomodoroEndTime = Date.now() / 1000 + 1500;
-    pomodoroPopoutOpen = false;
+    pomodoroPopoutScreen = null;
     Quickshell.execDetached(["bash", "-c",
       "mkdir -p $HOME/.local/share && printf '%s - %s\\n' \"$(date '+%Y-%m-%d %H:%M')\" \"$1\" >> $HOME/.local/share/pomodoro.log",
       "_", task]);
@@ -278,6 +281,11 @@ ShellRoot {
     function onVolumeChanged() { root.osdValue = root.volValue; root.osdIcon = root.volIcon; root.osdVisible = true; osdHideTimer.restart(); }
     function onMutedChanged() { root.osdValue = root.volMuted ? 0 : root.volValue; root.osdIcon = root.volIcon; root.osdVisible = true; osdHideTimer.restart(); }
   }
+  Connections {
+    target: root.source?.audio ?? null
+    function onVolumeChanged() { root.osdValue = root.micVolValue; root.osdIcon = root.micIcon; root.osdVisible = true; osdHideTimer.restart(); }
+    function onMutedChanged() { root.osdValue = root.micMuted ? 0 : root.micVolValue; root.osdIcon = root.micIcon; root.osdVisible = true; osdHideTimer.restart(); }
+  }
   Timer { id: osdHideTimer; interval: 2000; onTriggered: root.osdVisible = false }
 
   // cpu + memory + temp, delta-based for accurate instantaneous readings
@@ -329,30 +337,43 @@ ShellRoot {
   Timer { interval: 5000; running: root.scriptsLoaded; repeat: true; triggeredOnStart: true; onTriggered: { if (!sysProc.running) sysProc.running = true } }
 
   // weather
+  function refreshWeather() {
+    if (!weatherRefreshProc.running) weatherRefreshProc.running = true;
+  }
+  function _parseWeather(data) {
+    try {
+      let w = JSON.parse(data);
+      root.weatherIcon = w.icon; root.weatherTemp = w.temp;
+      root.weatherDesc = w.desc || "";
+      root.weatherFeelsLike = w.feelsLike || "";
+      root.weatherHumidity = w.humidity || "";
+      root.weatherWind = w.wind || "";
+      root.weatherLocation = w.location || "";
+      root.weatherHourly = w.hourly || [];
+      root.weatherTomorrow = w.tomorrow || null;
+      root.weatherPubIp = w.pubIp || "";
+      root.weatherRain = w.rain || "";
+      root.weatherError = w.error || "";
+      root.weatherLastUpdated = Qt.formatDateTime(new Date(), "h:mm AP");
+      if (w.error) {
+        if (root.weatherRetries < 5) { root.weatherRetries++; weatherRetryTimer.restart(); }
+      } else {
+        root.weatherRetries = 0;
+      }
+    } catch(e) { console.log("weather parse error:", e); }
+  }
+  Process {
+    id: weatherRefreshProc
+    command: root.scripts.weather ? [root.scripts.weather, "--refresh"] : ["true"]
+    stdout: SplitParser { onRead: data => root._parseWeather(data) }
+  }
   Process {
     id: weatherProc
     command: root.scripts.weather ? [root.scripts.weather] : ["true"]
-    stdout: SplitParser {
-      onRead: data => {
-        try {
-          let w = JSON.parse(data);
-          root.weatherIcon = w.icon; root.weatherTemp = w.temp;
-          root.weatherDesc = w.desc || "";
-          root.weatherFeelsLike = w.feelsLike || "";
-          root.weatherHumidity = w.humidity || "";
-          root.weatherWind = w.wind || "";
-          root.weatherLocation = w.location || "";
-          root.weatherForecast = w.forecast || [];
-          root.weatherHourly = w.hourly || [];
-          root.weatherTomorrow = w.tomorrow || null;
-          root.weatherPubIp = w.pubIp || "";
-          root.weatherRain = w.rain || "";
-          root.weatherLastUpdated = Qt.formatDateTime(new Date(), "h:mm AP");
-        } catch(e) {}
-      }
-    }
+    stdout: SplitParser { onRead: data => root._parseWeather(data) }
   }
   Timer { interval: 900000; running: root.scriptsLoaded; repeat: true; triggeredOnStart: true; onTriggered: { if (!weatherProc.running) weatherProc.running = true } }
+  Timer { id: weatherRetryTimer; interval: 30000; onTriggered: { if (!weatherRefreshProc.running) weatherRefreshProc.running = true } }
 
   // caffeine
   Process {
@@ -416,8 +437,6 @@ ShellRoot {
   Launcher {}
   SessionMenu {}
   WallpaperPicker {}
-  Popouts {}
-
   // tooltip overlay, x positioned via mapToItem from bar pills
   Variants {
     model: Quickshell.screens

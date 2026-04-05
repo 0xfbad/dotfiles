@@ -34,6 +34,12 @@ _: {
       CACHE="/tmp/qs-weather"
       CACHE_SCRIPT="/tmp/qs-weather-script"
       MAX_AGE=900
+      CURL="${pkgs.curl}/bin/curl"
+      JQ="${pkgs.jq}/bin/jq"
+
+      if [ "$1" = "--refresh" ]; then
+        rm -f "$CACHE"
+      fi
 
       SELF="$(readlink -f "$0")"
       if [ -f "$CACHE_SCRIPT" ] && [ "$(cat "$CACHE_SCRIPT")" != "$SELF" ]; then
@@ -41,7 +47,7 @@ _: {
       fi
       echo "$SELF" > "$CACHE_SCRIPT"
 
-      if [ -f "$CACHE" ]; then
+      if [ -f "$CACHE" ] && [ -s "$CACHE" ]; then
         age=$(( $(date +%s) - $(stat -c %Y "$CACHE") ))
         if [ "$age" -lt "$MAX_AGE" ]; then
           cat "$CACHE"
@@ -49,42 +55,77 @@ _: {
         fi
       fi
 
-      json=$(${pkgs.curl}/bin/curl -sf "wttr.in/?format=j1" 2>/dev/null)
-      pub_ip=$(${pkgs.curl}/bin/curl -sf --max-time 3 "ifconfig.me" 2>/dev/null || echo "")
-
-      if [ -z "$json" ] || [ "$json" = "null" ]; then
-        printf '{"icon":"󰖐","temp":"--","desc":"","feelsLike":"","humidity":"","wind":"","location":"","rain":"","pubIp":"","hourly":[],"tomorrow":null}\n'
+      fail() {
+        printf '{"icon":"󰖐","temp":"--","desc":"","feelsLike":"","humidity":"","wind":"","location":"","rain":"","pubIp":"","hourly":[],"tomorrow":null,"error":"%s"}\n' "$1"
         exit 0
+      }
+
+      # geolocate via ip
+      geo=$($CURL -sf --max-time 5 "https://ipinfo.io/json" 2>/dev/null)
+      if [ -z "$geo" ]; then
+        fail "geolocation failed"
       fi
 
-      hour_idx=$(( $(date +%-H) / 3 ))
+      loc=$(echo "$geo" | $JQ -r '.loc // empty' 2>/dev/null)
+      city=$(echo "$geo" | $JQ -r '.city // empty' 2>/dev/null)
+      region=$(echo "$geo" | $JQ -r '.region // empty' 2>/dev/null)
+      pub_ip=$(echo "$geo" | $JQ -r '.ip // empty' 2>/dev/null)
 
-      echo "$json" | ${pkgs.jq}/bin/jq -c --argjson hi "$hour_idx" --arg pip "$pub_ip" '
-        {"113":"󰖙","116":"󰖐","119":"󰖐","122":"󰖐","143":"󰖑","176":"󰖗","179":"󰙿","182":"󰖒","185":"󰖒","200":"󰖓","227":"󰼶","230":"󰼶","248":"󰖑","260":"󰖑","263":"󰖗","266":"󰖗","281":"󰖒","284":"󰖒","293":"󰖗","296":"󰖗","299":"󰖖","302":"󰖖","305":"󰖖","308":"󰖖","311":"󰖒","314":"󰖒","317":"󰙿","320":"󰙿","323":"󰙿","326":"󰙿","329":"󰼶","332":"󰼶","335":"󰼶","338":"󰼶","350":"󰖒","353":"󰖗","356":"󰖖","359":"󰖖","362":"󰖒","365":"󰖒","368":"󰙿","371":"󰼶","374":"󰖒","377":"󰖒","386":"󰖓","389":"󰖓","392":"󰙿","395":"󰼶"} as $icons |
-        .current_condition[0] as $cc |
-        .weather[0].hourly[$hi] as $ch |
-        ($icons[$cc.weatherCode] // "󰖐") as $icon |
+      if [ -z "$loc" ]; then
+        fail "no coordinates from ipinfo"
+      fi
+
+      lat=$(echo "$loc" | cut -d, -f1)
+      lon=$(echo "$loc" | cut -d, -f2)
+
+      # fetch from open-meteo (WMO codes, no api key)
+      weather=$($CURL -sf --max-time 10 \
+        "https://api.open-meteo.com/v1/forecast?latitude=$lat&longitude=$lon&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,wind_direction_10m&hourly=weather_code,temperature_2m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&temperature_unit=fahrenheit&wind_speed_unit=mph&timezone=auto&forecast_days=2" 2>/dev/null)
+      curl_exit=$?
+
+      if [ -z "$weather" ]; then
+        if [ "$curl_exit" -eq 6 ]; then fail "dns resolution failed"
+        elif [ "$curl_exit" -eq 7 ]; then fail "connection refused"
+        elif [ "$curl_exit" -eq 28 ]; then fail "request timed out"
+        else fail "open-meteo request failed (curl $curl_exit)"
+        fi
+      fi
+
+      echo "$weather" | $JQ -c --arg city "$city" --arg region "$region" --arg pip "$pub_ip" '
+        def wmo_icon: . as $c | {"0":"󰖙","1":"󰖙","2":"󰖐","3":"󰖐","45":"󰖑","48":"󰖑","51":"󰖗","53":"󰖗","55":"󰖗","56":"󰖒","57":"󰖒","61":"󰖗","63":"󰖖","65":"󰖖","66":"󰖒","67":"󰖒","71":"󰙿","73":"󰼶","75":"󰼶","77":"󰙿","80":"󰖗","81":"󰖖","82":"󰖖","85":"󰙿","86":"󰼶","95":"󰖓","96":"󰖓","99":"󰖓"} | .[$c | tostring] // "󰖐";
+        def wmo_desc: . as $c | {"0":"Clear","1":"Clear","2":"Partly cloudy","3":"Overcast","45":"Fog","48":"Fog","51":"Drizzle","53":"Drizzle","55":"Drizzle","56":"Freezing drizzle","57":"Freezing drizzle","61":"Light rain","63":"Rain","65":"Heavy rain","66":"Freezing rain","67":"Freezing rain","71":"Light snow","73":"Snow","75":"Heavy snow","77":"Snow grains","80":"Light showers","81":"Showers","82":"Heavy showers","85":"Snow showers","86":"Heavy snow showers","95":"Thunderstorm","96":"Thunderstorm with hail","99":"Thunderstorm with hail"} | .[$c | tostring] // "Unknown";
+        def wind_dir: if . < 22.5 then "N" elif . < 67.5 then "NE" elif . < 112.5 then "E" elif . < 157.5 then "SE" elif . < 202.5 then "S" elif . < 247.5 then "SW" elif . < 292.5 then "W" elif . < 337.5 then "NW" else "N" end;
+        def to12h: if . == 0 then "12 AM" elif . < 12 then "\(.) AM" elif . == 12 then "12 PM" else "\(. - 12) PM" end;
+
+        (now | floor) as $now_ts |
+        . as $root |
+
+        [range($root.hourly.time | length) | . as $i |
+          select(($root.hourly.time[$i] | sub("T"; " ") | strptime("%Y-%m-%d %H:%M") | mktime) > $now_ts) |
+          {time: ($root.hourly.time[$i] | split("T")[1] | split(":")[0] | tonumber | to12h),
+           icon: ($root.hourly.weather_code[$i] | wmo_icon),
+           temp: ($root.hourly.temperature_2m[$i] | round | tostring)}
+        ] | .[0:4] as $hourly |
+
+        (if ($root.daily.time | length) > 1 then {
+          day: ($root.daily.time[1] | split("-")[2]),
+          icon: ($root.daily.weather_code[1] | wmo_icon),
+          high: ($root.daily.temperature_2m_max[1] | round | tostring),
+          low: ($root.daily.temperature_2m_min[1] | round | tostring)
+        } else null end) as $tomorrow |
+
         {
-          icon: $icon,
-          temp: "\($cc.temp_F)°F",
-          feelsLike: "\($cc.FeelsLikeF)°F",
-          humidity: "\($cc.humidity)%",
-          wind: "\($cc.windspeedMiles) mph \($cc.winddir16Point)",
-          desc: ($cc.weatherDesc[0].value // ""),
-          location: ((.nearest_area[0].areaName[0].value // "") + ", " + (.nearest_area[0].region[0].value // "")),
+          icon: ($root.current.weather_code | wmo_icon),
+          temp: "\($root.current.temperature_2m | round)°F",
+          feelsLike: "\($root.current.apparent_temperature | round)°F",
+          humidity: "\($root.current.relative_humidity_2m)%",
+          wind: "\($root.current.wind_speed_10m | round) mph \($root.current.wind_direction_10m | wind_dir)",
+          desc: ($root.current.weather_code | wmo_desc),
+          location: ($city + ", " + $region),
           pubIp: $pip,
-          rain: (($ch.chanceofrain // "0") + "% chance, " + (($ch.precipInches // "0") | if . == "0.0" or . == "0" then "none" else "\(.) in" end)),
-          hourly: ([.weather[0].hourly[$hi+1:][]] + [.weather[1].hourly[:][]]) | .[0:4] | [.[] | {
-            time: (.time | tonumber / 100 | floor | if . == 0 then "12 AM" elif . < 12 then "\(.) AM" elif . == 12 then "12 PM" else "\(. - 12) PM" end),
-            icon: ($icons[.weatherCode] // "󰖐"),
-            temp: .tempF
-          }],
-          tomorrow: (.weather[1] // null) | if . then {
-            day: (.date | split("-") | .[2:3] | .[0] | tonumber | tostring),
-            icon: ($icons[.hourly[4].weatherCode] // "󰖐"),
-            high: .maxtempF,
-            low: .mintempF
-          } else null end
+          rain: (($root.daily.precipitation_probability_max[0] // 0 | tostring) + "% chance today"),
+          hourly: $hourly,
+          tomorrow: $tomorrow
         }
       ' | tee "$CACHE"
     '';
@@ -137,11 +178,7 @@ _: {
     '';
 
     wifiTui = pkgs.writeShellScript "wifi-tui" ''
-      if systemctl is-active --quiet iwd 2>/dev/null; then
-        exec ${pkgs.impala}/bin/impala
-      else
-        exec ${pkgs.wlctl}/bin/wlctl
-      fi
+      exec ${pkgs.wlctl}/bin/wlctl
     '';
 
     # json config files generated from nix values
@@ -184,8 +221,17 @@ _: {
         ExecStart = "${lib.getExe pkgs.quickshell}";
         Restart = "on-failure";
         RestartSec = 2;
+        # config path changes on rebuild, triggering unit diff for sd-switch
+        Environment = ["QS_CONFIG=${configDir}"];
       };
       Install.WantedBy = ["graphical-session.target"];
     };
+
+    # restart quickshell when config changes on rebuild
+    home.activation.restartQuickshell = lib.hm.dag.entryAfter ["reloadSystemd"] ''
+      if ${pkgs.systemd}/bin/systemctl --user is-active quickshell.service > /dev/null 2>&1; then
+        ${pkgs.systemd}/bin/systemctl --user restart quickshell.service || true
+      fi
+    '';
   };
 }

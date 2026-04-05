@@ -60,7 +60,7 @@ PanelWindow {
     width: 650
     implicitHeight: cardColumn.implicitHeight + 24
     radius: 16
-    color: Qt.rgba(root.colBg.r, root.colBg.g, root.colBg.b, 0.95)
+    color: root.colBg
     border.width: 1
     border.color: Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.15)
     clip: true

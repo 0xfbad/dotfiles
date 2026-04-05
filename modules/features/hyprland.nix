@@ -494,7 +494,7 @@ _: {
       # window rules
       windowrule = match:class .*, suppress_event maximize
       windowrule = match:title ^(Open|Save|Save As|File Upload), float on, center on
-      windowrule = match:class ^(btop|bluetui|wifi-tui|wlctl)$, float on, center on, size 875 600
+      windowrule = match:class ^(btop|bluetui|wifi-tui|wlctl|org.pulseaudio.pavucontrol)$, float on, center on, size (monitor_w*0.75) (monitor_h*0.75)
       windowrule = match:class ^(keybind-popup)$, float on, center on, size 920 700
       windowrule = match:class ^(vlc|mpv|com.obsproject.Studio|zoom|org.kde.kdenlive)$, opacity 1.0 override 1.0 override
       windowrule = match:fullscreen 1, idle_inhibit on

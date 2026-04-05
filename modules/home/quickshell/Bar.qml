@@ -142,25 +142,30 @@ PanelWindow {
 
         // weather
         Rectangle {
+          id: weatherPill
           Layout.preferredWidth: weatherRow.implicitWidth + 20; Layout.preferredHeight: 28; radius: 8
           color: weatherMouse.containsMouse ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4)
           scale: weatherMouse.containsMouse ? 1.02 : 1.0
           Behavior on scale { NumberAnimation { duration: 150 } }
           Behavior on color { ColorAnimation { duration: 200 } }
           RowLayout { id: weatherRow; anchors.centerIn: parent; spacing: 6
-            Text { text: root.weatherIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colYellow }
+            Text { text: root.weatherIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.weatherError !== "" ? root.colRed : root.colYellow; Behavior on color { ColorAnimation { duration: 200 } } }
             Text { text: root.weatherTemp; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
           }
           MouseArea {
             id: weatherMouse; hoverEnabled: true; anchors.fill: parent
-            onClicked: { root.pomodoroPopoutOpen = false; root.weatherPopoutOpen = !root.weatherPopoutOpen; }
-            onEntered: root.showTooltip("weather - " + root.weatherDesc.toLowerCase() + "\nclick for details", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+            onClicked: {
+              if (root.weatherError !== "") { root.weatherRetries = 0; root.refreshWeather(); }
+              else { root.pomodoroPopoutScreen = null; root.weatherPopoutScreen = root.weatherPopoutScreen === bar.screen ? null : bar.screen; }
+            }
+            onEntered: root.showTooltip(root.weatherError !== "" ? "weather\nclick to retry" : "weather\nclick for details", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
             onExited: root.hideTooltip()
           }
         }
 
         // pomodoro
         Rectangle {
+          id: pomPill
           Layout.preferredWidth: pomRow.implicitWidth + 20; Layout.preferredHeight: 28; radius: 8
           color: pomMouse.containsMouse ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
           scale: pomMouse.containsMouse ? 1.02 : 1.0
@@ -179,7 +184,7 @@ PanelWindow {
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
               if (mouse.button === Qt.RightButton) root.stopPomodoro();
-              else { root.weatherPopoutOpen = false; root.pomodoroPopoutOpen = !root.pomodoroPopoutOpen; }
+              else { root.weatherPopoutScreen = null; root.pomodoroPopoutScreen = root.pomodoroPopoutScreen === bar.screen ? null : bar.screen; }
             }
             onEntered: root.showTooltip("pomodoro - focus timer\nclick to open, right-click to stop", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
             onExited: root.hideTooltip()
@@ -263,7 +268,7 @@ PanelWindow {
             id: micMouse; hoverEnabled: true; anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
-              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol]);
+              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol, "-t", "4"]);
               else if (root.source?.audio) root.source.audio.muted = !root.source.audio.muted;
             }
             onWheel: wheel => {
@@ -353,7 +358,7 @@ PanelWindow {
             id: volMouse; hoverEnabled: true; anchors.fill: parent
             acceptedButtons: Qt.LeftButton | Qt.RightButton
             onClicked: mouse => {
-              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol]);
+              if (mouse.button === Qt.RightButton) Quickshell.execDetached([root.scripts.pavucontrol, "-t", "3"]);
               else if (root.sink?.audio) root.sink.audio.muted = !root.sink.audio.muted;
             }
             onWheel: wheel => {
@@ -454,12 +459,318 @@ PanelWindow {
         Repeater {
           model: SystemTray.items
           delegate: Rectangle {
-            required property var modelData
+            id: trayDelegate
+            required property SystemTrayItem modelData
             Layout.preferredWidth: 28; Layout.preferredHeight: 28; radius: 8
             color: trayMouse.containsMouse ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.5) : "transparent"
             Behavior on color { ColorAnimation { duration: 150 } }
-            Image { anchors.centerIn: parent; source: modelData.icon ?? ""; width: 18; height: 18; sourceSize.width: 18; sourceSize.height: 18 }
-            MouseArea { id: trayMouse; hoverEnabled: true; anchors.fill: parent; acceptedButtons: Qt.LeftButton | Qt.RightButton; onClicked: mouse => { if (mouse.button === Qt.RightButton) modelData.display(); else modelData.activate(); } }
+            Image { anchors.centerIn: parent; source: trayDelegate.modelData.icon ?? ""; width: 18; height: 18; sourceSize.width: 18; sourceSize.height: 18 }
+            QsMenuAnchor {
+              id: menuAnchor
+              menu: trayDelegate.modelData.menu
+              anchor.window: bar
+              anchor.adjustment: PopupAdjustment.Flip
+            }
+            MouseArea {
+              id: trayMouse; hoverEnabled: true; anchors.fill: parent
+              acceptedButtons: Qt.LeftButton | Qt.RightButton | Qt.MiddleButton
+              onClicked: mouse => {
+                if (mouse.button === Qt.RightButton || trayDelegate.modelData.onlyMenu) {
+                  if (trayDelegate.modelData.hasMenu) menuAnchor.open();
+                } else if (mouse.button === Qt.LeftButton) {
+                  trayDelegate.modelData.activate();
+                } else if (mouse.button === Qt.MiddleButton) {
+                  trayDelegate.modelData.secondaryActivate();
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  function windDir(d) {
+    let m = {"N":"North","NNE":"North Northeast","NE":"Northeast","ENE":"East Northeast","E":"East","ESE":"East Southeast","SE":"Southeast","SSE":"South Southeast","S":"South","SSW":"South Southwest","SW":"Southwest","WSW":"West Southwest","W":"West","WNW":"West Northwest","NW":"Northwest","NNW":"North Northwest"};
+    return m[d] || d;
+  }
+
+  // weather popout
+  PopupWindow {
+    id: weatherPopout
+    visible: root.weatherPopoutScreen === bar.screen
+    anchor.window: bar
+    anchor.rect: {
+      let mapped = weatherPill.mapToItem(null, 0, 0);
+      return Qt.rect(mapped.x, 0, weatherPill.width, bar.implicitHeight);
+    }
+    anchor.edges: Edges.Bottom
+    anchor.gravity: Edges.Bottom
+    anchor.adjustment: PopupAdjustment.SlideX
+    implicitWidth: 400
+    implicitHeight: weatherCol.implicitHeight + 36
+    color: "transparent"
+
+    HyprlandFocusGrab {
+      active: root.weatherPopoutScreen === bar.screen
+      windows: [weatherPopout, bar]
+      onCleared: root.weatherPopoutScreen = null
+    }
+
+    Rectangle {
+      anchors.fill: parent; radius: 14
+      color: root.colBg
+      border.width: 1; border.color: Qt.rgba(root.colText.r, root.colText.g, root.colText.b, 0.08)
+
+      Column {
+        id: weatherCol
+        anchors { fill: parent; margins: 16 }
+        spacing: 12
+
+        Column {
+          width: parent.width; spacing: 2
+          RowLayout {
+            width: parent.width
+            Text {
+              text: (root.weatherLocation || "Weather") + (root.weatherPubIp ? " (" + root.weatherPubIp + ")" : "")
+              font.family: root.textFont; font.pixelSize: 14; font.weight: Font.Bold; color: root.colText
+              Layout.fillWidth: true; elide: Text.ElideRight
+            }
+          }
+          RowLayout {
+            visible: root.weatherLastUpdated !== ""
+            spacing: 8
+            Text {
+              text: "updated " + root.weatherLastUpdated; font.family: root.textFont; font.pixelSize: 10; color: root.colSurface1
+            }
+            Text {
+              text: "refresh"
+              font.family: root.textFont; font.pixelSize: 10
+              color: refreshMouse.containsMouse ? root.colText : root.colSubtext0
+              Behavior on color { ColorAnimation { duration: 150 } }
+              MouseArea {
+                id: refreshMouse; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor
+                onClicked: root.refreshWeather()
+              }
+            }
+          }
+        }
+
+        RowLayout {
+          width: parent.width; spacing: 14
+          Text { text: root.weatherIcon; font.family: root.iconFont; font.pixelSize: 38; color: root.colYellow }
+          Column {
+            spacing: 2
+            Text { text: root.weatherTemp; font.family: root.textFont; font.pixelSize: 24; color: root.colText }
+            Text {
+              text: root.weatherDesc; font.family: root.textFont; font.pixelSize: 12
+              color: root.colSubtext0; visible: root.weatherDesc !== ""
+            }
+          }
+        }
+
+        Rectangle { width: parent.width; height: 1; color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.5); visible: root.weatherFeelsLike !== "" }
+
+        GridLayout {
+          visible: root.weatherFeelsLike !== ""
+          width: parent.width; columns: 2; rowSpacing: 8; columnSpacing: 16
+          Text { text: "Feels like"; font.family: root.textFont; font.pixelSize: 13; color: root.colSubtext0 }
+          Text { text: root.weatherFeelsLike; font.family: root.textFont; font.pixelSize: 13; color: root.colText }
+          Text { text: "Humidity"; font.family: root.textFont; font.pixelSize: 13; color: root.colSubtext0 }
+          Text { text: root.weatherHumidity; font.family: root.textFont; font.pixelSize: 13; color: root.colText }
+          Text { text: "Wind"; font.family: root.textFont; font.pixelSize: 13; color: root.colSubtext0 }
+          Text {
+            text: {
+              let parts = root.weatherWind.split(" ");
+              if (parts.length >= 3) return parts[0] + " mph " + bar.windDir(parts[2]);
+              return root.weatherWind;
+            }
+            font.family: root.textFont; font.pixelSize: 13; color: root.colText
+          }
+          Text { visible: root.weatherRain !== ""; text: "Rain"; font.family: root.textFont; font.pixelSize: 13; color: root.colSubtext0 }
+          Text { visible: root.weatherRain !== ""; text: root.weatherRain; font.family: root.textFont; font.pixelSize: 13; color: root.colText }
+        }
+
+        Rectangle { width: parent.width; height: 1; visible: root.weatherHourly.length > 0; color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.5) }
+
+        RowLayout {
+          visible: root.weatherHourly.length > 0
+          width: parent.width; spacing: 0
+
+          Repeater {
+            model: root.weatherHourly
+            delegate: Column {
+              required property var modelData
+              Layout.fillWidth: true; spacing: 4
+              Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.time; font.family: root.textFont; font.pixelSize: 11; color: root.colSubtext0 }
+              Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.icon; font.family: root.iconFont; font.pixelSize: 22; color: root.colYellow }
+              Text { anchors.horizontalCenter: parent.horizontalCenter; text: modelData.temp + "°"; font.family: root.textFont; font.pixelSize: 13; color: root.colText }
+            }
+          }
+
+          Rectangle { visible: root.weatherTomorrow !== null; Layout.preferredWidth: 1; Layout.preferredHeight: 50; color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.3) }
+
+          Column {
+            visible: root.weatherTomorrow !== null
+            Layout.fillWidth: true; spacing: 4
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: "Tomorrow"; font.family: root.textFont; font.pixelSize: 11; color: root.colSubtext0 }
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: root.weatherTomorrow?.icon ?? ""; font.family: root.iconFont; font.pixelSize: 22; color: root.colYellow }
+            Text { anchors.horizontalCenter: parent.horizontalCenter; text: (root.weatherTomorrow?.high ?? "") + "°/" + (root.weatherTomorrow?.low ?? "") + "°"; font.family: root.textFont; font.pixelSize: 12; color: root.colText }
+          }
+        }
+
+        Text {
+          visible: root.weatherError !== ""
+          width: parent.width
+          text: root.weatherError
+          font.family: root.textFont; font.pixelSize: 11; color: root.colRed
+          horizontalAlignment: Text.AlignLeft
+        }
+      }
+    }
+  }
+
+  // pomodoro popout
+  PopupWindow {
+    id: pomPopout
+    visible: root.pomodoroPopoutScreen === bar.screen
+    anchor.window: bar
+    anchor.rect: {
+      let mapped = pomPill.mapToItem(null, 0, 0);
+      return Qt.rect(mapped.x, 0, pomPill.width, bar.implicitHeight);
+    }
+    anchor.edges: Edges.Bottom
+    anchor.gravity: Edges.Bottom
+    anchor.adjustment: PopupAdjustment.SlideX
+    implicitWidth: 400
+    implicitHeight: pomCol.implicitHeight + 36
+    color: "transparent"
+
+    HyprlandFocusGrab {
+      active: root.pomodoroPopoutScreen === bar.screen
+      windows: [pomPopout, bar]
+      onCleared: root.pomodoroPopoutScreen = null
+    }
+
+    onVisibleChanged: {
+      if (visible && !root.pomodoroActive)
+        pomTaskInput.forceActiveFocus();
+    }
+
+    Rectangle {
+      anchors.fill: parent; radius: 14
+      color: root.colBg
+      border.width: 1; border.color: Qt.rgba(root.colText.r, root.colText.g, root.colText.b, 0.08)
+
+      Column {
+        id: pomCol
+        anchors { fill: parent; margins: 16 }
+        spacing: 12
+
+        Text { text: "Pomodoro"; font.family: root.textFont; font.pixelSize: 15; font.weight: Font.Bold; color: root.colText }
+
+        Column {
+          visible: root.pomodoroActive
+          width: parent.width; spacing: 10
+
+          Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            text: {
+              let remaining = Math.max(0, root.pomodoroEndTime - clock.date.getTime() / 1000);
+              let min = Math.floor(remaining / 60);
+              let sec = Math.floor(remaining % 60);
+              return String(min).padStart(2, '0') + ":" + String(sec).padStart(2, '0');
+            }
+            font.family: root.textFont; font.pixelSize: 40; color: root.colAccent
+          }
+
+          Text {
+            anchors.horizontalCenter: parent.horizontalCenter; text: root.pomodoroTask
+            font.family: root.textFont; font.pixelSize: 13; color: root.colSubtext0
+            width: parent.width; elide: Text.ElideRight; horizontalAlignment: Text.AlignHCenter
+          }
+
+          Rectangle {
+            width: parent.width; height: 6; radius: 3; color: root.colSurface0
+            Rectangle {
+              height: parent.height; radius: 3; color: root.colAccent
+              width: { let elapsed = 1500 - Math.max(0, root.pomodoroEndTime - clock.date.getTime() / 1000); return parent.width * Math.min(1, elapsed / 1500); }
+              Behavior on width { NumberAnimation { duration: 1000 } }
+            }
+          }
+
+          Rectangle {
+            width: parent.width; height: 40; radius: 20
+            color: stopMouse.containsMouse ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.25) : Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.15)
+            Behavior on color { ColorAnimation { duration: 150 } }
+            Text { anchors.centerIn: parent; text: "Stop"; font.family: root.textFont; font.pixelSize: 13; color: root.colRed }
+            MouseArea { id: stopMouse; anchors.fill: parent; hoverEnabled: true; onClicked: { root.stopPomodoro(); root.pomodoroPopoutScreen = null; } }
+          }
+        }
+
+        Column {
+          visible: !root.pomodoroActive
+          width: parent.width; spacing: 10
+
+          Rectangle {
+            width: parent.width; height: 40; radius: 20
+            color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.6)
+
+            TextInput {
+              id: pomTaskInput
+              anchors { fill: parent; leftMargin: 16; rightMargin: 16 }
+              verticalAlignment: TextInput.AlignVCenter
+              font.family: root.textFont; font.pixelSize: 13; color: root.colText
+              selectionColor: root.colAccent; clip: true
+
+              Text {
+                anchors.fill: parent; verticalAlignment: Text.AlignVCenter
+                text: "what are you working on?"
+                font.family: root.textFont; font.pixelSize: 13; color: root.colSurface1
+                visible: pomTaskInput.text === ""
+              }
+
+              Keys.onReturnPressed: {
+                if (pomTaskInput.text.trim() !== "") { root.startPomodoro(pomTaskInput.text.trim()); pomTaskInput.text = ""; }
+              }
+              Keys.onEscapePressed: root.pomodoroPopoutScreen = null
+            }
+          }
+
+          Rectangle {
+            width: parent.width; height: 40; radius: 20
+            color: startMouse.containsMouse ? Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.25) : Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.15)
+            Behavior on color { ColorAnimation { duration: 150 } }
+            Text { anchors.centerIn: parent; text: "Start (25 min)"; font.family: root.textFont; font.pixelSize: 13; color: root.colAccent }
+            MouseArea {
+              id: startMouse; anchors.fill: parent; hoverEnabled: true
+              onClicked: { if (pomTaskInput.text.trim() !== "") { root.startPomodoro(pomTaskInput.text.trim()); pomTaskInput.text = ""; } }
+            }
+          }
+
+          Column {
+            visible: root.pomodoroRecent.length > 0
+            width: parent.width; spacing: 4
+
+            Rectangle { width: parent.width; height: 1; color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.5) }
+            Text { text: "Recent"; font.family: root.textFont; font.pixelSize: 11; color: root.colSurface1; topPadding: 4 }
+
+            Repeater {
+              model: root.pomodoroRecent.slice(0, 8)
+              delegate: Rectangle {
+                required property var modelData
+                width: parent.width; height: 32; radius: 8
+                color: recentMouse.containsMouse ? Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.4) : "transparent"
+                Behavior on color { ColorAnimation { duration: 100 } }
+                Text {
+                  anchors { fill: parent; leftMargin: 10; rightMargin: 10 }
+                  verticalAlignment: Text.AlignVCenter
+                  text: modelData; font.family: root.textFont; font.pixelSize: 12; color: root.colSubtext0
+                  elide: Text.ElideRight
+                }
+                MouseArea { id: recentMouse; anchors.fill: parent; hoverEnabled: true; onClicked: root.startPomodoro(modelData) }
+              }
+            }
           }
         }
       }
