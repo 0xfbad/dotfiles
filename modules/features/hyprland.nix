@@ -412,7 +412,7 @@ _: {
 
       # decoration
       decoration {
-        rounding = 0
+        rounding = 12
         shadow {
           enabled = false
         }
