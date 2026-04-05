@@ -97,7 +97,6 @@ _: {
       playerctl
       brightnessctl
       bluetui
-      impala
       pueue # background task queue, survives terminal closes, concurrency control
       process-compose # like docker-compose for bare processes, YAML config, TUI
       tailspin # pipe any log through tspin, auto-highlights dates/IPs/UUIDs/severity
