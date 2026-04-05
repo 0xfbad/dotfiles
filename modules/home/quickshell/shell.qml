@@ -331,47 +331,6 @@ ShellRoot {
   property string caffeineIcon: "local_cafe"
   property bool caffeineActive: false
 
-  // workspace window type icons
-  property var wsWindowIcons: ({})
-
-  readonly property var classIconMap: ({
-    "firefox": "web", "chromium": "web", "brave": "web", "librewolf": "web",
-    "kitty": "terminal", "wezterm": "terminal", "foot": "terminal", "Alacritty": "terminal",
-    "code": "code", "codium": "code", "zed": "code", "neovide": "code",
-    "dolphin": "folder", "nautilus": "folder", "thunar": "folder",
-    "steam": "sports_esports",
-    "spotify": "music_note", "tidal-hifi": "music_note",
-    "discord": "chat", "vesktop": "chat", "telegram-desktop": "chat",
-    "gimp": "photo_library", "inkscape": "photo_library",
-    "obs": "videocam",
-    "pavucontrol": "graphic_eq",
-    "btop": "monitor_heart",
-  })
-
-  Process {
-    id: wsIconProc
-    command: ["hyprctl", "clients", "-j"]
-    stdout: StdioCollector {
-      onStreamFinished: {
-        try {
-          let clients = JSON.parse(wsIconProc.stdout.text);
-          let icons = {};
-          for (let c of clients) {
-            let ws = c.workspace?.id ?? -1;
-            if (ws <= 0) continue;
-            if (!icons[ws]) icons[ws] = [];
-            let cls = (c.class || "").toLowerCase();
-            let icon = root.classIconMap[cls];
-            if (!icon && cls.includes(".")) icon = root.classIconMap[cls.split(".").pop()];
-            if (icon && !icons[ws].includes(icon)) icons[ws].push(icon);
-          }
-          root.wsWindowIcons = icons;
-        } catch(e) {}
-      }
-    }
-  }
-  Timer { interval: 3000; running: true; repeat: true; triggeredOnStart: true; onTriggered: { if (!wsIconProc.running) wsIconProc.running = true } }
-
   // misc
   property bool recording: false
   property bool capsLock: false
