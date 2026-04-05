@@ -65,7 +65,15 @@
                 cpu=$(awk -F: '/model name/ {gsub(/^ +/, "", $2); print $2; exit}' /proc/cpuinfo)
                 cores=$(nproc)
                 mem=$(awk '/MemTotal/ {printf "%.0f GB", $2/1024/1024}' /proc/meminfo)
-                gpu=$(lspci | awk -F: '/VGA|3D/ {gsub(/^ +/, "", $3); print $3; exit}')
+                discrete=$(lspci | awk -F: '/VGA|3D/ && !/^00/ {gsub(/^ +/, "", $3); print $3; exit}')
+                integrated=$(lspci | awk -F: '/VGA|3D/ && /^00/ {gsub(/^ +/, "", $3); print $3; exit}')
+                if [ -n "$discrete" ] && [ -n "$integrated" ]; then
+                  gpu="$discrete & integrated graphics"
+                elif [ -n "$discrete" ]; then
+                  gpu="$discrete"
+                else
+                  gpu="$integrated"
+                fi
                 disk=$(df -h / | awk 'NR==2 {print $2 " total, " $4 " free"}')
                 ip=$(ip -4 -br addr show | awk '/UP/ {gsub(/\/.*/, "", $3); print $3; exit}')
                 host=$(hostname)
