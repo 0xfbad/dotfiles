@@ -91,21 +91,30 @@ _: {
         fi
       fi
 
-      echo "$weather" | $JQ -c --arg city "$city" --arg region "$region" --arg pip "$pub_ip" '
+      local_now=$(date +%Y-%m-%dT%H:%M)
+      echo "$weather" | $JQ -c --arg city "$city" --arg region "$region" --arg pip "$pub_ip" --arg now "$local_now" '
         def wmo_icon: . as $c | {"0":"sunny","1":"sunny","2":"partly_cloudy_day","3":"cloud","45":"foggy","48":"foggy","51":"rainy","53":"rainy","55":"rainy","56":"ac_unit","57":"ac_unit","61":"rainy","63":"rainy","65":"rainy","66":"ac_unit","67":"ac_unit","71":"cloudy_snowing","73":"cloudy_snowing","75":"cloudy_snowing","77":"cloudy_snowing","80":"rainy","81":"rainy","82":"rainy","85":"cloudy_snowing","86":"cloudy_snowing","95":"thunderstorm","96":"thunderstorm","99":"thunderstorm"} | .[$c | tostring] // "cloud";
         def wmo_desc: . as $c | {"0":"Clear","1":"Clear","2":"Partly cloudy","3":"Overcast","45":"Fog","48":"Fog","51":"Drizzle","53":"Drizzle","55":"Drizzle","56":"Freezing drizzle","57":"Freezing drizzle","61":"Light rain","63":"Rain","65":"Heavy rain","66":"Freezing rain","67":"Freezing rain","71":"Light snow","73":"Snow","75":"Heavy snow","77":"Snow grains","80":"Light showers","81":"Showers","82":"Heavy showers","85":"Snow showers","86":"Heavy snow showers","95":"Thunderstorm","96":"Thunderstorm with hail","99":"Thunderstorm with hail"} | .[$c | tostring] // "Unknown";
         def wind_dir: if . < 22.5 then "N" elif . < 67.5 then "NE" elif . < 112.5 then "E" elif . < 157.5 then "SE" elif . < 202.5 then "S" elif . < 247.5 then "SW" elif . < 292.5 then "W" elif . < 337.5 then "NW" else "N" end;
         def to12h: if . == 0 then "12 AM" elif . < 12 then "\(.) AM" elif . == 12 then "12 PM" else "\(. - 12) PM" end;
 
-        (now | floor) as $now_ts |
         . as $root |
 
-        [range($root.hourly.time | length) | . as $i |
-          select(($root.hourly.time[$i] | sub("T"; " ") | strptime("%Y-%m-%d %H:%M") | mktime) > $now_ts) |
-          {time: ($root.hourly.time[$i] | split("T")[1] | split(":")[0] | tonumber | to12h),
-           icon: ($root.hourly.weather_code[$i] | wmo_icon),
-           temp: ($root.hourly.temperature_2m[$i] | round | tostring)}
-        ] | .[0:4] as $hourly |
+        # future hours today, evenly spread until midnight
+        ([range($root.hourly.time | length) | . as $i |
+          select(
+            $root.hourly.time[$i] > $now and
+            ($root.hourly.time[$i] | split("T")[0]) == $root.daily.time[0]
+          ) | $i
+        ]) as $tf |
+        (if ($tf | length) <= 4 then $tf
+         else ($tf | length / 4) as $s | [range(4) | $tf[(. * $s | floor)]]
+         end) as $picks |
+        [$picks[] | {
+          time: ($root.hourly.time[.] | split("T")[1] | split(":")[0] | tonumber | to12h),
+          icon: ($root.hourly.weather_code[.] | wmo_icon),
+          temp: ($root.hourly.temperature_2m[.] | round | tostring)
+        }] as $hourly |
 
         (if ($root.daily.time | length) > 1 then {
           day: ($root.daily.time[1] | split("-")[2]),
