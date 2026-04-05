@@ -51,13 +51,8 @@ _: {
       '';
     });
 
-    # uses impala (iwd) if available, falls back to wlctl (networkmanager)
     wifiTui = pkgs.writeShellScript "wifi-tui" ''
-      if systemctl is-active --quiet iwd 2>/dev/null; then
-        exec ${pkgs.impala}/bin/impala
-      else
-        exec ${pkgs.wlctl}/bin/wlctl
-      fi
+      exec ${pkgs.wlctl}/bin/wlctl
     '';
 
     screenshotArea = lib.getExe (pkgs.writeShellApplication {
@@ -298,7 +293,7 @@ _: {
     mod = "SUPER";
     dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors;
   in {
-    xdg.configFile."hypr/pyprland.toml".text = ''
+    xdg.configFile."pypr/config.toml".text = ''
       [pyprland]
       plugins = ["scratchpads"]
 
@@ -499,7 +494,7 @@ _: {
       # window rules
       windowrule = match:class .*, suppress_event maximize
       windowrule = match:title ^(Open|Save|Save As|File Upload), float on, center on
-      windowrule = match:class ^(btop|bluetui|impala|wifi-tui|wlctl)$, float on, center on, size 875 600
+      windowrule = match:class ^(btop|bluetui|wifi-tui|wlctl)$, float on, center on, size 875 600
       windowrule = match:class ^(keybind-popup)$, float on, center on, size 920 700
       windowrule = match:class ^(vlc|mpv|com.obsproject.Studio|zoom|org.kde.kdenlive)$, opacity 1.0 override 1.0 override
       windowrule = match:fullscreen 1, idle_inhibit on
