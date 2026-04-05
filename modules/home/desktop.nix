@@ -1,14 +1,5 @@
 _: {
   flake.homeModules.desktop = {pkgs, ...}: {
-    # disable remmina tray icon autostart
-    xdg.configFile."autostart/remmina-applet.desktop".text = ''
-      [Desktop Entry]
-      Type=Application
-      Name=Remmina Applet
-      Exec=remmina -i
-      Hidden=true
-    '';
-
     home.packages = with pkgs; [
       # browsers
       ungoogled-chromium
