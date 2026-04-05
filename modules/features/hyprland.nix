@@ -26,7 +26,7 @@ _: {
         main=$(hyprctl monitors -j | jq -r '.[0].name')
         mapfile -t all_mons < <(hyprctl monitors all -j | jq -r '.[].name')
         if [ "''${#all_mons[@]}" -lt 2 ]; then
-          notify-send -t 3000 "presentation" "no external monitor detected"
+          notify-send -a "display" -t 3000 "presentation" "no external monitor detected"
           exit 0
         fi
 
@@ -38,14 +38,14 @@ _: {
               hyprctl keyword monitor "$ext, preferred, auto, 1, mirror, $main"
             done
             echo "mirror" > "$state_file"
-            notify-send -t 3000 "presentation" "mirroring $main"
+            notify-send -a "display" -t 3000 "presentation" "mirroring $main"
             ;;
           mirror)
             for ext in "''${externals[@]}"; do
               hyprctl keyword monitor "$ext, preferred, auto-up, 1"
             done
             echo "extend" > "$state_file"
-            notify-send -t 3000 "presentation" "extended above"
+            notify-send -a "display" -t 3000 "presentation" "extended above"
             ;;
         esac
       '';
@@ -66,7 +66,7 @@ _: {
         GEOM=$(slurp $SLURP_ARGS) || { kill "$PID"; exit 0; }
         grim -g "$GEOM" - | wl-copy -t image/png
         kill "$PID"
-        notify-send -t 2000 "Screenshot" "copied to clipboard"
+        notify-send -a "screenshot" -t 2000 "screenshot" "copied to clipboard"
       '';
     });
 
@@ -89,7 +89,7 @@ _: {
       runtimeInputs = with pkgs; [grim wl-clipboard libnotify];
       text = ''
         grim - | wl-copy -t image/png
-        notify-send -t 2000 "Screenshot" "full screen copied to clipboard"
+        notify-send -a "screenshot" -t 2000 "screenshot" "full screen copied to clipboard"
       '';
     });
 
@@ -116,13 +116,13 @@ _: {
           sleep 0.5
           LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
           if [ -n "$LAST" ]; then
-            notify-send -t 3000 "Recording saved to videos" "named as $(basename "$LAST")"
+            notify-send -a "recording" -t 3000 "recording saved" "$(basename "$LAST")"
           fi
         else
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
           GEOM=$(slurp -b 000000CC -s 00000000) || exit 0
-          notify-send -t 2000 "Recording started" "Super+Shift+R to stop"
+          notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
           wl-screenrec -g "$GEOM" --audio -f "$FILE" &
         fi
       '';
@@ -170,11 +170,11 @@ _: {
         if [ "$current" = "scrolling" ]; then
           hyprctl keyword general:layout dwindle
           sleep 0.2
-          notify-send -t 3000 "layout now dwindle" "$monitor"
+          notify-send -a "hyprland" -t 3000 "layout" "dwindle on $monitor"
         else
           hyprctl keyword general:layout scrolling
           sleep 0.2
-          notify-send -t 3000 "layout now scrolling" "$monitor"
+          notify-send -a "hyprland" -t 3000 "layout" "scrolling on $monitor"
         fi
       '';
     });

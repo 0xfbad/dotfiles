@@ -280,7 +280,7 @@ ShellRoot {
       let startTime = pomodoroEndTime - 1500;
       let elapsed = Math.floor((Date.now() / 1000 - startTime) / 60);
       let task = pomodoroTask;
-      Quickshell.execDetached(["notify-send", "Pomodoro cancelled", task + " (" + elapsed + " min)"]);
+      Quickshell.execDetached(["notify-send", "-a", "pomodoro", "cancelled", task + " (" + elapsed + " min)"]);
       Quickshell.execDetached(["bash", "-c",
         "printf '%s - %s (cancelled after %smin)\\n' \"$(date '+%Y-%m-%d %H:%M')\" \"$1\" \"$2\" >> $HOME/.local/share/pomodoro.log",
         "_", task, String(elapsed)]);
@@ -305,7 +305,7 @@ ShellRoot {
         let task = root.pomodoroTask;
         root.pomodoroEndTime = 0;
         root.pomodoroTask = "";
-        Quickshell.execDetached(["notify-send", "-u", "critical", "Pomodoro done", task + ", take a break"]);
+        Quickshell.execDetached(["notify-send", "-a", "pomodoro", "-u", "critical", "done", task + ", take a break"]);
       }
     }
   }
