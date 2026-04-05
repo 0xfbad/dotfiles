@@ -434,11 +434,11 @@ PanelWindow {
           Behavior on color { ColorAnimation { duration: 200 } }
           RowLayout { id: sysRow; anchors.centerIn: parent; spacing: 6
             Text { text: "speed"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colText }
-            Text { text: root.cpuPercent + "%"; Layout.preferredWidth: 34; horizontalAlignment: Text.AlignRight; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
+            Text { text: root.cpuPercent + "%"; Layout.preferredWidth: 26; horizontalAlignment: Text.AlignRight; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
             Text { visible: root.cpuTemp > 0; text: root.cpuTemp + "\u00B0"; font.family: root.textFont; font.pixelSize: 10; color: root.cpuTemp >= 80 ? root.colRed : root.colSurface1 }
             Rectangle { width: 1; height: 14; color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.5) }
             Text { text: "memory"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colText }
-            Text { text: root.memPercent + "%"; Layout.preferredWidth: 34; horizontalAlignment: Text.AlignRight; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
+            Text { text: root.memPercent + "%"; Layout.preferredWidth: 26; horizontalAlignment: Text.AlignRight; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: root.colText }
           }
           MouseArea {
             id: sysMouse; hoverEnabled: true; anchors.fill: parent
