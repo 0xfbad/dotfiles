@@ -177,6 +177,44 @@ ShellRoot {
     if (mediaActive && scriptsLoaded && !cavaProc.running) cavaProc.running = true;
   }
 
+  // battery details (from sysfs)
+  property string batPower: ""
+  property string batTimeLeft: ""
+  property string batHealth: ""
+  property string batCycles: ""
+  property string batStatus: ""
+  property var batHistory: []
+  property var batPopoutScreen: null
+  readonly property bool batPopoutOpen: batPopoutScreen !== null
+
+  Process {
+    id: batDetailProc
+    command: ["bash", "-c", "awk -F= '{a[$1]=$2} END { v=a[\"POWER_SUPPLY_VOLTAGE_NOW\"]+0; c=a[\"POWER_SUPPLY_CURRENT_NOW\"]+0; w=v*c/1e12; s=a[\"POWER_SUPPLY_STATUS\"]; now=a[\"POWER_SUPPLY_CHARGE_NOW\"]+0; full=a[\"POWER_SUPPLY_CHARGE_FULL\"]+0; design=a[\"POWER_SUPPLY_CHARGE_FULL_DESIGN\"]+0; pw=sprintf(\"%.1fW\",w); tl=\"\"; if(c>1000 && s==\"Discharging\"){h=now/c; tl=sprintf(\"%.0fh %02.0fm\",h,h*60%60)} else if(c>1000 && s==\"Charging\"){h=(full-now)/c; tl=sprintf(\"%.0fh %02.0fm\",h,h*60%60)}; hl=(design>0)?sprintf(\"%.0f%%\",full*100/design):\"\"; printf \"%s|%s|%s|%s|%s\\n\",pw,tl,hl,a[\"POWER_SUPPLY_CYCLE_COUNT\"],s }' /sys/class/power_supply/BAT0/uevent 2>/dev/null"]
+    stdout: SplitParser {
+      onRead: data => {
+        let p = data.trim().split("|");
+        root.batPower = p[0] || "";
+        root.batTimeLeft = p[1] || "";
+        root.batHealth = p[2] || "";
+        root.batCycles = p[3] || "";
+        root.batStatus = p[4] || "";
+      }
+    }
+  }
+  Timer {
+    interval: 5000; running: root.hasBattery; repeat: true; triggeredOnStart: true
+    property int tick: 0
+    onTriggered: {
+      if (!batDetailProc.running) batDetailProc.running = true;
+      tick++;
+      // sample history every 30s, keep 4 hours (480 points)
+      if (tick % 6 === 0) {
+        let entry = { pct: root.batPercent, charging: root.batCharging, ts: Date.now() };
+        root.batHistory = [...root.batHistory, entry].slice(-480);
+      }
+    }
+  }
+
   // wifi + power
   property string wifiIcon: ""
   property string wifiSsid: ""

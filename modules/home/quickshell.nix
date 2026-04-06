@@ -167,9 +167,9 @@ _: {
       power_profile=$(${pkgs.power-profiles-daemon}/bin/powerprofilesctl get 2>/dev/null || echo "balanced")
 
       case "$power_profile" in
-        performance) power_icon="bolt" ;;
-        power-saver) power_icon="battery_saver" ;;
-        *) power_icon="tune" ;;
+        performance) power_icon="flash_on" ;;
+        power-saver) power_icon="eco" ;;
+        *) power_icon="balance" ;;
       esac
 
       ${pkgs.jq}/bin/jq -n -c \
@@ -224,6 +224,7 @@ _: {
       brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
       swww = "${pkgs.swww}/bin/swww";
       cava = "${cavaScript}";
+      powerprofilesctl = "${pkgs.power-profiles-daemon}/bin/powerprofilesctl";
     };
     configDir = pkgs.runCommand "quickshell-config" {} ''
       mkdir -p $out

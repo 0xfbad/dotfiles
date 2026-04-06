@@ -488,21 +488,24 @@ PanelWindow {
           id: batPill
           visible: root.hasBattery
           property bool hovered: batMouse.containsMouse
+          property bool critical: root.batPercent <= 20 && !root.batCharging
           Layout.preferredWidth: root.hasBattery ? batRow.implicitWidth + 20 : 0; Layout.preferredHeight: root.pillHeight; radius: root.pillRadius
-          property color batColor: root.batCharging ? root.colGreen : (root.batPercent >= 70 ? root.colBlue : (root.batPercent >= 30 ? root.colYellow : root.colRed))
-          color: (root.batCharging || root.batPercent <= 20)
-            ? Qt.rgba(batPill.batColor.r, batPill.batColor.g, batPill.batColor.b, 0.2)
+          color: critical
+            ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.2)
             : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.55))
           scale: hovered ? 1.02 : 1.0
           Behavior on scale { NumberAnimation { duration: 150 } }
           Behavior on color { ColorAnimation { duration: 200 } }
           RowLayout { id: batRow; anchors.centerIn: parent; spacing: 6
-            Text { text: root.batIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: batPill.batColor }
-            Text { text: root.batPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: (root.batCharging || root.batPercent <= 20) ? batPill.batColor : root.colText }
+            Text { text: root.batIcon; font.family: root.iconFont; font.pixelSize: root.iconSize; color: batPill.critical ? root.colRed : root.colText; Behavior on color { ColorAnimation { duration: 200 } } }
+            Text { text: root.batPercent + "%"; font.family: root.textFont; font.pixelSize: root.textSize; font.weight: Font.Medium; color: batPill.critical ? root.colRed : root.colText; Behavior on color { ColorAnimation { duration: 200 } } }
+            Rectangle { width: 1; height: 14; color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.5) }
+            Text { text: root.powerIcon; font.family: root.iconFont; font.pixelSize: 14; color: root.colSubtext0 }
           }
           MouseArea {
             id: batMouse; hoverEnabled: true; anchors.fill: parent
-            onEntered: root.showTooltip("battery - power status\n" + root.batPercent + "%" + (root.batCharging ? " charging" : ""), bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+            onClicked: { root.batPopoutScreen = root.batPopoutScreen === bar.screen ? null : bar.screen; }
+            onEntered: root.showTooltip("battery\nclick for details", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
             onExited: root.hideTooltip()
           }
         }
@@ -1268,6 +1271,298 @@ PanelWindow {
           RowLayout { spacing: 4
             Text { text: "arrow_upward"; font.family: root.iconFont; font.pixelSize: 12; color: root.colPeach }
             Text { text: root.formatBytes(root.netTxSession); font.family: root.textFont; font.pixelSize: 11; color: root.colSubtext0 }
+          }
+        }
+      }
+    }
+  }
+
+  // battery popout
+  PopupWindow {
+    id: batPopout
+    visible: root.batPopoutOpen && root.batPopoutScreen === bar.screen
+    anchor.window: bar
+    anchor.rect: {
+      let mapped = batPill.mapToItem(null, 0, 0);
+      return Qt.rect(mapped.x, 0, batPill.width, bar.implicitHeight);
+    }
+    anchor.edges: Edges.Bottom
+    anchor.gravity: Edges.Bottom
+    anchor.adjustment: PopupAdjustment.SlideX
+    implicitWidth: 360
+    implicitHeight: batPopCol.implicitHeight + 36
+    color: "transparent"
+
+    HyprlandFocusGrab {
+      active: root.batPopoutScreen === bar.screen
+      windows: [batPopout, bar]
+      onCleared: root.batPopoutScreen = null
+    }
+
+    Rectangle {
+      anchors.fill: parent; radius: 14
+      color: root.colBg
+      border.width: 1; border.color: Qt.rgba(root.colText.r, root.colText.g, root.colText.b, 0.08)
+
+      Column {
+        id: batPopCol
+        anchors { fill: parent; margins: 16 }
+        spacing: 12
+
+        // header
+        RowLayout {
+          width: parent.width
+          Text { text: "Battery"; font.family: root.textFont; font.pixelSize: 14; font.weight: Font.Bold; color: root.colText }
+          Item { Layout.fillWidth: true }
+          Text {
+            text: {
+              let s = root.batStatus;
+              if (s === "Charging") return root.batPercent + "% charging";
+              if (s === "Discharging") return root.batPercent + "%";
+              if (s === "Full") return "full";
+              if (s === "Not charging") return root.batPercent + "% plugged in";
+              return root.batPercent + "%";
+            }
+            font.family: root.textFont; font.pixelSize: 13; color: root.colSubtext0
+          }
+        }
+
+        // stats grid
+        GridLayout {
+          width: parent.width; columns: 2; rowSpacing: 6; columnSpacing: 12
+
+          Text { text: "Power"; font.family: root.textFont; font.pixelSize: 12; color: root.colSubtext0 }
+          Text { text: root.batPower; font.family: root.textFont; font.pixelSize: 12; color: root.colText; Layout.fillWidth: true; horizontalAlignment: Text.AlignRight }
+
+          Text {
+            visible: root.batTimeLeft !== ""
+            text: root.batCharging ? "Time to full" : "Time left"
+            font.family: root.textFont; font.pixelSize: 12; color: root.colSubtext0
+          }
+          Text {
+            visible: root.batTimeLeft !== ""
+            text: root.batTimeLeft
+            font.family: root.textFont; font.pixelSize: 12; color: root.colText; Layout.fillWidth: true; horizontalAlignment: Text.AlignRight
+          }
+
+          Text { text: "Health"; font.family: root.textFont; font.pixelSize: 12; color: root.colSubtext0 }
+          Text { text: root.batHealth || "—"; font.family: root.textFont; font.pixelSize: 12; color: root.colText; Layout.fillWidth: true; horizontalAlignment: Text.AlignRight }
+
+          Text { text: "Cycles"; font.family: root.textFont; font.pixelSize: 12; color: root.colSubtext0 }
+          Text { text: root.batCycles || "—"; font.family: root.textFont; font.pixelSize: 12; color: root.colText; Layout.fillWidth: true; horizontalAlignment: Text.AlignRight }
+        }
+
+        Rectangle { width: parent.width; height: 1; color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.5) }
+
+        // graph section
+        Column {
+          width: parent.width; spacing: 6
+
+          // legend
+          RowLayout {
+            width: parent.width
+            Text { text: "History"; font.family: root.textFont; font.pixelSize: 13; font.weight: Font.Bold; color: root.colText }
+            Item { Layout.fillWidth: true }
+            RowLayout { spacing: 8
+              RowLayout { spacing: 3
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colAccent }
+                Text { text: "on battery"; font.family: root.textFont; font.pixelSize: 10; color: root.colSubtext0 }
+              }
+              RowLayout { spacing: 3
+                Rectangle { width: 8; height: 8; radius: 4; color: root.colPeach }
+                Text { text: "charging"; font.family: root.textFont; font.pixelSize: 10; color: root.colSubtext0 }
+              }
+            }
+          }
+
+          // graph
+          Item {
+            width: parent.width; height: 120
+
+            // empty state
+            Text {
+              visible: root.batHistory.length < 2
+              anchors.centerIn: parent
+              text: "collecting data..."
+              font.family: root.textFont; font.pixelSize: 11; color: root.colSurface1
+            }
+
+            Rectangle {
+              visible: root.batHistory.length >= 2
+              anchors.fill: parent; radius: root.pillRadius
+              color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.3)
+
+              // danger zone (below 20%)
+              Rectangle {
+                anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
+                anchors.leftMargin: 28; anchors.bottomMargin: 18
+                height: (parent.height - 18) * 0.2; radius: 4
+                color: Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.06)
+                Rectangle { anchors.top: parent.top; width: parent.width; height: 1; color: Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.15) }
+              }
+
+              // y-axis labels
+              Repeater {
+                model: [100, 50, 20]
+                Text {
+                  required property var modelData
+                  x: 2; y: (parent.height - 18) * (1 - modelData / 100) - 5
+                  text: modelData; font.family: root.textFont; font.pixelSize: 8
+                  color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6)
+                }
+              }
+
+              // grid lines
+              Repeater {
+                model: [100, 50, 20]
+                Rectangle {
+                  required property var modelData
+                  x: 28; width: parent.width - 28; height: 1
+                  y: (parent.height - 18) * (1 - modelData / 100)
+                  color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.1)
+                }
+              }
+
+              Canvas {
+                id: batCanvas
+                x: 28; y: 0; width: parent.width - 28; height: parent.height - 18
+
+                onPaint: {
+                  let ctx = getContext("2d");
+                  ctx.clearRect(0, 0, width, height);
+                  let hist = root.batHistory;
+                  if (hist.length < 2) return;
+                  let w = width, h = height, n = hist.length;
+
+                  // filled area first (draw as one path per state segment)
+                  for (let i = 1; i < n; i++) {
+                    let x0 = (i - 1) * w / (n - 1);
+                    let x1 = i * w / (n - 1);
+                    let y0 = h - (hist[i-1].pct / 100) * h;
+                    let y1 = h - (hist[i].pct / 100) * h;
+                    let charging = hist[i].charging;
+                    let pct = hist[i].pct;
+
+                    let col;
+                    if (pct <= 20 && !charging) col = root.colRed;
+                    else if (charging) col = root.colPeach;
+                    else col = root.colAccent;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x0, h);
+                    ctx.lineTo(x0, y0);
+                    ctx.lineTo(x1, y1);
+                    ctx.lineTo(x1, h);
+                    ctx.closePath();
+                    ctx.fillStyle = Qt.rgba(col.r, col.g, col.b, 0.12);
+                    ctx.fill();
+
+                    ctx.beginPath();
+                    ctx.moveTo(x0, y0);
+                    ctx.lineTo(x1, y1);
+                    ctx.strokeStyle = Qt.rgba(col.r, col.g, col.b, 0.8);
+                    ctx.lineWidth = 1.5;
+                    ctx.stroke();
+                  }
+
+                  // current level dot
+                  let lastY = h - (hist[n-1].pct / 100) * h;
+                  let lastCol = hist[n-1].charging ? root.colPeach : (hist[n-1].pct <= 20 ? root.colRed : root.colAccent);
+                  ctx.beginPath();
+                  ctx.arc(w, lastY, 3, 0, 2 * Math.PI);
+                  ctx.fillStyle = Qt.rgba(lastCol.r, lastCol.g, lastCol.b, 1);
+                  ctx.fill();
+                }
+              }
+
+              Connections {
+                target: root
+                function onBatHistoryChanged() { batCanvas.requestPaint(); }
+              }
+
+              // x-axis time labels
+              Row {
+                anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
+                anchors.leftMargin: 28
+                height: 16
+
+                Repeater {
+                  model: {
+                    if (root.batHistory.length < 2) return [];
+                    let first = root.batHistory[0].ts;
+                    let last = root.batHistory[root.batHistory.length - 1].ts;
+                    let span = last - first;
+                    let labels = [];
+                    // place ~4 evenly spaced labels
+                    for (let i = 0; i <= 3; i++) {
+                      let ts = first + (span * i / 3);
+                      let d = new Date(ts);
+                      let mins = Math.round((last - ts) / 60000);
+                      let label = mins > 0 ? mins + "m ago" : "now";
+                      let frac = i / 3;
+                      labels.push({ label: label, frac: frac });
+                    }
+                    return labels;
+                  }
+                  Text {
+                    required property var modelData
+                    required property int index
+                    x: {
+                      let total = parent.width;
+                      let pos = total * modelData.frac;
+                      if (index === 0) return 0;
+                      if (index === 3) return total - implicitWidth;
+                      return pos - implicitWidth / 2;
+                    }
+                    text: modelData.label; font.family: root.textFont; font.pixelSize: 8
+                    color: Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.6)
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        Rectangle { width: parent.width; height: 1; color: Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.5) }
+
+        // power profile
+        Column {
+          width: parent.width; spacing: 8
+
+          Text { text: "Power Profile"; font.family: root.textFont; font.pixelSize: 13; font.weight: Font.Bold; color: root.colText }
+
+          RowLayout {
+            width: parent.width; spacing: 6
+
+            Repeater {
+              model: [
+                { name: "power-saver", icon: "eco", label: "Saver" },
+                { name: "balanced", icon: "balance", label: "Balanced" },
+                { name: "performance", icon: "flash_on", label: "Performance" }
+              ]
+              Rectangle {
+                required property var modelData
+                property bool active: root.powerProfile === modelData.name
+                property bool hovered: ppBtnMouse.containsMouse
+                Layout.fillWidth: true; height: 32; radius: root.pillRadius
+                color: active
+                  ? Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.2)
+                  : (hovered ? Qt.rgba(root.colSurface1.r, root.colSurface1.g, root.colSurface1.b, 0.4) : Qt.rgba(root.colSurface0.r, root.colSurface0.g, root.colSurface0.b, 0.3))
+                Behavior on color { ColorAnimation { duration: 150 } }
+                RowLayout { id: ppBtnRow; anchors.centerIn: parent; spacing: 4
+                  Text { text: modelData.icon; font.family: root.iconFont; font.pixelSize: 15; color: active ? root.colAccent : root.colSubtext0; Behavior on color { ColorAnimation { duration: 150 } } }
+                  Text { text: modelData.label; font.family: root.textFont; font.pixelSize: 11; color: active ? root.colAccent : root.colSubtext0; Behavior on color { ColorAnimation { duration: 150 } } }
+                }
+                MouseArea {
+                  id: ppBtnMouse; anchors.fill: parent; hoverEnabled: true
+                  onClicked: {
+                    root.powerProfile = modelData.name;
+                    root.powerIcon = modelData.icon;
+                    Quickshell.execDetached([root.scripts.powerprofilesctl, "set", modelData.name]);
+                  }
+                }
+              }
+            }
           }
         }
       }

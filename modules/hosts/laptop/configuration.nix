@@ -27,6 +27,7 @@
 
     networking.hostName = "laptop";
 
+    services.upower.enable = true;
     services.power-profiles-daemon.enable = true;
 
     boot.loader.systemd-boot.enable = true;
