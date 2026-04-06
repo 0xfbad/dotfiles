@@ -1,10 +1,10 @@
 _: {
   flake.homeModules.git = {pkgs, ...}: {
-    # gitui's libgit2 needs a real ssh-agent, run ssh-add after first login
     services.ssh-agent.enable = true;
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
+      addKeysToAgent = "yes";
       matchBlocks."*" = {
         compression = true;
         extraOptions = {
