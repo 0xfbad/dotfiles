@@ -547,7 +547,7 @@ ShellRoot {
   // misc
   Process {
     id: miscProc
-    command: ["bash", "-c", "rec=$(pgrep -x wl-screenrec > /dev/null && echo 1 || echo 0); caps=$(cat /sys/class/leds/input*::capslock/brightness 2>/dev/null | head -1); num=$(cat /sys/class/leds/input*::numlock/brightness 2>/dev/null | head -1); echo \"$rec ${caps:-0} ${num:-0}\""]
+    command: ["bash", "-c", "rec=$(pgrep -f gpu-screen-recorder > /dev/null && echo 1 || echo 0); caps=$(cat /sys/class/leds/input*::capslock/brightness 2>/dev/null | head -1); num=$(cat /sys/class/leds/input*::numlock/brightness 2>/dev/null | head -1); echo \"$rec ${caps:-0} ${num:-0}\""]
     stdout: SplitParser {
       onRead: data => { let p = data.trim().split(" "); root.recording = p[0] === "1"; root.capsLock = p[1] === "1"; root.numLock = p[2] === "1"; }
     }

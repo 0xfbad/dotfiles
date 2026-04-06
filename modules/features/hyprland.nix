@@ -101,7 +101,7 @@ _: {
 
     recordToggle = lib.getExe (pkgs.writeShellApplication {
       name = "record-toggle";
-      runtimeInputs = with pkgs; [wl-screenrec slurp libnotify procps coreutils scowl];
+      runtimeInputs = with pkgs; [gpu-screen-recorder slurp libnotify procps coreutils scowl];
       text = ''
         VIDDIR="$HOME/Videos"
         mkdir -p "$VIDDIR"
@@ -111,8 +111,8 @@ _: {
           shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
         }
 
-        if pgrep -x wl-screenrec > /dev/null; then
-          pkill -INT -x wl-screenrec
+        if pgrep -f gpu-screen-recorder > /dev/null; then
+          pkill -INT -f gpu-screen-recorder
           sleep 0.5
           LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
           if [ -n "$LAST" ]; then
@@ -122,8 +122,18 @@ _: {
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
           GEOM=$(slurp -b 000000CC -s 00000000) || exit 0
+
+          # slurp gives "X,Y WxH", gpu-screen-recorder wants "WxH+X+Y"
+          X=$(echo "$GEOM" | cut -d',' -f1)
+          REST=$(echo "$GEOM" | cut -d',' -f2)
+          Y=$(echo "$REST" | cut -d' ' -f1)
+          SIZE=$(echo "$REST" | cut -d' ' -f2)
+          W=$(echo "$SIZE" | cut -d'x' -f1)
+          H=$(echo "$SIZE" | cut -d'x' -f2)
+          REGION="''${W}x''${H}+''${X}+''${Y}"
+
           notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
-          wl-screenrec -g "$GEOM" --audio -f "$FILE" &
+          gpu-screen-recorder -w region -region "$REGION" -a default_output -f 60 -o "$FILE" &
         fi
       '';
     });
