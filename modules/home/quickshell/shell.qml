@@ -371,6 +371,10 @@ ShellRoot {
 
   // misc
   property bool recording: false
+  property int recX: 0
+  property int recY: 0
+  property int recW: 0
+  property int recH: 0
   property bool capsLock: false
   property bool numLock: false
   property real lastBrightness: -1
@@ -585,9 +589,25 @@ ShellRoot {
   // misc
   Process {
     id: miscProc
-    command: ["bash", "-c", "rec=$(pgrep -f '[g]pu-screen-recorder' > /dev/null && echo 1 || echo 0); caps=$(cat /sys/class/leds/input*::capslock/brightness 2>/dev/null | head -1); num=$(cat /sys/class/leds/input*::numlock/brightness 2>/dev/null | head -1); echo \"$rec ${caps:-0} ${num:-0}\""]
+    command: ["bash", "-c", "rec=$(pgrep -x wf-recorder > /dev/null && echo 1 || echo 0); caps=$(cat /sys/class/leds/input*::capslock/brightness 2>/dev/null | head -1); num=$(cat /sys/class/leds/input*::numlock/brightness 2>/dev/null | head -1); geom=$(cat /tmp/qs-rec-geom 2>/dev/null); echo \"$rec ${caps:-0} ${num:-0} ${geom:--}\""]
     stdout: SplitParser {
-      onRead: data => { let p = data.trim().split(" "); root.recording = p[0] === "1"; root.capsLock = p[1] === "1"; root.numLock = p[2] === "1"; }
+      onRead: data => {
+        let p = data.trim().split(" ");
+        root.recording = p[0] === "1";
+        root.capsLock = p[1] === "1";
+        root.numLock = p[2] === "1";
+        // parse slurp geometry "X,Y WxH"
+        if (p[0] === "1" && p.length >= 5 && p[3] !== "-") {
+          let xy = p[3].split(",");
+          let wh = p[4].split("x");
+          root.recX = parseInt(xy[0]) || 0;
+          root.recY = parseInt(xy[1]) || 0;
+          root.recW = parseInt(wh[0]) || 0;
+          root.recH = parseInt(wh[1]) || 0;
+        } else {
+          root.recX = 0; root.recY = 0; root.recW = 0; root.recH = 0;
+        }
+      }
     }
   }
   Timer { interval: 1000; running: true; repeat: true; triggeredOnStart: true; onTriggered: { if (!miscProc.running) miscProc.running = true } }
@@ -626,6 +646,53 @@ ShellRoot {
   Variants {
     model: Quickshell.screens
     Bar {}
+  }
+
+  // recording overlay (click-through)
+  Variants {
+    model: Quickshell.screens
+    PanelWindow {
+      id: recOverlay
+      required property var modelData
+      screen: modelData
+      visible: root.recording && root.recW > 0
+      anchors { top: true; left: true; right: true; bottom: true }
+      exclusiveZone: -1
+      color: "transparent"
+      mask: Region {}
+      WlrLayershell.layer: WlrLayer.Overlay
+      WlrLayershell.keyboardFocus: WlrKeyboardFocus.None
+
+      Canvas {
+        id: recCanvas
+        anchors.fill: parent
+        onPaint: {
+          let ctx = getContext("2d");
+          ctx.clearRect(0, 0, width, height);
+          let x = root.recX, y = root.recY, w = root.recW, h = root.recH;
+          if (w <= 0 || h <= 0) return;
+
+          // dim everything outside the region
+          ctx.fillStyle = "rgba(0, 0, 0, 0.3)";
+          ctx.fillRect(0, 0, width, y);
+          ctx.fillRect(0, y + h, width, height - y - h);
+          ctx.fillRect(0, y, x, h);
+          ctx.fillRect(x + w, y, width - x - w, h);
+
+          // dashed border outside the capture region so it doesn't appear in the recording
+          ctx.setLineDash([6, 4]);
+          ctx.strokeStyle = root.colRed.toString();
+          ctx.lineWidth = 2;
+          ctx.strokeRect(x - 3, y - 3, w + 6, h + 6);
+        }
+      }
+
+      Connections {
+        target: root
+        function onRecordingChanged() { recCanvas.requestPaint(); }
+        function onRecWChanged() { recCanvas.requestPaint(); }
+      }
+    }
   }
 
   // overlays

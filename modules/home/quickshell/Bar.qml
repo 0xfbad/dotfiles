@@ -448,7 +448,7 @@ PanelWindow {
           }
           MouseArea {
             id: recMouse; hoverEnabled: true; anchors.fill: parent
-            onClicked: Quickshell.execDetached(["pkill", "-INT", "-f", "[g]pu-screen-recorder"])
+            onClicked: Quickshell.execDetached(["bash", "-c", "pkill -INT -x wf-recorder; rm -f /tmp/qs-rec-geom; PID=$(cat /tmp/qs-rec-pid 2>/dev/null); [ -n \"$PID\" ] && tail --pid=$PID -f /dev/null 2>/dev/null || sleep 2; F=$(cat /tmp/qs-rec-file 2>/dev/null); rm -f /tmp/qs-rec-pid /tmp/qs-rec-file; [ -n \"$F\" ] && [ -f \"$F\" ] && notify-send -a recording -t 3000 'recording saved to ~/videos' \"$(basename \"$F\")\""])
             onEntered: root.showTooltip("recording\nclick to stop", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
             onExited: root.hideTooltip()
           }

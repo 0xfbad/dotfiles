@@ -30,6 +30,9 @@
     services.upower.enable = true;
     services.power-profiles-daemon.enable = true;
 
+    # intel iGPU VA-API encoding for wl-screenrec
+    hardware.graphics.extraPackages = with pkgs; [intel-media-driver];
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.systemd-boot.configurationLimit = 5;
     boot.loader.efi.canTouchEfiVariables = true;

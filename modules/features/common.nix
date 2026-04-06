@@ -214,7 +214,6 @@
       extraPackages = with pkgs; [gamescope];
     };
     programs.gamemode.enable = true;
-    programs.gpu-screen-recorder.enable = true;
     programs.gamescope = {
       enable = true;
       capSysNice = true;

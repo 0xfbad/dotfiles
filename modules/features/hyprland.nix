@@ -101,7 +101,7 @@ _: {
 
     recordToggle = lib.getExe (pkgs.writeShellApplication {
       name = "record-toggle";
-      runtimeInputs = with pkgs; [gpu-screen-recorder slurp libnotify procps coreutils scowl];
+      runtimeInputs = with pkgs; [wf-recorder slurp libnotify procps coreutils scowl];
       text = ''
         VIDDIR="$HOME/Videos"
         mkdir -p "$VIDDIR"
@@ -111,29 +111,33 @@ _: {
           shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
         }
 
-        if pgrep -f '[g]pu-screen-recorder' > /dev/null; then
-          pkill -INT -f gpu-screen-recorder
-          sleep 0.5
-          LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
-          if [ -n "$LAST" ]; then
+        GEOMFILE="/tmp/qs-rec-geom"
+
+        PIDFILE="/tmp/qs-rec-pid"
+        FILEFILE="/tmp/qs-rec-file"
+
+        if pgrep -x wf-recorder > /dev/null; then
+          pkill -INT -x wf-recorder
+          rm -f "$GEOMFILE"
+          # wait for wf-recorder to flush and exit
+          PID=$(cat "$PIDFILE" 2>/dev/null)
+          if [ -n "$PID" ]; then
+            tail --pid="$PID" -f /dev/null 2>/dev/null || sleep 2
+          fi
+          LAST=$(cat "$FILEFILE" 2>/dev/null)
+          rm -f "$PIDFILE" "$FILEFILE"
+          if [ -n "$LAST" ] && [ -f "$LAST" ]; then
             notify-send -a "recording" -t 3000 "recording saved to ~/videos" "$(basename "$LAST")"
           fi
         else
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
           GEOM=$(slurp -b 000000CC -s 00000000) || exit 0
-
-          # slurp gives "X,Y WxH", gpu-screen-recorder wants "WxH+X+Y"
-          X=$(echo "$GEOM" | cut -d',' -f1)
-          REST=$(echo "$GEOM" | cut -d',' -f2)
-          Y=$(echo "$REST" | cut -d' ' -f1)
-          SIZE=$(echo "$REST" | cut -d' ' -f2)
-          W=$(echo "$SIZE" | cut -d'x' -f1)
-          H=$(echo "$SIZE" | cut -d'x' -f2)
-          REGION="''${W}x''${H}+''${X}+''${Y}"
-
+          echo "$GEOM" > "$GEOMFILE"
+          echo "$FILE" > "$FILEFILE"
           notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
-          gpu-screen-recorder -w region -region "$REGION" -a default_output -f 60 -o "$FILE" &
+          wf-recorder -g "$GEOM" -c libx264 -a -f "$FILE" &
+          echo $! > "$PIDFILE"
         fi
       '';
     });

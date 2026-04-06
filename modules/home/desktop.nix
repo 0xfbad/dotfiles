@@ -38,7 +38,7 @@ _: {
       grimblast # grim+slurp wrapper, --freeze for screen freeze, active/area/output modes
       imagemagick
       wl-clipboard
-      gpu-screen-recorder # hardware-accelerated screen recording via NVENC
+      wf-recorder # screen recording via wlroots screencopy
       pngquant
 
       # clipboard
