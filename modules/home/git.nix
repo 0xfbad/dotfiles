@@ -4,8 +4,8 @@ _: {
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      addKeysToAgent = "yes";
       matchBlocks."*" = {
+        addKeysToAgent = "yes";
         compression = true;
         extraOptions = {
           ControlMaster = "auto";
