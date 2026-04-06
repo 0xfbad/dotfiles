@@ -32,7 +32,7 @@ _: {
           red = "rgb(f38ba8)";
           green = "rgb(a6e3a1)";
           yellow = "rgb(f9e2af)";
-          surface0Alpha = "rgba(313244, 0.5)";
+          surface0Alpha = "rgba(31324480)";
         };
       };
     };

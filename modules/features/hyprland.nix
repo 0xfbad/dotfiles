@@ -111,7 +111,7 @@ _: {
           shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
         }
 
-        if pgrep -f gpu-screen-recorder > /dev/null; then
+        if pgrep -f '[g]pu-screen-recorder' > /dev/null; then
           pkill -INT -f gpu-screen-recorder
           sleep 0.5
           LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
@@ -422,7 +422,7 @@ _: {
 
       # decoration
       decoration {
-        rounding = config.colors.rounding
+        rounding = ${toString c.rounding}
         shadow {
           enabled = false
         }

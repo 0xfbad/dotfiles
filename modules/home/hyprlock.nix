@@ -8,14 +8,11 @@ _: {
     inherit (config.colors) rounding;
 
     jq = "${pkgs.jq}/bin/jq";
-    playerctl = "${pkgs.playerctl}/bin/playerctl";
 
     # reads the quickshell weather cache, no extra network calls
-    weatherCmd = ''cmd[update:300000] [ -f /tmp/qs-weather ] && ${jq} -r '"\(.temp)  \(.desc), \(.location)"' /tmp/qs-weather || echo ""'';
+    weatherCmd = ''cmd[update:300000] [ -f /tmp/qs-weather ] && ${jq} -r '"\(.temp)  \(.desc), \(.location)"' /tmp/qs-weather || echo " "'';
 
-    mediaCmd = ''cmd[update:3000] ${playerctl} metadata --format '{{artist}} - {{title}}' 2>/dev/null || echo ""'';
-
-    greetingCmd = ''cmd[update:60000] h=$(date +%H); if [ "$h" -lt 6 ]; then echo "good night"; elif [ "$h" -lt 12 ]; then echo "good morning"; elif [ "$h" -lt 18 ]; then echo "good afternoon"; else echo "good evening"; fi'';
+    greetingCmd = ''cmd[update:60000] h=$(date +%H); if [ "$h" -lt 6 ]; then echo "good night, $USER"; elif [ "$h" -lt 12 ]; then echo "good morning, $USER"; elif [ "$h" -lt 18 ]; then echo "good afternoon, $USER"; else echo "good evening, $USER"; fi'';
   in {
     programs.hyprlock = {
       enable = true;
@@ -38,21 +35,6 @@ _: {
             brightness = 0.7;
             vibrancy = 0.2;
             vibrancy_darkness = 0.0;
-          }
-        ];
-
-        # dark panel behind the clock and input area
-        shape = [
-          {
-            monitor = "";
-            size = "420, 520";
-            color = "rgba(0, 0, 0, 0.45)";
-            inherit rounding;
-            border_size = 0;
-            position = "0, 0";
-            halign = "center";
-            valign = "center";
-            zindex = 1;
           }
         ];
 
@@ -129,21 +111,6 @@ _: {
             position = "0, -2%";
             halign = "center";
             valign = "top";
-            zindex = 5;
-            shadow_passes = 1;
-            shadow_boost = 0.5;
-          }
-
-          # now playing
-          {
-            monitor = "";
-            text = mediaCmd;
-            color = c.text;
-            font_size = 11;
-            font_family = "JetBrainsMono Nerd Font";
-            position = "0, 3%";
-            halign = "center";
-            valign = "bottom";
             zindex = 5;
             shadow_passes = 1;
             shadow_boost = 0.5;

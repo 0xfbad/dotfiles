@@ -437,10 +437,20 @@ PanelWindow {
         // recording
         Rectangle {
           visible: root.recording
-          Layout.preferredWidth: root.recording ? recRow.implicitWidth + 16 : 0; Layout.preferredHeight: 28; radius: root.pillRadius; color: "transparent"
+          Layout.preferredWidth: root.recording ? recRow.implicitWidth + 16 : 0; Layout.preferredHeight: 28; radius: root.pillRadius
+          color: recMouse.containsMouse ? Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.25) : Qt.rgba(root.colRed.r, root.colRed.g, root.colRed.b, 0.15)
+          scale: recMouse.containsMouse ? 1.02 : 1.0
+          Behavior on scale { NumberAnimation { duration: 150 } }
+          Behavior on color { ColorAnimation { duration: 150 } }
           RowLayout { id: recRow; anchors.centerIn: parent; spacing: 4
             Text { text: "fiber_manual_record"; font.family: root.iconFont; font.pixelSize: root.iconSize; color: root.colRed }
             Text { text: "REC"; font.family: root.textFont; font.pixelSize: 11; font.weight: Font.Bold; color: root.colRed }
+          }
+          MouseArea {
+            id: recMouse; hoverEnabled: true; anchors.fill: parent
+            onClicked: Quickshell.execDetached(["pkill", "-INT", "-f", "[g]pu-screen-recorder"])
+            onEntered: root.showTooltip("recording\nclick to stop", bar.screen, parent.mapToItem(null, parent.width/2, 0).x + 6)
+            onExited: root.hideTooltip()
           }
         }
 
