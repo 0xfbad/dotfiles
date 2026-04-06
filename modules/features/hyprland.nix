@@ -116,7 +116,7 @@ _: {
           sleep 0.5
           LAST=$(find "$VIDDIR" -maxdepth 1 -name '*.mp4' -printf '%T@ %p\n' 2>/dev/null | sort -rn | head -1 | cut -d' ' -f2)
           if [ -n "$LAST" ]; then
-            notify-send -a "recording" -t 3000 "recording saved" "$(basename "$LAST")"
+            notify-send -a "recording" -t 3000 "recording saved to ~/videos" "$(basename "$LAST")"
           fi
         else
           NAME=$(gen_name)
