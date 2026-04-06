@@ -422,7 +422,7 @@ _: {
 
       # decoration
       decoration {
-        rounding = 12
+        rounding = config.colors.rounding
         shadow {
           enabled = false
         }

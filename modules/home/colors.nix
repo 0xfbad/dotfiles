@@ -20,6 +20,8 @@ _: {
         green = "#a6e3a1";
         yellow = "#f9e2af";
 
+        rounding = 12;
+
         # hyprland uses rgb() without # prefix
         hypr = {
           bg = "rgb(000000)";
@@ -27,6 +29,10 @@ _: {
           surface0 = "rgb(313244)";
           text = "rgb(cdd6f4)";
           accent = "rgb(cba6f7)";
+          red = "rgb(f38ba8)";
+          green = "rgb(a6e3a1)";
+          yellow = "rgb(f9e2af)";
+          surface0Alpha = "rgba(313244, 0.5)";
         };
       };
     };
