@@ -30,7 +30,7 @@
     services.upower.enable = true;
     services.power-profiles-daemon.enable = true;
 
-    # intel iGPU VA-API encoding for wl-screenrec
+    # intel iGPU VA-API for hardware video encode/decode
     hardware.graphics.extraPackages = with pkgs; [intel-media-driver];
 
     boot.loader.systemd-boot.enable = true;
