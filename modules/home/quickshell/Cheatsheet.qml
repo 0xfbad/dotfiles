@@ -40,7 +40,6 @@ PanelWindow {
       { keys: "Super  F", desc: "fullscreen" },
       { keys: "Super  T", desc: "float" },
       { keys: "Super  J", desc: "toggle split" },
-      { keys: "Super  G", desc: "toggle group" },
       { keys: "Super  O", desc: "pop out" },
       { keys: "Super  C", desc: "center" },
     ]},

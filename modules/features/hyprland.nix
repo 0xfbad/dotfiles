@@ -57,7 +57,7 @@ _: {
 
     screenshotArea = lib.getExe (pkgs.writeShellApplication {
       name = "screenshot-area";
-      runtimeInputs = with pkgs; [wayfreeze grim slurp wl-clipboard libnotify];
+      runtimeInputs = with pkgs; [wayfreeze grim slurp wl-clipboard];
       text = ''
         wayfreeze --hide-cursor &
         PID=$!
@@ -66,13 +66,12 @@ _: {
         GEOM=$(slurp $SLURP_ARGS) || { kill "$PID"; exit 0; }
         grim -g "$GEOM" - | wl-copy -t image/png
         kill "$PID"
-        notify-send -a "screenshot" -t 2000 "screenshot" "copied to clipboard"
       '';
     });
 
     screenshotEdit = lib.getExe (pkgs.writeShellApplication {
       name = "screenshot-edit";
-      runtimeInputs = with pkgs; [wayfreeze grim slurp satty libnotify];
+      runtimeInputs = with pkgs; [wayfreeze grim slurp satty];
       text = ''
         wayfreeze --hide-cursor &
         PID=$!
@@ -86,10 +85,9 @@ _: {
 
     screenshotFull = lib.getExe (pkgs.writeShellApplication {
       name = "screenshot-full";
-      runtimeInputs = with pkgs; [grim wl-clipboard libnotify];
+      runtimeInputs = with pkgs; [grim wl-clipboard];
       text = ''
         grim - | wl-copy -t image/png
-        notify-send -a "screenshot" -t 2000 "screenshot" "full screen copied to clipboard"
       '';
     });
 
@@ -271,10 +269,10 @@ _: {
       menu:
         - key: s
           desc: screenshot region
-          cmd: "grimblast --freeze --notify copy area"
+          cmd: "grimblast --freeze copy area"
         - key: f
           desc: screenshot full
-          cmd: "grimblast --notify copy screen"
+          cmd: "grimblast copy screen"
         - key: e
           desc: edit clipboard
           cmd: "${editClipboard}"
@@ -531,7 +529,6 @@ _: {
       bindd = ${mod}, T, float, togglefloating
       bindd = ${mod}, J, toggle split, layoutmsg, togglesplit
       bindd = ${mod}, P, presentation toggle, exec, ${presentationToggle}
-      bindd = ${mod}, G, group, togglegroup
       bindd = ${mod} ALT, G, ungroup, moveoutofgroup
       bindd = ${mod}, O, pop out, exec, ${popWindow}
       bindd = ${mod}, C, center, centerwindow
