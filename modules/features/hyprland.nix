@@ -215,8 +215,6 @@ _: {
       '';
     });
 
-
-
     mod = "SUPER";
     dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors;
   in {
