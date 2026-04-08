@@ -1481,7 +1481,7 @@ PanelWindow {
               }
 
               // x-axis time labels
-              Row {
+              Item {
                 anchors.bottom: parent.bottom; anchors.left: parent.left; anchors.right: parent.right
                 anchors.leftMargin: 28
                 height: 16
