@@ -74,11 +74,10 @@ PanelWindow {
     { name: "System", binds: [
       { keys: "Super  Space", desc: "launcher" },
       { keys: "Super  D", desc: "which-key" },
-      { keys: "Super  Ctrl  V", desc: "clipboard" },
+      { keys: "Super  V", desc: "clipboard" },
       { keys: "Super  Ctrl  L", desc: "lock screen" },
       { keys: "Super  Escape", desc: "power menu" },
       { keys: "Super  \\", desc: "toggle layout" },
-      { keys: "Super  V", desc: "mic mute" },
       { keys: "Super  N", desc: "notifications" },
     ]},
   ]

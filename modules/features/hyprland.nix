@@ -215,92 +215,7 @@ _: {
       '';
     });
 
-    keybindPopup = pkgs.writeShellScriptBin "keybind-popup" ''
-            ${lib.getExe pkgs.wezterm} start --class keybind-popup -- bash -c '
-            cat <<HELPEOF
 
-       WINDOWS                                            SCROLLING
-         Super + Enter            terminal                  Super + [ ]            scroll viewport
-         Super + W                close                     Super + Shift + [ ]    swap columns
-         Super + F                fullscreen                Super + Ctrl  + =      widen column
-         Super + T                float                     Super + Ctrl  + -      narrow column
-         Super + J                toggle split              Super + Alt   + =      next preset width
-         Super + G                toggle group              Super + Alt   + -      prev preset width
-         Super + O                pop out                   Super + Home           focus first
-         Super + P                presentation              Super + End            focus last
-         Super + C                center                    Super + Shift + Home   fit visible
-                                                            Super + Shift + End    fit all
-       FOCUS
-         Super + Arrows           navigate                CAPTURE
-         Super + H/K/L            navigate (J=split)        Print                  screenshot region
-         Super + Shift + Arrows   swap window               Super + Shift + S      screenshot + edit
-         Super + Shift + Alt      to monitor                Super + Ctrl  + S      screenshot full
-         Super + Ctrl  + H/J/K/L  resize                    Super + Shift + E      edit clipboard
-                                                            Super + Shift + R      record (toggle)
-       WORKSPACES
-         Super + 1-0              switch                  SYSTEM
-         Super + Shift + 1-0      move window               Super + Space          launcher
-         Super + Tab              next workspace            Super + D              which-key
-         Super + Shift + Tab      prev workspace            Super + Ctrl  + V      clipboard history
-         Alt   + Tab              cycle windows             Super + Ctrl  + L      lock screen
-         Super + Scroll           scroll layout             Super + Escape         power menu
-         Super + Drag             move window               Super + \\              toggle layout
-         Super + Right Drag       resize window             Super + ,              dismiss notif
-         Super + S                scratchpad                Super + Shift + ,      dismiss all
-         Super + Alt   + S        to scratchpad             Super + V              mic mute
-
-       press any key to close
-      HELPEOF
-            read -rsn 1
-            '
-    '';
-
-    whichKeyConfig = pkgs.writeText "wlr-which-key.yaml" ''
-      font: "JetBrainsMono Nerd Font 12"
-      background: "${c.bgAlphaHigh}"
-      color: "${c.text}"
-      border: "${c.accent}"
-      separator: " -> "
-      border_width: 2
-      corner_r: 8
-      padding: 15
-      anchor: center
-
-      menu:
-        - key: s
-          desc: screenshot region
-          cmd: "grimblast --freeze copy area"
-        - key: f
-          desc: screenshot full
-          cmd: "grimblast copy screen"
-        - key: e
-          desc: edit clipboard
-          cmd: "${editClipboard}"
-        - key: p
-          desc: screenshot + edit
-          cmd: "grimblast --freeze save area - | satty -f -"
-        - key: r
-          desc: record (toggle)
-          cmd: "${recordToggle}"
-        - key: v
-          desc: volume mixer
-          cmd: "${lib.getExe pkgs.pavucontrol}"
-        - key: n
-          desc: file manager
-          cmd: "dolphin"
-        - key: b
-          desc: bluetooth
-          cmd: "${lib.getExe pkgs.wezterm} start -- bluetui"
-        - key: w
-          desc: wifi
-          cmd: "${lib.getExe pkgs.wezterm} start --class wifi-tui -- ${wifiTui}"
-        - key: d
-          desc: docker
-          cmd: "${lib.getExe pkgs.wezterm} start -- lazydocker"
-        - key: m
-          desc: monitor config
-          cmd: "${lib.getExe pkgs.wezterm} start -- hyprmon"
-    '';
 
     mod = "SUPER";
     dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors;
@@ -507,8 +422,10 @@ _: {
       windowrule = match:class .*, suppress_event maximize
       windowrule = match:title ^(Open|Save|Save As|File Upload), float on, center on
       windowrule = match:class ^(btop|bluetui|wifi-tui|wlctl|org.pulseaudio.pavucontrol)$, float on, center on, size (monitor_w*0.75) (monitor_h*0.75)
-      windowrule = match:class ^(keybind-popup)$, float on, center on, size 920 700
+
       windowrule = match:class ^(vlc|mpv|com.obsproject.Studio|zoom|org.kde.kdenlive)$, opacity 1.0 override 1.0 override
+      windowrule = match:class ^(zoom)$, float on
+      windowrule = match:class ^(zoom)$, match:title ^(menu window|confirm window)$, stay_focused on
       windowrule = match:fullscreen 1, idle_inhibit on
 
       # PIP (picture-in-picture)
@@ -642,7 +559,7 @@ _: {
 
       # launcher and tools
       bindd = ${mod}, Space, launcher, global, quickshell:toggle-launcher
-      bindd = ${mod} CTRL, V, clipboard, exec, cliphist list | ${pkgs.fuzzel}/bin/fuzzel --dmenu | cliphist decode | wl-copy
+      bindd = ${mod}, V, clipboard, global, quickshell:toggle-clipboard
       bindd = ${mod} CTRL, L, lock, exec, hyprlock
       bindd = ${mod}, Escape, power menu, global, quickshell:toggle-session
       bindd = ${mod} SHIFT, W, wallpaper picker, global, quickshell:toggle-wallpicker
@@ -671,7 +588,6 @@ _: {
       bindde = , XF86AudioLowerVolume, volume down, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-
       bindd = , XF86AudioMute, mute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
       bindd = , XF86AudioMicMute, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
-      bindd = ${mod}, V, mic mute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle
 
       # brightness (quickshell osd detects changes via polling)
       bindde = , XF86MonBrightnessUp, brightness up, exec, ${pkgs.brightnessctl}/bin/brightnessctl set +5%
