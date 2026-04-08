@@ -8,6 +8,16 @@ _: {
         [ -n "$file" ] && ''${EDITOR:-hx} "$file"
       }
 
+      # fuzzy find files and send over scp
+      sff() {
+        (( $# < 1 )) && echo "usage: sff <host>[:<path>]" && return 1
+        local target="$1"
+        [[ "$target" != *:* ]] && target="$target:"
+        fd --type f --hidden --exclude .git |
+          fzf --multi --preview 'bat --color=always --style=numbers {}' |
+          while IFS= read -r f; do scp "$f" "$target" && echo "sent $f"; done
+      }
+
       # git worktree add
       ga() {
         if [ -z "$1" ]; then
