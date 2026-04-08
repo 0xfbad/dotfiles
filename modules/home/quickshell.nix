@@ -229,6 +229,7 @@ _: {
     configDir = pkgs.runCommand "quickshell-config" {} ''
       mkdir -p $out
       cp ${./quickshell}/*.qml $out/
+      cp ${./quickshell}/*.js $out/ 2>/dev/null || true
       echo ${lib.escapeShellArg colorsJson} > $out/colors.json
       echo ${lib.escapeShellArg scriptsJson} > $out/scripts.json
     '';

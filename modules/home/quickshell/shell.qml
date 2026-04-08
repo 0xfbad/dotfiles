@@ -385,6 +385,7 @@ ShellRoot {
   property string launcherSearch: ""
   property int launcherIndex: 0
   property bool sessionOpen: false
+  property bool clipboardOpen: false
   property bool wallpickerOpen: false
   property bool osdVisible: false
   property string osdIcon: ""
@@ -445,6 +446,7 @@ ShellRoot {
   GlobalShortcut { appid: "quickshell"; name: "toggle-cheatsheet"; onPressed: root.cheatsheetOpen = !root.cheatsheetOpen }
   GlobalShortcut { appid: "quickshell"; name: "toggle-launcher"; onPressed: { root.launcherOpen = !root.launcherOpen; if (root.launcherOpen) { root.launcherSearch = ""; root.launcherIndex = 0; } } }
   GlobalShortcut { appid: "quickshell"; name: "toggle-session"; onPressed: root.sessionOpen = !root.sessionOpen }
+  GlobalShortcut { appid: "quickshell"; name: "toggle-clipboard"; onPressed: root.clipboardOpen = !root.clipboardOpen }
   GlobalShortcut { appid: "quickshell"; name: "toggle-wallpicker"; onPressed: root.wallpickerOpen = !root.wallpickerOpen }
   GlobalShortcut { appid: "quickshell"; name: "toggle-notif-panel"; onPressed: { root.notifPanelOpen = !root.notifPanelOpen; if (root.notifPanelOpen) root.unreadCount = 0; } }
   GlobalShortcut { appid: "quickshell"; name: "dismiss-notif"; onPressed: { if (toastModel.count > 0) toastModel.remove(0); } }
@@ -699,6 +701,7 @@ ShellRoot {
   Osd {}
   Notifications {}
   Launcher {}
+  ClipboardHistory {}
   SessionMenu {}
   WallpaperPicker {}
   Cheatsheet {}
