@@ -90,7 +90,7 @@ PanelWindow {
             MouseArea {
               id: wpMouse; anchors.fill: parent; hoverEnabled: true
               onClicked: {
-                Quickshell.execDetached([root.scripts.swww || "swww", "img",
+                Quickshell.execDetached([root.scripts.awww || "awww", "img",
                   "--transition-type", "grow",
                   "--transition-pos", "0.5,0.5",
                   "--transition-duration", "1",

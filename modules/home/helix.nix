@@ -8,6 +8,7 @@ _: {
       settings = {
         theme = "catppuccin_mocha_transparent";
         editor = {
+          auto-pairs = false;
           scrolloff = 8;
           line-number = "relative";
           soft-wrap.enable = true;

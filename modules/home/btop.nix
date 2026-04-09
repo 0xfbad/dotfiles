@@ -1,7 +1,6 @@
 _: {
   flake.homeModules.btop = {
     pkgs,
-    config,
     ...
   }: {
     programs.btop = {

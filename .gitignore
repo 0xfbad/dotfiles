@@ -1,5 +1,6 @@
 wallpapers/
-startpage/index.html
 result
+modules/home/quickshell/colors.json
+modules/home/quickshell/scripts.json
 *.md
 !README.md

@@ -59,6 +59,7 @@ _: {
       name = "screenshot-area";
       runtimeInputs = with pkgs; [wayfreeze grim slurp wl-clipboard];
       text = ''
+        pgrep -x wayfreeze && exit 0
         wayfreeze --hide-cursor &
         PID=$!
         sleep 0.1
@@ -73,6 +74,7 @@ _: {
       name = "screenshot-edit";
       runtimeInputs = with pkgs; [wayfreeze grim slurp satty];
       text = ''
+        pgrep -x wayfreeze && exit 0
         wayfreeze --hide-cursor &
         PID=$!
         sleep 0.1
@@ -128,6 +130,7 @@ _: {
             notify-send -a "recording" -t 3000 "recording saved to ~/videos" "$(basename "$LAST")"
           fi
         else
+          pgrep -x slurp && exit 0
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
           GEOM=$(slurp -b 000000CC -s 00000000) || exit 0
@@ -142,11 +145,11 @@ _: {
 
     wallpaper = lib.getExe (pkgs.writeShellApplication {
       name = "wallpaper";
-      runtimeInputs = with pkgs; [coreutils swww hyprland jq findutils];
+      runtimeInputs = with pkgs; [coreutils awww hyprland jq findutils];
       text = ''
         WALL_DIR="$HOME/dotfiles/wallpapers"
 
-        # wait for swww daemon
+        # wait for awww daemon
         sleep 1
 
         set_wallpapers() {
@@ -159,7 +162,7 @@ _: {
           for i in $(seq 0 $((mon_count - 1))); do
             mon_name=$(echo "$monitors" | jq -r ".[$i].name")
             idx=$((i % ''${#walls[@]}))
-            swww img -o "$mon_name" --fill-color 000000 --transition-type grow --transition-pos 0.5,0.5 --transition-duration 1 --transition-fps 60 "''${walls[$idx]}"
+            awww img -o "$mon_name" --fill-color 000000 --transition-type grow --transition-pos 0.5,0.5 --transition-duration 1 --transition-fps 60 "''${walls[$idx]}"
           done
         }
 
@@ -232,8 +235,8 @@ _: {
 
       [scratchpads.volume]
       animation = "fromRight"
-      command = "${lib.getExe pkgs.pavucontrol}"
-      class = "org.pulseaudio.pavucontrol"
+      command = "${lib.getExe pkgs.pwvucontrol}"
+      class = "com.saivert.pwvucontrol"
       size = "40% 90%"
       unfocus = "hide"
       lazy = true
@@ -308,6 +311,8 @@ _: {
 
       # prevent slurp selection border from bleeding into screenshots
       layerrule = no_anim on, match:namespace selection
+      layerrule = blur, match:namespace hyprlock
+      layerrule = ignorealpha 0.3, match:namespace hyprlock
 
       # input
       input {
@@ -342,7 +347,12 @@ _: {
           enabled = false
         }
         blur {
-          enabled = false
+          enabled = true
+          size = 6
+          passes = 3
+          brightness = 0.7
+          contrast = 0.9
+          vibrancy = 0.2
         }
       }
 
@@ -407,7 +417,7 @@ _: {
 
 
       # startup
-      exec-once = swww-daemon
+      exec-once = awww-daemon
       exec-once = pypr
       exec-once = ${wallpaper}
       exec-once = ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1
@@ -419,7 +429,7 @@ _: {
       # window rules
       windowrule = match:class .*, suppress_event maximize
       windowrule = match:title ^(Open|Save|Save As|File Upload), float on, center on
-      windowrule = match:class ^(btop|bluetui|wifi-tui|wlctl|org.pulseaudio.pavucontrol)$, float on, center on, size (monitor_w*0.75) (monitor_h*0.75)
+      windowrule = match:class ^(btop|bluetui|wifi-tui|wlctl|com.saivert.pwvucontrol)$, float on, center on, size (monitor_w*0.75) (monitor_h*0.75)
 
       windowrule = match:class ^(vlc|mpv|com.obsproject.Studio|zoom|org.kde.kdenlive)$, opacity 1.0 override 1.0 override
       windowrule = match:title ^(Windows VM), opacity 1.0 override 1.0 override
@@ -448,10 +458,6 @@ _: {
       bindd = ${mod} ALT, G, ungroup, moveoutofgroup
       bindd = ${mod}, O, pop out, exec, ${popWindow}
       bindd = ${mod}, C, center, centerwindow
-
-      # scratchpads (pyprland)
-      bindd = ${mod}, A, dropdown terminal, exec, pypr toggle term
-      bindd = ${mod} SHIFT, V, volume mixer, exec, pypr toggle volume
 
       # scratchpad workspace
       bindd = ${mod}, S, scratchpad, togglespecialworkspace, scratchpad
@@ -566,11 +572,6 @@ _: {
 
       # which-key cheatsheet (quickshell native)
       bindd = ${mod}, D, which-key menu, global, quickshell:toggle-cheatsheet
-
-      # notifications
-      bindd = ${mod}, comma, dismiss notification, global, quickshell:dismiss-notif
-      bindd = ${mod} SHIFT, comma, dismiss all, global, quickshell:dismiss-all-notif
-      bindd = ${mod}, N, notification panel, global, quickshell:toggle-notif-panel
 
       # color picker (copies hex to clipboard)
       bindd = ${mod} SHIFT, C, color picker, exec, ${lib.getExe pkgs.hyprpicker} -a -n

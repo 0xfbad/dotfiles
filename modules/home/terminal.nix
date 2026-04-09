@@ -8,23 +8,22 @@ _: {
 
     home.packages = with pkgs; [
       # fonts
-      nerd-fonts.jetbrains-mono
-      material-symbols
-      noto-fonts
-      noto-fonts-cjk-sans
-      noto-fonts-color-emoji
-      liberation_ttf
+      nerd-fonts.jetbrains-mono # monospace font with ligatures and nerd font icons
+      material-symbols # google's variable icon font
+      noto-fonts # google's unicode coverage font family
+      noto-fonts-cjk-sans # chinese, japanese, korean characters
+      noto-fonts-color-emoji # google's color emoji set
+      liberation_ttf # metric-compatible replacements for arial, times, courier
 
       # cli utilities
-      sox
-      fastfetch
-      less
-      jq
+      fastfetch # system info display, faster neofetch
+      less # pager
+      jq # JSON processor
       jnv # modern jq, TUI where you build filters and see results live
-      file
-      socat
-      psmisc
-      libqalculate
+      file # identifies file types by content, not extension
+      socat # bidirectional data relay between streams, sockets, files
+      psmisc # killall, fuser, pstree
+      libqalculate # calculator with unit conversion and symbolic math
       numbat # modern calculator, understands units (e.g. 3 meters + 2 feet)
       nix-output-monitor # nh uses this for build progress (tree view, download/build status)
       csvlens # like less but for CSV, aligned columns, filtering, search
@@ -36,80 +35,66 @@ _: {
       # modern replacements
       sd # modern sed, uses normal regex so no escaping needed
       procs # modern ps, tree view, per-process ports, docker container names
-      doggo # modern dig, colored output, DoH/DoT support, JSON mode
+      q # modern dig, DoH/DoT/DoQ support, JSON and table output
       duf # modern df, grouped table by device type, auto-adjusts to terminal
       viddy # modern watch, highlights diffs between runs, scrollable history
       choose # modern cut/awk, human-friendly field selection, negative indexing
 
       # file tools
-      mdcat
-      fd
-      ripgrep
-      fzf
-      pdfgrep
-      poppler
-      resvg
-      magic-wormhole
-      ripdrag
-      dust
-      imv
+      mdcat # renders markdown in terminal with images and links
+      fd # modern find, simpler syntax, respects .gitignore
+      ripgrep # modern grep, fast, respects .gitignore
+      fzf # fuzzy finder for files, history, anything piped in
+      pdfgrep # grep through PDF files
+      poppler # PDF tools (pdftotext, pdfinfo, pdfunite)
+      resvg # SVG renderer, converts SVG to PNG
+      magic-wormhole # send files between computers with a one-time code
+      ripdrag # drag and drop files from terminal to GUI apps
+      dua # modern du, interactive TUI, fast parallel scanning
+      imv # lightweight Wayland image viewer
       fclones # finds duplicate files, hashes progressively to skip full reads
       # broot is enabled via programs.broot above for the br shell function
-      trashy # modern rm, moves to FreeDesktop trash so Dolphin can recover files
-      ouch # modern tar/zip/gzip, auto-detects format from extension
-
-      # compression
-      zip
-      unzip
-      unp
-      bzip2
-      gzip
-      rar
-      gnutar
-      p7zip
+      rip2 # modern rm, moves to graveyard with undo support
+      ouch # modern tar/zip/gzip/bzip2/rar/7z, replaces individual compression tools
 
       # networking
-      dnsutils
-      mtr
-      whois
-      lsof
-      traceroute
-      sshfs
+      dnsutils # dig, nslookup, nsupdate
+      mtr # traceroute + ping combined, runs continuously
+      rdap # modern whois, structured queries via RDAP protocol
+      lsof # lists open files, useful for finding what's using a port
+      sshfs # mount remote directories over SSH as local folders
       trippy # modern traceroute, real-time latency graphs per hop
       bandwhich # shows bandwidth usage per process and per connection
       xh # modern httpie, syntax-highlighted responses, sessions
       gping # modern ping, real-time line graph, multiple hosts on same chart
       miniserve # modern python -m http.server, file upload, auth, TLS, QR code
 
-      # multiplexers
-      tmux
-
       # system tools
-      libnotify
-      hyprmon
-      hyprpicker
-      hyprsunset
-      hyprdim
-      wl-clip-persist
-      gum
-      lazydocker
+      libnotify # notify-send for desktop notifications
+      hyprmon # hyprland monitor management
+      hyprpicker # screen color picker for hyprland
+      hyprsunset # blue light filter for hyprland
+      hyprdim # dims inactive windows in hyprland
+      wl-clip-persist # keeps clipboard alive after source app closes on Wayland
+      gum # charm's shell scripting toolkit, interactive prompts and spinners
+      lazydocker # TUI for docker containers, images, volumes, logs
       lazyjournal # TUI for browsing journalctl, docker logs, and plain log files
-      inxi
-      playerctl
-      brightnessctl
-      bluetui
-      pueue # background task queue, survives terminal closes, concurrency control
+      playerctl # MPRIS media player control (play, pause, next)
+      brightnessctl # screen brightness control
+      bluetui # bluetooth TUI manager
       process-compose # like docker-compose for bare processes, YAML config, TUI
       tailspin # pipe any log through tspin, auto-highlights dates/IPs/UUIDs/severity
       watchexec # modern entr, file watcher that auto-ignores .git, coalesces events
-      wlctl
+      wlctl # wayland output control (resolution, position, transform)
 
       # fun
-      cowsay
-      vhs # records terminal GIFs from scripts, deterministic output
+      cowsay # ASCII art cow says your message
       glow # renders markdown in the terminal with a file browser TUI
       charm-freeze # generates pretty PNG/SVG screenshots of code or terminal output
     ];
+
+    # background task queue, survives terminal closes, concurrency control
+    services.pueue.enable = true;
 
     xdg.mimeApps = {
       enable = true;

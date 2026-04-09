@@ -220,9 +220,9 @@ _: {
       sysinfo = "${sysInfoScript}";
       wifiTui = "${wifiTui}";
       wezterm = "${pkgs.wezterm}/bin/wezterm";
-      pavucontrol = "${pkgs.pavucontrol}/bin/pavucontrol";
+      pavucontrol = "${pkgs.pwvucontrol}/bin/pwvucontrol";
       brightnessctl = "${pkgs.brightnessctl}/bin/brightnessctl";
-      swww = "${pkgs.swww}/bin/swww";
+      awww = "${pkgs.awww}/bin/awww";
       cava = "${cavaScript}";
       powerprofilesctl = "${pkgs.power-profiles-daemon}/bin/powerprofilesctl";
     };
@@ -234,7 +234,7 @@ _: {
       echo ${lib.escapeShellArg scriptsJson} > $out/scripts.json
     '';
   in {
-    home.packages = [pkgs.quickshell pkgs.brightnessctl pkgs.cava];
+    home.packages = [pkgs.quickshell pkgs.cava];
 
     xdg.configFile."quickshell".source = configDir;
 

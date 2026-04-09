@@ -59,26 +59,25 @@
       };
       path = [pkgs.gawk pkgs.pciutils pkgs.iproute2 pkgs.coreutils pkgs.util-linux pkgs.hostname];
       script = ''
-                os=$(. /etc/os-release && echo "$PRETTY_NAME")
-                kernel=$(uname -r)
-                arch=$(uname -m)
-                cpu=$(awk -F: '/model name/ {gsub(/^ +/, "", $2); print $2; exit}' /proc/cpuinfo)
-                cores=$(nproc)
-                mem=$(awk '/MemTotal/ {printf "%.0f GB", $2/1024/1024}' /proc/meminfo)
-                discrete=$(lspci | awk -F: '/VGA|3D/ && !/^00/ {gsub(/^ +/, "", $3); print $3; exit}')
-                integrated=$(lspci | awk -F: '/VGA|3D/ && /^00/ {gsub(/^ +/, "", $3); print $3; exit}')
-                if [ -n "$discrete" ] && [ -n "$integrated" ]; then
-                  gpu="$discrete & integrated graphics"
-                elif [ -n "$discrete" ]; then
-                  gpu="$discrete"
-                else
-                  gpu="$integrated"
-                fi
-                disk=$(df -h / | awk 'NR==2 {print $2 " total, " $4 " free"}')
-                ip=$(ip -4 -br addr show | awk '/UP/ {gsub(/\/.*/, "", $3); print $3; exit}')
-                host=$(hostname)
+        os=$(. /etc/os-release && echo "$PRETTY_NAME")
+        kernel=$(uname -r)
+        arch=$(uname -m)
+        cpu=$(awk -F: '/model name/ {gsub(/^ +/, "", $2); print $2; exit}' /proc/cpuinfo)
+        cores=$(nproc)
+        mem=$(awk '/MemTotal/ {printf "%.0f GB", $2/1024/1024}' /proc/meminfo)
+        discrete=$(lspci | awk -F: '/VGA|3D/ && !/^00/ {gsub(/^ +/, "", $3); print $3; exit}')
+        integrated=$(lspci | awk -F: '/VGA|3D/ && /^00/ {gsub(/^ +/, "", $3); print $3; exit}')
+        if [ -n "$discrete" ] && [ -n "$integrated" ]; then
+          gpu="$discrete & integrated graphics"
+        elif [ -n "$discrete" ]; then
+          gpu="$discrete"
+        else
+          gpu="$integrated"
+        fi
+        disk=$(df -h / | awk 'NR==2 {print $2 " total, " $4 " free"}')
+        ip=$(ip -4 -br addr show | awk '/UP/ {gsub(/\/.*/, "", $3); print $3; exit}')
 
-                cat > /etc/issue <<EOF
+        cat > /etc/issue <<EOF
         $os | $arch | $kernel
         $cpu ($cores cores) | $mem RAM
         $gpu
@@ -134,79 +133,6 @@
     services.netbird.enable = true;
 
     # programs
-    programs.firefox = {
-      enable = true;
-      policies = {
-        DisableTelemetry = true;
-        DisableFirefoxStudies = true;
-        DisablePocket = true;
-        DisableFirefoxAccounts = true;
-        DisableProfileImport = true;
-        DontCheckDefaultBrowser = true;
-        EnableTrackingProtection = {
-          Value = true;
-          Locked = true;
-          Cryptomining = true;
-          Fingerprinting = true;
-        };
-        FirefoxHome = {
-          Search = true;
-          TopSites = false;
-          SponsoredTopSites = false;
-          Highlights = false;
-          Pocket = false;
-          SponsoredPocket = false;
-          Snippets = false;
-          Locked = true;
-        };
-        NoDefaultBookmarks = true;
-        DisplayBookmarksToolbar = "always";
-        DisplayMenuBar = "default-off";
-        ShowHomeButton = true;
-        ExtensionSettings = {
-          "uBlock0@raymondhill.net" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "navbar";
-          };
-          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "navbar";
-          };
-          "addon@darkreader.org" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "navbar";
-          };
-          "firefox@tampermonkey.net" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/tampermonkey/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "navbar";
-          };
-          "myallychou@gmail.com" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/youtube-recommended-videos/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "menupanel";
-          };
-          "{a6c4a591-f1b2-4f03-b3ff-767e5bedf4e7}" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/user-agent-string-switcher/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "navbar";
-          };
-          "{DEBA3021-9876-4702-89BA-42D095339A0A}" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/disable-page-visibility/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "menupanel";
-          };
-          "{7343f7d1-e6ef-4d8a-8449-d4c18850f559}" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/clipboard2file/latest.xpi";
-            installation_mode = "force_installed";
-            default_area = "menupanel";
-          };
-        };
-      };
-    };
     programs.steam = {
       enable = true;
       protontricks.enable = true;
@@ -279,11 +205,11 @@
 
     # system packages
     environment.systemPackages = with pkgs; [
-      helix
-      wget
-      git
-      grim
-      polkit_gnome
+      helix # modal text editor, tree-sitter built in
+      wget # download files from the web
+      git # version control
+      grim # screenshot tool for Wayland
+      polkit_gnome # authentication agent for privilege escalation dialogs
     ];
 
     # user

@@ -24,29 +24,24 @@ _: {
           text_trim = true;
         };
 
-        # screenshot of current screen with frosted blur
+        # transparent background, compositor blur handles the rest via layerrule
         background = [
           {
             monitor = "";
-            path = "screenshot";
-            blur_passes = 3;
-            blur_size = 6;
-            contrast = 0.9;
-            brightness = 0.7;
-            vibrancy = 0.2;
-            vibrancy_darkness = 0.0;
+            path = "";
+            color = "rgba(1e1e2eaa)";
           }
         ];
 
         label = [
-          # hours
+          # hours (pixel offset, grouped with minutes + greeting)
           {
             monitor = "";
             text = ''cmd[update:1000] echo "<b>$(date +"%H")</b>"'';
             color = c.accent;
             font_size = 120;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, 12%";
+            position = "0, 75";
             halign = "center";
             valign = "center";
             zindex = 5;
@@ -56,14 +51,14 @@ _: {
             shadow_boost = 1.2;
           }
 
-          # minutes
+          # minutes (pixel offset, grouped with hours + greeting)
           {
             monitor = "";
             text = ''cmd[update:1000] echo "$(date +"%M")"'';
             color = c.text;
             font_size = 120;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, 0%";
+            position = "0, -55";
             halign = "center";
             valign = "center";
             zindex = 5;
@@ -71,6 +66,19 @@ _: {
             shadow_size = 3;
             shadow_color = "rgb(0,0,0)";
             shadow_boost = 1.2;
+          }
+
+          # greeting (pixel offset, grouped with hours + minutes)
+          {
+            monitor = "";
+            text = greetingCmd;
+            color = c.text;
+            font_size = 11;
+            font_family = "JetBrainsMono Nerd Font";
+            position = "0, -115";
+            halign = "center";
+            valign = "center";
+            zindex = 5;
           }
 
           # date
@@ -80,25 +88,12 @@ _: {
             color = c.text;
             font_size = 14;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, -8%";
+            position = "0, -15%";
             halign = "center";
             valign = "center";
             zindex = 5;
             shadow_passes = 1;
             shadow_boost = 0.5;
-          }
-
-          # greeting
-          {
-            monitor = "";
-            text = greetingCmd;
-            color = c.text;
-            font_size = 11;
-            font_family = "JetBrainsMono Nerd Font";
-            position = "0, -10%";
-            halign = "center";
-            valign = "center";
-            zindex = 5;
           }
 
           # weather from quickshell cache
@@ -138,7 +133,7 @@ _: {
             fail_text = ''<i>$FAIL <b>($ATTEMPTS)</b></i>'';
             hide_input = false;
             inherit rounding;
-            position = "0, -17%";
+            position = "0, -22%";
             halign = "center";
             valign = "center";
             zindex = 10;

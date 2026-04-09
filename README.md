@@ -21,7 +21,7 @@ modules/
     greetd.nix                 tuigreet + uwsm
     common.nix                 nix settings, locale, bluetooth, user, fontconfig
     nvidia.nix                 GPU drivers, wayland session vars
-    audio.nix                  pipewire
+    audio.nix                  pipewire, audio tools (sox, pwvucontrol)
     virtualization.nix         docker, libvirt, qemu
     anonymity.nix              tor, dnscrypt
     networking.nix             networkmanager, dns
@@ -35,11 +35,12 @@ modules/
     quickshell.nix             desktop shell (bar, launcher, notifications, OSD, session menu, wallpaper picker)
     quickshell/                QML components for quickshell
     helix.nix                  editor, nixd + nil + harper + hyprls
-    git.nix                    histogram diffs, rerere, difftastic
+    vcs.nix                    git (histogram diffs, rerere, difftastic), gitui, jujutsu, gh
+    ssh.nix                    SSH agent, multiplexing, compression
     shell-functions.nix        ff, git worktree helpers, ssh port forwarding
     hyprlock.nix               lock screen
     hypridle.nix               idle management
-    firefox.nix                declarative profile, search engines, privacy
+    firefox.nix                declarative profile, search engines, privacy, policies, extensions
     zsh.nix                    shell, aliases, tab completion
     wezterm.nix                terminal emulator
     atuin.nix                  shell history
@@ -49,11 +50,12 @@ modules/
     zellij.nix                 multiplexer
     starship.nix               prompt
     zoxide.nix                 smart cd
-    startpage.nix              firefox homepage
+    colors.nix                 centralized catppuccin palette
+    gtk.nix                    GTK/Qt theming
+    tealdeer.nix               tldr pages
     dolphin.nix                file manager config
     btop.nix                   system monitor
     mangohud.nix               gaming overlay
-    jujutsu.nix                modern VCS
     zed.nix                    gui editor
     pycharm.nix                jetbrains
 ```
@@ -75,10 +77,10 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 **hyprland**
 - Niri-style scrolling layout (infinite horizontal columns, Super+[/] to scroll, Super+Alt+=/- for widths), Super+\\ toggles dwindle
 - Scratchpad workspace (Super+S), window groups (Super+G), float+pin (Super+O)
-- pyprland scratchpads: dropdown terminal (Super+A), volume mixer (Super+Shift+V)
+- pyprland scratchpads: dropdown terminal, volume mixer
 - hyprdim dims inactive windows, hypr-dynamic-cursors (tilt + shake-to-find), Super+Ctrl+Scroll zoom
-- Wallpaper rotation via swww, per-monitor, animated transitions, shuffles every 30 min
-- Screenshots via grimblast --freeze + satty annotation, wf-recorder for recording with dashed region overlay
+- Wallpaper rotation via awww, per-monitor, animated transitions, shuffles every 30 min
+- Screenshots via grim + slurp + satty annotation, wf-recorder for recording with dashed region overlay
 - Random dictionary-word filenames for recordings (`coffee-telescope.mp4`)
 - Monitor config in mutable `monitors.conf` so hyprmon layouts survive rebuilds
 - Super+Shift+C color picker
@@ -93,7 +95,7 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 - Histogram diffs, colorMoved, rerere, zdiff3 conflicts, autoSquash + autoStash, force-push safety, difftastic
 
 **cli replacements**
-- bat/cat, eza/ls, dust/du, sd/sed, procs/ps, doggo/dig, duf/df, viddy/watch, choose/cut, trippy/traceroute, gping/ping, ouch/tar, trashy/rm, miniserve/http.server
+- bat/cat, eza/ls, dua/du, sd/sed, procs/ps, q/dig, duf/df, viddy/watch, choose/cut, trippy/traceroute, gping/ping, ouch/tar+zip+gz+bz2+rar+7z, rip2/rm, miniserve/http.server
 
 **nix**
 - [Determinate Nix](https://github.com/DeterminateSystems/determinate), channels killed, flake registry pinned to lockfile
@@ -103,16 +105,16 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 **system**
 - DNS over HTTPS via dnscrypt-proxy, mDNS/LLMNR disabled
 - OLED black catppuccin mocha everywhere, centralized palette in `colors.nix`
-- systemd-oomd, watchdog timers, caps→escape, network services don't restart during rebuild
-- Greetd login with system specs, Bibata cursor
+- systemd-oomd, watchdog timers, caps rebound to escape (mainly for helix, works in tty), network services don't restart during rebuild
+- Greetd login with 4-line system specs (OS, CPU, GPU, disk/IP), Bibata cursor
+- SSH agent with multiplexing, connection keep-alive, compression
 
 **firefox**
 - Declarative profile, extensions force-installed (uBlock, Bitwarden, Dark Reader, etc), telemetry nuked, OLED userChrome
 - Custom search engines (`@np` nix packages, `@no` options, `@nw` wiki, `@hm` home-manager)
-- Custom startpage with catppuccin colors and quick links
 
 **other**
-- cliphist + fuzzel for clipboard history
+- cliphist + quickshell for clipboard history
 - Lazydocker, bluetui, wlctl TUIs
 - Gaming: proton-ge, gamescope, gamemode, mangohud
 - Security: trufflehog, gitleaks, nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex

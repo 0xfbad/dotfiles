@@ -2,76 +2,67 @@ _: {
   flake.homeModules.desktop = {pkgs, ...}: {
     home.packages = with pkgs; [
       # browsers
-      ungoogled-chromium
-      tor
-      torsocks
+      ungoogled-chromium # chromium with google services stripped out
+      torsocks # route any app's traffic through tor
 
       # media
-      obs-studio
-      vlc
-      mpv
-      yt-dlp
-      ffmpeg
-      gimp3-with-plugins
-      gimp3Plugins.gmic
+      obs-studio # screen recording and streaming
+      vlc # video player, plays everything
+      mpv # lightweight video player, scriptable
+      yt-dlp # download videos from youtube and 1000+ sites
+      ffmpeg # video/audio conversion, encoding, streaming
+      gimp3-with-plugins # image editor
+      gimp3Plugins.gmic # advanced image processing filters for GIMP
 
       # communication
-      signal-desktop
-      vesktop
-      zoom-us
-      weechat
+      signal-desktop # encrypted messaging
+      vesktop # discord client with screen sharing on Wayland
+      zoom-us # video conferencing
+      weechat # IRC client, extensible, runs in terminal
 
       # productivity
-      libreoffice
-      odt2txt
-      obsidian
-
+      libreoffice # office suite (docs, sheets, presentations)
+      odt2txt # converts OpenDocument files to plain text
       # video editing
-      kdePackages.kdenlive
+      kdePackages.kdenlive # video editor
 
       # pdf annotation
-      xournalpp
+      xournalpp # PDF annotation and handwriting
 
       # screenshots and recording
-      satty
-      font-awesome
-      grimblast # grim+slurp wrapper, --freeze for screen freeze, active/area/output modes
-      imagemagick
-      wl-clipboard
+      satty # screenshot annotation tool for Wayland
+      font-awesome # icon font used by status bars and widgets
+      imagemagick # image manipulation from CLI
+      wl-clipboard # copy/paste on Wayland (wl-copy, wl-paste)
       wf-recorder # screen recording via wlroots screencopy
-      pngquant
+      pngquant # lossy PNG compression
 
       # clipboard
-      cliphist # clipboard history, stores text and images, pipe through walker
+      cliphist # clipboard history, stores text and images
 
       # wallpaper
-      swww # animated wallpaper transitions (fade, wipe, grow)
+      awww # animated wallpaper transitions (fade, wipe, grow)
 
       # hyprland tools
       pyprland # scratchpads, expose mode, lost window recovery
 
       # gaming
-      bottles
-      prismlauncher
-      supertuxkart
-
-      # audio mixers
-      pavucontrol
-      pwvucontrol
+      bottles # run windows apps and games via Wine
+      prismlauncher # open-source minecraft launcher
+      supertuxkart # open-source kart racing game
 
       # vpn and networking
-      openvpn
-      openconnect
-      wireguard-tools
-      netbird
-      netbird-ui
-      remmina
+      openconnect # Cisco/Juniper VPN client
+      wireguard-tools # WireGuard VPN utilities
+      netbird # peer-to-peer VPN mesh
+      netbird-ui # GUI for netbird
+      remmina # remote desktop client (RDP, VNC, SSH)
 
       # matlab
-      matlab
+      matlab # numerical computing environment
 
       # misc
-      spotify
+      spotify # music streaming
     ];
   };
 }

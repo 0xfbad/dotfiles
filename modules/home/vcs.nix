@@ -1,19 +1,17 @@
 _: {
-  flake.homeModules.git = {pkgs, ...}: {
-    services.ssh-agent.enable = true;
-    programs.ssh = {
-      enable = true;
-      enableDefaultConfig = false;
-      matchBlocks."*" = {
-        addKeysToAgent = "yes";
-        compression = true;
-        extraOptions = {
-          ControlMaster = "auto";
-          ControlPath = "~/.ssh/master-%C";
-          ControlPersist = "600";
-        };
-      };
+  flake.homeModules.vcs = {pkgs, ...}: let
+    catppuccin-gitui = pkgs.fetchFromGitHub {
+      owner = "catppuccin";
+      repo = "gitui";
+      rev = "df2f59f847e047ff119a105afff49238311b2d36";
+      hash = "sha256-DRK/j3899qJW4qP1HKzgEtefz/tTJtwPkKtoIzuoTj0=";
     };
+  in {
+    home.packages = with pkgs; [
+      gh # GitHub CLI, manage PRs/issues/repos from terminal
+      difftastic # modern git diff, parses ASTs via tree-sitter, shows semantic changes
+    ];
+
     programs.git = {
       enable = true;
       signing.format = null;
@@ -45,6 +43,25 @@ _: {
         fetch.all = true;
         diff.renames = "copies";
         help.autocorrect = "prompt";
+      };
+    };
+
+    programs.gitui = {
+      enable = true;
+      theme = builtins.readFile "${catppuccin-gitui}/themes/catppuccin-mocha.ron";
+    };
+
+    programs.jujutsu = {
+      enable = true;
+      settings = {
+        ui = {
+          default-command = ["log"];
+          diff-editor = ":builtin";
+          pager = "less -FRX";
+          graph.style = "curved";
+          log-word-wrap = true;
+        };
+        git.colocate = true;
       };
     };
   };

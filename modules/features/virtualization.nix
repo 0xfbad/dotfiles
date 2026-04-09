@@ -17,12 +17,13 @@ _: {
     services.qemuGuest.enable = true;
 
     environment.systemPackages = with pkgs; [
-      virt-manager
-      qemu
-      spice-gtk
-      libvirt
-      dnsmasq
-      phodav
+      virt-manager # GUI for managing KVM/QEMU virtual machines
+      qemu # machine emulator and virtualizer
+      spice-gtk # SPICE client for VM display and USB redirection
+      libvirt # virtualization API and management daemon
+      dnsmasq # DNS/DHCP server for VM networking
+      phodav # WebDAV server for SPICE folder sharing
+      winboat # Windows VM management
     ];
   };
 }

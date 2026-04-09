@@ -24,7 +24,7 @@ PanelWindow {
   MouseArea { anchors.fill: parent; onClicked: root.cheatsheetOpen = false }
 
   property var actionKeys: [
-    { key: "v", icon: "volume_up", desc: "volume mixer", cmd: root.scripts.pavucontrol || "pavucontrol" },
+    { key: "v", icon: "volume_up", desc: "volume mixer", cmd: root.scripts.pavucontrol || "pwvucontrol" },
     { key: "n", icon: "folder", desc: "file manager", cmd: "dolphin" },
     { key: "b", icon: "bluetooth", desc: "bluetooth", cmd: (root.scripts.wezterm || "wezterm") + " start -- bluetui" },
     { key: "w", icon: "wifi", desc: "wifi", cmd: (root.scripts.wezterm || "wezterm") + " start --class wifi-tui -- " + (root.scripts.wifiTui || "wlctl") },
@@ -38,15 +38,20 @@ PanelWindow {
       { keys: "Super  Enter", desc: "terminal" },
       { keys: "Super  W", desc: "close" },
       { keys: "Super  F", desc: "fullscreen" },
+      { keys: "Super  Ctrl  F", desc: "true fullscreen" },
       { keys: "Super  T", desc: "float" },
       { keys: "Super  J", desc: "toggle split" },
       { keys: "Super  O", desc: "pop out" },
       { keys: "Super  C", desc: "center" },
+      { keys: "Super  -/=", desc: "resize window" },
+      { keys: "Super  P", desc: "presentation" },
+      { keys: "Super  Alt  G", desc: "ungroup" },
     ]},
     { name: "Focus", binds: [
       { keys: "Super  Arrows", desc: "navigate" },
       { keys: "Super  H/K/L", desc: "navigate" },
       { keys: "Super  Shift  Arrows", desc: "swap" },
+      { keys: "Super  Shift  Alt  Arrows", desc: "workspace to monitor" },
       { keys: "Super  Ctrl  H/J/K/L", desc: "resize" },
     ]},
     { name: "Workspaces", binds: [
@@ -54,8 +59,10 @@ PanelWindow {
       { keys: "Super  Shift  1-0", desc: "move window" },
       { keys: "Super  Tab", desc: "next workspace" },
       { keys: "Super  Shift  Tab", desc: "previous" },
+      { keys: "Super  Ctrl  Tab", desc: "last workspace" },
       { keys: "Alt  Tab", desc: "cycle windows" },
       { keys: "Super  S", desc: "scratchpad" },
+      { keys: "Super  Alt  S", desc: "move to scratchpad" },
     ]},
     { name: "Scrolling", binds: [
       { keys: "Super  [ ]", desc: "scroll viewport" },
@@ -63,6 +70,12 @@ PanelWindow {
       { keys: "Super  Ctrl  +/-", desc: "resize column" },
       { keys: "Super  Alt  +/-", desc: "preset width" },
       { keys: "Super  Home/End", desc: "first/last" },
+      { keys: "Super  Shift  Home/End", desc: "fit visible/all" },
+    ]},
+    { name: "Groups", binds: [
+      { keys: "Super  Alt  Arrows", desc: "move into group" },
+      { keys: "Super  Alt  Tab", desc: "next in group" },
+      { keys: "Super  Alt  Shift  Tab", desc: "prev in group" },
     ]},
     { name: "Capture", binds: [
       { keys: "Print", desc: "screenshot region" },
@@ -75,10 +88,16 @@ PanelWindow {
       { keys: "Super  Space", desc: "launcher" },
       { keys: "Super  D", desc: "which-key" },
       { keys: "Super  V", desc: "clipboard" },
+      { keys: "Super  Shift  F", desc: "file manager" },
+      { keys: "Super  Shift  B", desc: "browser" },
+      { keys: "Super  Shift  W", desc: "wallpaper picker" },
+      { keys: "Super  Shift  C", desc: "color picker" },
       { keys: "Super  Ctrl  L", desc: "lock screen" },
       { keys: "Super  Escape", desc: "power menu" },
+      { keys: "Super  Ctrl  Scroll", desc: "screen zoom" },
       { keys: "Super  \\", desc: "toggle layout" },
-      { keys: "Super  N", desc: "notifications" },
+      { keys: "Super  Mouse Drag", desc: "move/resize window" },
+      { keys: "Super  Scroll", desc: "scroll layout" },
     ]},
   ]
 
