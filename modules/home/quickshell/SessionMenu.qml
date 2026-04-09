@@ -11,6 +11,8 @@ PanelWindow {
   exclusiveZone: 0
   color: Qt.rgba(0, 0, 0, 0.6)
 
+  property int countdown: 5
+
   HyprlandFocusGrab {
     active: root.sessionOpen
     windows: [sessionWin]
@@ -18,6 +20,25 @@ PanelWindow {
   }
 
   MouseArea { anchors.fill: parent; onClicked: root.sessionOpen = false }
+
+  Timer {
+    id: autoLockTimer
+    interval: 1000
+    repeat: true
+    onTriggered: {
+      sessionWin.countdown--;
+      if (sessionWin.countdown <= 0) {
+        autoLockTimer.stop();
+        root.sessionOpen = false;
+        Quickshell.execDetached(["bash", "-c", "hyprlock"]);
+      }
+    }
+  }
+
+  onVisibleChanged: {
+    if (visible) { sessionWin.countdown = 5; autoLockTimer.start(); }
+    else autoLockTimer.stop();
+  }
 
   Rectangle {
     anchors.centerIn: parent
@@ -56,6 +77,14 @@ PanelWindow {
           }
         }
       }
+    }
+
+    // countdown indicator below the buttons
+    Text {
+      anchors { horizontalCenter: parent.horizontalCenter; top: parent.bottom; topMargin: 10 }
+      text: "locking in " + sessionWin.countdown + "s"
+      font.family: root.textFont; font.pixelSize: 12
+      color: root.colSubtext0
     }
   }
 }
