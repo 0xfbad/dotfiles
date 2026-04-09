@@ -57,16 +57,45 @@
         Type = "oneshot";
         RemainAfterExit = true;
       };
-      path = [pkgs.gawk pkgs.pciutils pkgs.iproute2 pkgs.coreutils pkgs.util-linux pkgs.hostname];
+      path = [pkgs.gawk pkgs.pciutils pkgs.coreutils pkgs.util-linux];
       script = ''
+        parse_gpu() {
+          echo "$1" | gawk '{
+            name = ""
+            s = $0
+            while (match(s, /\[([^\]]+)\]/, a)) {
+              if (a[1] != "AMD/ATI" && a[1] !~ /^[0-9a-f]{4}:[0-9a-f]{4}$/)
+                name = a[1]
+              s = substr(s, RSTART + RLENGTH)
+            }
+            if (name == "") {
+              sub(/.*: /, "")
+              sub(/ \(rev.*\)/, "")
+              if (match($0, /(GeForce|Quadro|Tesla|Radeon|Arc |UHD|Iris|HD Graphics).*/, a))
+                name = a[0]
+              else
+                name = $0
+            }
+            if (name ~ /^GeForce|^Quadro|^Tesla/) name = "NVIDIA " name
+            else if (name ~ /^Radeon/) name = "AMD " name
+            else if (name ~ /^Arc |^UHD |^Iris|^HD Graphics/) name = "Intel " name
+            else if ($0 ~ /NVIDIA/) name = "NVIDIA " name
+            else if ($0 ~ /AMD|ATI/) name = "AMD " name
+            else if ($0 ~ /Intel/) name = "Intel " name
+            print name
+          }'
+        }
+
         os=$(. /etc/os-release && echo "$PRETTY_NAME")
         kernel=$(uname -r)
         arch=$(uname -m)
         cpu=$(awk -F: '/model name/ {gsub(/^ +/, "", $2); print $2; exit}' /proc/cpuinfo)
         cores=$(nproc)
         mem=$(awk '/MemTotal/ {printf "%.0f GB", $2/1024/1024}' /proc/meminfo)
-        discrete=$(lspci | awk -F: '/VGA|3D/ && !/^00/ {gsub(/^ +/, "", $3); print $3; exit}')
-        integrated=$(lspci | awk -F: '/VGA|3D/ && /^00/ {gsub(/^ +/, "", $3); print $3; exit}')
+        discrete_line=$(lspci | awk '/VGA|3D/ && !/^00/ {print; exit}')
+        integrated_line=$(lspci | awk '/VGA|3D/ && /^00/ {print; exit}')
+        discrete=$(parse_gpu "$discrete_line")
+        integrated=$(parse_gpu "$integrated_line")
         if [ -n "$discrete" ] && [ -n "$integrated" ]; then
           gpu="$discrete & integrated graphics"
         elif [ -n "$discrete" ]; then
@@ -75,13 +104,13 @@
           gpu="$integrated"
         fi
         disk=$(df -h / | awk 'NR==2 {print $2 " total, " $4 " free"}')
-        ip=$(ip -4 -br addr show | awk '/UP/ {gsub(/\/.*/, "", $3); print $3; exit}')
+        gen=$(readlink /nix/var/nix/profiles/system | sed 's/system-\([0-9]*\)-.*/\1/')
 
         cat > /etc/issue <<EOF
         $os | $arch | $kernel
         $cpu ($cores cores) | $mem RAM
         $gpu
-        Disk: $disk | IP: ''${ip:-no network}
+        Disk: $disk | Gen: $gen
         EOF
       '';
     };
