@@ -311,8 +311,6 @@ _: {
 
       # prevent slurp selection border from bleeding into screenshots
       layerrule = no_anim on, match:namespace selection
-      layerrule = blur, match:namespace hyprlock
-      layerrule = ignorealpha 0.3, match:namespace hyprlock
 
       # input
       input {

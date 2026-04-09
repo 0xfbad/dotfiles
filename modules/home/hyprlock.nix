@@ -19,7 +19,6 @@ _: {
       settings = {
         general = {
           hide_cursor = true;
-          grace = 5;
           ignore_empty_input = true;
           text_trim = true;
         };
@@ -28,20 +27,28 @@ _: {
         background = [
           {
             monitor = "";
-            path = "";
-            color = "rgba(1e1e2eaa)";
+            path = "screenshot";
+            blur_passes = 3;
+            blur_size = 8;
+            brightness = 0.7;
+            contrast = 0.9;
+            vibrancy = 0.2;
           }
         ];
 
+        # pixel offsets from center, computed from font heights:
+        # hours(120px) +150, gap 10, minutes(120px) +20, gap 18,
+        # greeting(14px) -65, gap 29, date(18px) -110, gap 36,
+        # input(50px) -180. weather anchored 30px from top edge.
         label = [
-          # hours (pixel offset, grouped with minutes + greeting)
+          # hours
           {
             monitor = "";
             text = ''cmd[update:1000] echo "<b>$(date +"%H")</b>"'';
             color = c.accent;
             font_size = 120;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, 75";
+            position = "0, 150";
             halign = "center";
             valign = "center";
             zindex = 5;
@@ -51,14 +58,14 @@ _: {
             shadow_boost = 1.2;
           }
 
-          # minutes (pixel offset, grouped with hours + greeting)
+          # minutes
           {
             monitor = "";
             text = ''cmd[update:1000] echo "$(date +"%M")"'';
             color = c.text;
             font_size = 120;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, -55";
+            position = "0, 20";
             halign = "center";
             valign = "center";
             zindex = 5;
@@ -68,14 +75,14 @@ _: {
             shadow_boost = 1.2;
           }
 
-          # greeting (pixel offset, grouped with hours + minutes)
+          # greeting
           {
             monitor = "";
             text = greetingCmd;
             color = c.text;
             font_size = 11;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, -115";
+            position = "0, -65";
             halign = "center";
             valign = "center";
             zindex = 5;
@@ -88,7 +95,7 @@ _: {
             color = c.text;
             font_size = 14;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, -15%";
+            position = "0, -110";
             halign = "center";
             valign = "center";
             zindex = 5;
@@ -103,7 +110,7 @@ _: {
             color = c.text;
             font_size = 11;
             font_family = "JetBrainsMono Nerd Font";
-            position = "0, -2%";
+            position = "0, -30";
             halign = "center";
             valign = "top";
             zindex = 5;
@@ -129,11 +136,11 @@ _: {
             fade_on_empty = true;
             fade_timeout = 5000;
             font_family = "JetBrainsMono Nerd Font";
-            placeholder_text = ''<span foreground="#cdd6f4"><i>locked</i></span>'';
+            placeholder_text = "locked";
             fail_text = ''<i>$FAIL <b>($ATTEMPTS)</b></i>'';
             hide_input = false;
             inherit rounding;
-            position = "0, -22%";
+            position = "0, -180";
             halign = "center";
             valign = "center";
             zindex = 10;
