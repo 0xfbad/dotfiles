@@ -1,7 +1,8 @@
 _: {
   flake.homeModules.btop = {pkgs, ...}: {
     # catppuccin mocha with oled black background
-    xdg.configFile."btop/themes/catppuccin_mocha.theme".text = builtins.replaceStrings
+    xdg.configFile."btop/themes/catppuccin_mocha.theme".text =
+      builtins.replaceStrings
       [''theme[main_bg]="#1e1e2e"'']
       [''theme[main_bg]="#000000"'']
       (builtins.readFile (builtins.fetchurl {
