@@ -34,6 +34,9 @@ _: {
         plugins = ["sudo"];
       };
       initContent = ''
+        # load ssh keys into agent if none are loaded
+        ssh-add -l &>/dev/null || ssh-add &>/dev/null
+
         # completion
         zstyle ':completion:*' menu select
         zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
