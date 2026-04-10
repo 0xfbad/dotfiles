@@ -158,8 +158,12 @@
     '';
 
     # services
-    services.printing.enable = true;
+    services.printing = {
+      enable = true;
+      drivers = [pkgs.brlaser];
+    };
     services.netbird.enable = true;
+    services.udisks2.enable = true; # needed for dolphin to discover and mount removable drives
 
     # programs
     programs.steam = {
