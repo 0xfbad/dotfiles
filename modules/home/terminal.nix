@@ -52,6 +52,7 @@ _: {
       ripdrag # drag and drop files from terminal to GUI apps
       dua # modern du, interactive TUI, fast parallel scanning
       imv # lightweight Wayland image viewer
+      zathura # lightweight PDF viewer, vim keybinds
       fclones # finds duplicate files, hashes progressively to skip full reads
       # broot is enabled via programs.broot above for the br shell function
       rip2 # modern rm, moves to graveyard with undo support
@@ -104,6 +105,14 @@ _: {
         "x-scheme-handler/https" = "firefox.desktop";
         "text/html" = "firefox.desktop";
         "application/xhtml+xml" = "firefox.desktop";
+        "image/png" = "imv.desktop";
+        "image/jpeg" = "imv.desktop";
+        "image/gif" = "imv.desktop";
+        "image/webp" = "imv.desktop";
+        "image/bmp" = "imv.desktop";
+        "image/tiff" = "imv.desktop";
+        "image/svg+xml" = "imv.desktop";
+        "application/pdf" = "org.pwmt.zathura.desktop";
       };
     };
   };
