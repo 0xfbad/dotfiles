@@ -539,11 +539,7 @@ PanelWindow {
           color: Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.15)
           Text { anchors.centerIn: parent; text: "CAP"; font.family: root.textFont; font.pixelSize: 10; font.weight: Font.Bold; color: root.colAccent }
         }
-        Rectangle {
-          visible: root.numLock; Layout.preferredWidth: root.numLock ? 40 : 0; Layout.preferredHeight: 28; radius: root.pillRadius
-          color: Qt.rgba(root.colAccent.r, root.colAccent.g, root.colAccent.b, 0.15)
-          Text { anchors.centerIn: parent; text: "NUM"; font.family: root.textFont; font.pixelSize: 10; font.weight: Font.Bold; color: root.colAccent }
-        }
+
 
       }
     }
