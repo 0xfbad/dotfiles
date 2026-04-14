@@ -113,6 +113,9 @@ _: {
         "image/tiff" = "imv.desktop";
         "image/svg+xml" = "imv.desktop";
         "application/pdf" = "org.pwmt.zathura.desktop";
+        "text/plain" = "Helix.desktop";
+        "text/markdown" = "Helix.desktop";
+        "text/x-markdown" = "Helix.desktop";
       };
     };
   };

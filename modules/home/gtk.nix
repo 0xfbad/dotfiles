@@ -47,6 +47,8 @@ _: {
       "kdeglobals".text = ''
         [General]
         ColorScheme=CatppuccinMochaMauve
+        TerminalApplication=wezterm
+        TerminalService=org.wezfurlong.wezterm.desktop
 
         [KDE]
         widgetStyle=kvantum

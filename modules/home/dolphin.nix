@@ -20,9 +20,20 @@ _: {
 
     xdg.configFile."dolphinrc".text = ''
       [General]
+      GlobalViewProps=true
       ShowFullPath=true
       ShowZoomSlider=false
       ShowStatusBar=1
+    '';
+
+    xdg.dataFile."dolphin/view_properties/global/.directory".text = ''
+      [Dolphin]
+      SortFoldersFirst=false
+      SortHiddenLast=false
+      SortOrder=1
+      SortRole=modificationtime
+      Version=4
+      ViewMode=0
     '';
 
     xdg.mimeApps.defaultApplications = {

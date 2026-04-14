@@ -56,7 +56,6 @@ modules/
     dolphin.nix                file manager config
     btop.nix                   system monitor
     mangohud.nix               gaming overlay
-    zed.nix                    gui editor
     pycharm.nix                jetbrains
 ```
 
