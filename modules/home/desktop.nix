@@ -61,6 +61,10 @@ _: {
       # matlab
       matlab # numerical computing environment
 
+      # email and passwords
+      thunderbird # email client
+      keepassxc # offline password manager
+
       # misc
       spotify # music streaming
     ];
