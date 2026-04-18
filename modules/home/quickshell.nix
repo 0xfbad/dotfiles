@@ -8,23 +8,19 @@ _: {
     c = config.colors;
 
     caffeineScript = pkgs.writeShellScript "caffeine" ''
-      STATE="/tmp/caffeine"
       case "$1" in
         toggle)
-          if [ -f "$STATE" ]; then
-            kill "$(cat "$STATE")" 2>/dev/null
-            rm -f "$STATE"
+          if ${pkgs.systemd}/bin/systemctl --user is-active --quiet hypridle; then
+            ${pkgs.systemd}/bin/systemctl --user stop hypridle
           else
-            ${pkgs.systemd}/bin/systemd-inhibit --what=idle --who=caffeine --why=manual --mode=block sleep infinity &
-            echo $! > "$STATE"
+            ${pkgs.systemd}/bin/systemctl --user start hypridle
           fi
           ;;
         status)
-          if [ -f "$STATE" ] && kill -0 "$(cat "$STATE")" 2>/dev/null; then
-            printf '{"icon":"local_cafe","active":true}\n'
-          else
-            rm -f "$STATE" 2>/dev/null
+          if ${pkgs.systemd}/bin/systemctl --user is-active --quiet hypridle; then
             printf '{"icon":"local_cafe","active":false}\n'
+          else
+            printf '{"icon":"local_cafe","active":true}\n'
           fi
           ;;
       esac
