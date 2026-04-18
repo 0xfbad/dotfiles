@@ -54,6 +54,8 @@ modules/
     gtk.nix                    GTK/Qt theming
     tealdeer.nix               tldr pages
     dolphin.nix                file manager config
+    thunderbird.nix            email, OLED userChrome, telemetry hardened
+    keepassxc.nix              password manager, browser + SSH agent integration
     btop.nix                   system monitor
     mangohud.nix               gaming overlay
     pycharm.nix                jetbrains
@@ -111,6 +113,10 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 **firefox**
 - Declarative profile, extensions force-installed (uBlock, Bitwarden, Dark Reader, etc), telemetry nuked, OLED userChrome
 - Custom search engines (`@np` nix packages, `@no` options, `@nw` wiki, `@hm` home-manager)
+
+**email + passwords**
+- Thunderbird with OLED black userChrome, compact density, telemetry/crash reports nuked, remote images blocked, mailto handler, 18 declarative extensions (send later, conversations, DKIM verifier, snooze, Gmail-style keybinds, expression search, quick folder move, filter tools, unsubscribe, identity management)
+- KeePassXC with Firefox browser integration (native messaging auto-wired), SSH agent, FdoSecrets, Kvantum/Catppuccin theming via classic mode, 24-char password generator
 
 **other**
 - cliphist + quickshell for clipboard history

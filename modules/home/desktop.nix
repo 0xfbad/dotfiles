@@ -58,13 +58,6 @@ _: {
       netbird-ui # GUI for netbird
       remmina # remote desktop client (RDP, VNC, SSH)
 
-      # matlab
-      matlab # numerical computing environment
-
-      # email and passwords
-      thunderbird # email client
-      keepassxc # offline password manager
-
       # misc
       spotify # music streaming
     ];

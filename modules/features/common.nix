@@ -142,11 +142,20 @@
     hardware.bluetooth.settings = {
       General = {
         FastConnectable = true;
+        JustWorksRepairing = "always";
+        Privacy = "off";
+      };
+      LE = {
+        MinConnectionInterval = 7;
+        MaxConnectionInterval = 9;
+        ConnectionLatency = 0;
       };
     };
     hardware.bluetooth.input = {
       General = {
         IdleTimeout = 0;
+        UserspaceHID = true;
+        ClassicBondedOnly = false;
       };
     };
     # blueman tray disabled, using bluetui instead
@@ -155,6 +164,15 @@
     # disable ERTM for bluetooth keyboards
     boot.extraModprobeConfig = ''
       options bluetooth disable_ertm=1
+    '';
+
+    # xbox controller support (current controller is firmware 5.09 which has issues with reconnecting after it sleeps, update it when u can via xbox accessories app)
+    hardware.xpadneo.enable = true;
+    # force xpadneo binding on systemd 258+
+    services.udev.extraRules = ''
+      ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:045E:*:*02FD.*|*:02E0.*|*:0B05.*|*:0B13.*|*:0B20.*|*:0B22.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
+      ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="input", TAG+="uaccess"
+      ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="hidraw", MODE:="0000", TAG-="uaccess"
     '';
 
     # services
@@ -194,6 +212,9 @@
     environment.variables.EDITOR = "hx";
     environment.variables.VISUAL = "hx";
     environment.variables.SUDO_EDITOR = "hx";
+
+    # hunspell dictionaries for thunderbird/firefox spell check
+    environment.variables.DICPATH = "/run/current-system/sw/share/hunspell";
 
     # wayland env vars for electron apps
     environment.sessionVariables.NIXOS_OZONE_WL = "1";
@@ -243,6 +264,7 @@
       git # version control
       grim # screenshot tool for Wayland
       polkit_gnome # authentication agent for privilege escalation dialogs
+      hunspellDicts.en_US-large
     ];
 
     # user

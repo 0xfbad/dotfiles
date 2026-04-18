@@ -21,7 +21,6 @@
 
     nixpkgs.config.allowUnfree = true;
     nixpkgs.overlays = [
-      inputs.nix-matlab.overlay
       (final: prev: {wlctl = inputs.wlctl.packages.${final.stdenv.hostPlatform.system}.default;})
     ];
 
@@ -38,7 +37,6 @@
     };
     boot.loader.timeout = 0;
     boot.kernelModules = ["kvm-intel"];
-    boot.extraModulePackages = with pkgs.linuxPackages; [xpadneo];
     boot.extraModprobeConfig = ''
       options kvm-intel nested=1
     '';

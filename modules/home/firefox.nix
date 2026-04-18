@@ -41,8 +41,8 @@ _: {
             installation_mode = "force_installed";
             default_area = "navbar";
           };
-          "{446900e4-71c2-419f-a6a7-df9c091e268b}" = {
-            install_url = "https://addons.mozilla.org/firefox/downloads/latest/bitwarden-password-manager/latest.xpi";
+          "keepassxc-browser@keepassxc.org" = {
+            install_url = "https://addons.mozilla.org/firefox/downloads/latest/keepassxc-browser/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
           };
@@ -239,7 +239,7 @@ _: {
           "extensions.ml.enabled" = false;
           "browser.tabs.groups.smart.enabled" = false;
 
-          # passwords and autofill (bitwarden handles all of this)
+          # passwords and autofill (keepassxc handles all of this)
           "signon.rememberSignons" = false;
           "signon.autofillForms" = false;
           "signon.generation.enabled" = false;
