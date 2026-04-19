@@ -32,7 +32,7 @@ modules/
     terminal.nix               CLI packages
     desktop.nix                GUI packages
     development.nix            LSPs, dev tools, security, AI, direnv
-    quickshell.nix             desktop shell (bar, launcher, notifications, OSD, session menu, wallpaper picker)
+    quickshell.nix             desktop shell (bar, notifications, OSD, session menu, cheatsheet)
     quickshell/                QML components for quickshell
     helix.nix                  editor, nixd + nil + harper + hyprls
     vcs.nix                    git (histogram diffs, rerere, difftastic), gitui, jujutsu, gh
@@ -72,8 +72,9 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 ## cool stuff
 
 **desktop shell**
-- Quickshell (QML) bar: workspaces, clock, media with cava visualizer, system stats + network graph popout, battery timeline + power profile control, weather + hourly forecast, pomodoro + todo, notifications, caffeine toggle, recording indicator with region overlay
-- Launcher on Super+Space (fuzzy search, calculator), keybind cheatsheet on Super+D, session menu, wallpaper picker, OSD
+- Quickshell (QML) bar: workspaces, clock, media with cava visualizer, system stats + network graph popout, battery timeline + power profile control, weather + hourly forecast, notifications, caffeine toggle, recording indicator with region overlay
+- Vicinae launcher on Super+Space with extensions (nix search, firefox bookmarks, todo, hypr keybinds, bluetooth, wifi, etc), clipboard on Super+V, wallpaper switcher on Super+Shift+W
+- Quickshell keybind cheatsheet on Super+D, session menu, OSD
 
 **hyprland**
 - Niri-style scrolling layout (infinite horizontal columns, Super+[/] to scroll, Super+Alt+=/- for widths), Super+\\ toggles dwindle
@@ -119,7 +120,7 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 - KeePassXC with Firefox browser integration (native messaging auto-wired), SSH agent, FdoSecrets, Kvantum/Catppuccin theming via classic mode, 24-char password generator
 
 **other**
-- cliphist + quickshell for clipboard history
+- Vicinae built-in clipboard history
 - Lazydocker, bluetui, wlctl TUIs
 - Gaming: proton-ge, gamescope, gamemode, mangohud
 - Security: trufflehog, gitleaks, nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex

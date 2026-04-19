@@ -20,6 +20,12 @@
       url = "github:aashish-thapa/wlctl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # don't follow nixpkgs, keeps vicinae cachix cache hits
+    vicinae.url = "github:vicinaehq/vicinae";
+    vicinae-extensions = {
+      url = "github:vicinaehq/extensions";
+      inputs.vicinae.follows = "vicinae";
+    };
     # don't follow nixpkgs here, keeps flakehub cache hits
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/3";
   };

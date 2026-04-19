@@ -19,6 +19,8 @@ _: {
         peach = "#fab387";
         green = "#a6e3a1";
         yellow = "#f9e2af";
+        pink = "#f5c2e7";
+        teal = "#94e2d5";
 
         rounding = 12;
 

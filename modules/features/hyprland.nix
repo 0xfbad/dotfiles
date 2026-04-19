@@ -312,6 +312,11 @@ _: {
       # prevent slurp selection border from bleeding into screenshots
       layerrule = no_anim on, match:namespace selection
 
+      # vicinae launcher blur and animation
+      layerrule = blur on, match:namespace vicinae
+      layerrule = ignore_alpha 0, match:namespace vicinae
+      layerrule = no_anim on, match:namespace vicinae
+
       # input
       input {
         kb_layout = us
@@ -420,7 +425,6 @@ _: {
       exec-once = ${wallpaper}
       exec-once = ${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1
       exec-once = ${lib.getExe pkgs.wl-clip-persist} --clipboard regular
-      exec-once = wl-paste --watch cliphist store
       exec-once = ${lib.getExe pkgs.hyprdim} --no-dim-when-only --persist --strength 30 --duration 800
       # quickshell managed by systemd user service
 
@@ -561,11 +565,11 @@ _: {
       bindm = ${mod}, mouse:273, resizewindow
 
       # launcher and tools
-      bindd = ${mod}, Space, launcher, global, quickshell:toggle-launcher
-      bindd = ${mod}, V, clipboard, global, quickshell:toggle-clipboard
+      bindd = ${mod}, Space, launcher, exec, vicinae toggle
+      bindd = ${mod}, V, clipboard, exec, vicinae 'vicinae://launch/clipboard/history?toggle=true'
       bindd = ${mod} CTRL, L, lock, exec, hyprlock
       bindd = ${mod}, Escape, power menu, global, quickshell:toggle-session
-      bindd = ${mod} SHIFT, W, wallpaper picker, global, quickshell:toggle-wallpicker
+      bindd = ${mod} SHIFT, W, wallpaper picker, exec, vicinae 'vicinae://launch/@sovereign/vicinae-extension-awww-switcher-0/wpgrid?toggle=true'
       bindd = ${mod}, backslash, toggle layout, exec, ${layoutToggle}
 
       # which-key cheatsheet (quickshell native)

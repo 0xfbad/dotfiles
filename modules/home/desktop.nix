@@ -37,9 +37,6 @@ _: {
       wf-recorder # screen recording via wlroots screencopy
       pngquant # lossy PNG compression
 
-      # clipboard
-      cliphist # clipboard history, stores text and images
-
       # wallpaper
       awww # animated wallpaper transitions (fade, wipe, grow)
 
@@ -57,6 +54,9 @@ _: {
       netbird # peer-to-peer VPN mesh
       netbird-ui # GUI for netbird
       remmina # remote desktop client (RDP, VNC, SSH)
+
+      # downloads
+      aria2 # multi-protocol download utility (HTTP, FTP, BitTorrent, Metalink)
 
       # misc
       spotify # music streaming

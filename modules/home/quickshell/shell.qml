@@ -267,104 +267,6 @@ ShellRoot {
   property var weatherPopoutScreen: null
   readonly property bool weatherPopoutOpen: weatherPopoutScreen !== null
 
-  // pomodoro + todo
-  property real pomodoroEndTime: 0
-  property string pomodoroTask: ""
-  property var pomodoroPopoutScreen: null
-  readonly property bool pomodoroPopoutOpen: pomodoroPopoutScreen !== null
-  property var pomodoroRecent: []
-  property int pomodoroTab: 0
-  property var todoItems: []
-  readonly property int todoIncomplete: todoItems.filter(t => !t.done).length
-
-  function saveTodos() {
-    let json = JSON.stringify(root.todoItems);
-    Quickshell.execDetached(["bash", "-c",
-      "printf '%s' \"$1\" > $HOME/.local/share/quickshell-todos.json.tmp && mv $HOME/.local/share/quickshell-todos.json.tmp $HOME/.local/share/quickshell-todos.json",
-      "_", json]);
-  }
-  function addTodo(text) {
-    root.todoItems = [...root.todoItems, {id: Date.now().toString(), text: text, done: false}];
-    saveTodos();
-  }
-  function toggleTodo(id) {
-    root.todoItems = root.todoItems.map(t => t.id === id ? Object.assign({}, t, {done: !t.done}) : t);
-    saveTodos();
-  }
-  function removeTodo(id) {
-    root.todoItems = root.todoItems.filter(t => t.id !== id);
-    saveTodos();
-  }
-  readonly property bool pomodoroActive: pomodoroEndTime > 0 && clock.date.getTime() / 1000 < pomodoroEndTime
-  readonly property string pomodoroText: {
-    if (!pomodoroActive) return "";
-    let remaining = Math.max(0, pomodoroEndTime - clock.date.getTime() / 1000);
-    let min = Math.floor(remaining / 60);
-    let sec = Math.floor(remaining % 60);
-    return String(min).padStart(2, '0') + ":" + String(sec).padStart(2, '0');
-  }
-
-  function startPomodoro(task) {
-    pomodoroTask = task;
-    pomodoroEndTime = Date.now() / 1000 + 1500;
-    pomodoroPopoutScreen = null;
-    Quickshell.execDetached(["bash", "-c",
-      "mkdir -p $HOME/.local/share && printf '%s - %s\\n' \"$(date '+%Y-%m-%d %H:%M')\" \"$1\" >> $HOME/.local/share/pomodoro.log",
-      "_", task]);
-  }
-
-  function stopPomodoro() {
-    if (pomodoroEndTime > 0) {
-      let startTime = pomodoroEndTime - 1500;
-      let elapsed = Math.floor((Date.now() / 1000 - startTime) / 60);
-      let task = pomodoroTask;
-      Quickshell.execDetached(["notify-send", "-a", "pomodoro", "cancelled", task + " (" + elapsed + " min)"]);
-      Quickshell.execDetached(["bash", "-c",
-        "printf '%s - %s (cancelled after %smin)\\n' \"$(date '+%Y-%m-%d %H:%M')\" \"$1\" \"$2\" >> $HOME/.local/share/pomodoro.log",
-        "_", task, String(elapsed)]);
-    }
-    pomodoroEndTime = 0;
-    pomodoroTask = "";
-  }
-
-  function removeRecentPomodoro(task) {
-    root.pomodoroRecent = root.pomodoroRecent.filter(t => t !== task);
-    // remove matching lines from log so they don't reappear on reload
-    Quickshell.execDetached(["bash", "-c",
-      "f=$HOME/.local/share/pomodoro.log; [ -f \"$f\" ] && { while IFS= read -r line; do t=\"${line#* - }\"; case \"$t\" in \"$1\"|\"$1 (cancelled\"*) ;; *) printf '%s\\n' \"$line\" ;; esac; done < \"$f\" > \"$f.tmp\" && mv \"$f.tmp\" \"$f\"; }",
-      "_", task]);
-  }
-
-  Timer {
-    running: root.pomodoroEndTime > 0
-    interval: 1000; repeat: true
-    onTriggered: {
-      if (Date.now() / 1000 >= root.pomodoroEndTime) {
-        let task = root.pomodoroTask;
-        root.pomodoroEndTime = 0;
-        root.pomodoroTask = "";
-        Quickshell.execDetached(["notify-send", "-a", "pomodoro", "-u", "critical", "done", task + ", take a break"]);
-      }
-    }
-  }
-
-  Process {
-    running: true
-    command: ["bash", "-c", "if [ -f $HOME/.local/share/pomodoro.log ]; then grep -v cancelled $HOME/.local/share/pomodoro.log | sed 's/^[^ ]* [^ ]* - //' | tac | awk '!seen[$0]++' | head -10; fi"]
-    stdout: SplitParser {
-      onRead: data => { let t = data.trim(); if (t) root.pomodoroRecent = [...root.pomodoroRecent, t]; }
-    }
-  }
-
-  // load todos on startup
-  Process {
-    running: true
-    command: ["bash", "-c", "cat $HOME/.local/share/quickshell-todos.json 2>/dev/null || echo '[]'"]
-    stdout: SplitParser {
-      onRead: data => { try { root.todoItems = JSON.parse(data.trim()); } catch(e) {} }
-    }
-  }
-
   // caffeine
   property string caffeineIcon: "local_cafe"
   property bool caffeineActive: false
@@ -381,18 +283,12 @@ ShellRoot {
 
   // overlay state
   property bool cheatsheetOpen: false
-  property bool launcherOpen: false
-  property string launcherSearch: ""
-  property int launcherIndex: 0
   property bool sessionOpen: false
-  property bool clipboardOpen: false
-  property bool wallpickerOpen: false
   property bool osdVisible: false
   property string osdIcon: ""
   property real osdValue: 0
   property int unreadCount: 0
   property bool notifPanelOpen: false
-  property var wallpaperList: []
 
   // tooltip
   property string tooltipText: ""
@@ -444,10 +340,7 @@ ShellRoot {
 
   // global shortcuts
   GlobalShortcut { appid: "quickshell"; name: "toggle-cheatsheet"; onPressed: root.cheatsheetOpen = !root.cheatsheetOpen }
-  GlobalShortcut { appid: "quickshell"; name: "toggle-launcher"; onPressed: { root.launcherOpen = !root.launcherOpen; if (root.launcherOpen) { root.launcherSearch = ""; root.launcherIndex = 0; } } }
   GlobalShortcut { appid: "quickshell"; name: "toggle-session"; onPressed: root.sessionOpen = !root.sessionOpen }
-  GlobalShortcut { appid: "quickshell"; name: "toggle-clipboard"; onPressed: root.clipboardOpen = !root.clipboardOpen }
-  GlobalShortcut { appid: "quickshell"; name: "toggle-wallpicker"; onPressed: root.wallpickerOpen = !root.wallpickerOpen }
   GlobalShortcut { appid: "quickshell"; name: "toggle-notif-panel"; onPressed: { root.notifPanelOpen = !root.notifPanelOpen; if (root.notifPanelOpen) root.unreadCount = 0; } }
   GlobalShortcut { appid: "quickshell"; name: "dismiss-notif"; onPressed: { if (toastModel.count > 0) toastModel.remove(0); } }
   GlobalShortcut { appid: "quickshell"; name: "dismiss-all-notif"; onPressed: toastModel.clear() }
@@ -635,14 +528,6 @@ ShellRoot {
   }
   Timer { interval: 500; running: root.scriptsLoaded; repeat: true; triggeredOnStart: true; onTriggered: { if (!brightProc.running) brightProc.running = true } }
 
-  // wallpaper list
-  Process {
-    running: true
-    command: ["bash", "-c", "find $HOME/dotfiles/wallpapers -type f \\( -name '*.jpg' -o -name '*.png' -o -name '*.webp' \\) | sort"]
-    stdout: SplitParser {
-      onRead: data => { let p = data.trim(); if (p !== "") root.wallpaperList = [...root.wallpaperList, p]; }
-    }
-  }
 
   // per-monitor bars
   Variants {
@@ -700,10 +585,7 @@ ShellRoot {
   // overlays
   Osd {}
   Notifications {}
-  Launcher {}
-  ClipboardHistory {}
   SessionMenu {}
-  WallpaperPicker {}
   Cheatsheet {}
   // tooltip overlay, x positioned via mapToItem from bar pills
   Variants {
