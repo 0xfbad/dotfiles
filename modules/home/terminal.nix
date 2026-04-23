@@ -94,9 +94,6 @@ _: {
       charm-freeze # generates pretty PNG/SVG screenshots of code or terminal output
     ];
 
-    # background task queue, survives terminal closes, concurrency control
-    services.pueue.enable = true;
-
     xdg.mimeApps = {
       enable = true;
       defaultApplications = {
