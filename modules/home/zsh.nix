@@ -75,9 +75,6 @@ _: {
         export FZF_ALT_C_COMMAND='fd --type d --hidden --exclude .git'
         export FZF_ALT_C_OPTS="--preview 'eza --tree --color=always --level=2 {}'"
 
-        # silence direnv loading messages
-        export DIRENV_LOG_FORMAT=
-
         # edit command line in $EDITOR with ctrl-x ctrl-e
         autoload -U edit-command-line
         zle -N edit-command-line
