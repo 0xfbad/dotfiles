@@ -43,6 +43,8 @@
     nix.registry = builtins.mapAttrs (_: flake: {inherit flake;}) inputs;
     nix.nixPath = ["nixpkgs=flake:nixpkgs"];
 
+    nixpkgs.config.allowUnfree = true;
+
     # strip default packages (perl, rsync, strace)
     environment.defaultPackages = [];
 

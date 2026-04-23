@@ -19,7 +19,6 @@
       self.nixosModules.homeManager
     ];
 
-    nixpkgs.config.allowUnfree = true;
     nixpkgs.overlays = [
       (final: prev: {wlctl = inputs.wlctl.packages.${final.stdenv.hostPlatform.system}.default;})
     ];
