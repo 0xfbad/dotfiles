@@ -9,6 +9,7 @@ _: {
         theme = "catppuccin_mocha_transparent";
         editor = {
           auto-pairs = false;
+          default-yank-register = "+";
           scrolloff = 8;
           line-number = "relative";
           soft-wrap.enable = true;
