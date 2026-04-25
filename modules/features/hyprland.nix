@@ -72,7 +72,7 @@ _: {
 
     screenshotEdit = lib.getExe (pkgs.writeShellApplication {
       name = "screenshot-edit";
-      runtimeInputs = with pkgs; [wayfreeze grim slurp satty];
+      runtimeInputs = with pkgs; [wayfreeze grim slurp satty coreutils];
       text = ''
         pgrep -x wayfreeze && exit 0
         wayfreeze --hide-cursor &
@@ -80,8 +80,11 @@ _: {
         sleep 0.1
         # shellcheck disable=SC2086
         GEOM=$(slurp $SLURP_ARGS) || { kill "$PID"; exit 0; }
-        grim -g "$GEOM" - | satty -f -
+        TMP=$(mktemp --suffix=.png)
+        trap 'rm -f "$TMP"' EXIT
+        grim -g "$GEOM" "$TMP"
         kill "$PID"
+        satty -f "$TMP"
       '';
     });
 
