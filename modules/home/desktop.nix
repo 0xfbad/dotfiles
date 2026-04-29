@@ -44,7 +44,6 @@ _: {
       pyprland # scratchpads, expose mode, lost window recovery
 
       # gaming
-      bottles # run windows apps and games via Wine
       prismlauncher # open-source minecraft launcher
       supertuxkart # open-source kart racing game
 
