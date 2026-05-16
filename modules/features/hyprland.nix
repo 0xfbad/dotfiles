@@ -222,7 +222,16 @@ _: {
     });
 
     mod = "SUPER";
-    dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors;
+    # 2026-05-16: nixpkgs version broken against hyprland 0.55.1
+    dynamicCursors = pkgs.hyprlandPlugins.hypr-dynamic-cursors.overrideAttrs (_: {
+      version = "0-unstable-2026-05-12";
+      src = pkgs.fetchFromGitHub {
+        owner = "VirtCode";
+        repo = "hypr-dynamic-cursors";
+        rev = "47f3da0dc5d97f51c2307070fd1d547efbdae6a3";
+        hash = "sha256-LATqyui3+kV7MJG07E2OsWbnv7BLHwmHS0aYW7r9dAI=";
+      };
+    });
   in {
     xdg.configFile."pypr/config.toml".text = ''
       [pyprland]

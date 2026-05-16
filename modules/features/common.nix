@@ -45,6 +45,20 @@
 
     nixpkgs.config.allowUnfree = true;
 
+    # 2026-05-16: nixpkgs hash for john-rolling is stale
+    nixpkgs.overlays = [
+      (_: prev: {
+        john = prev.john.overrideAttrs (_: {
+          src = prev.fetchFromGitHub {
+            owner = "openwall";
+            repo = "john";
+            rev = "f514ece8ec4ae5e38ad75aaa322eac86d73dcd76";
+            hash = "sha256-zO1/KUJe3LvYCGlwVpNg5uDwPRD0ql/7anErb7tywC0=";
+          };
+        });
+      })
+    ];
+
     # strip default packages (perl, rsync, strace)
     environment.defaultPackages = [];
 
