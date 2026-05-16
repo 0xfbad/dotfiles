@@ -395,7 +395,6 @@ _: {
 
       # dwindle (fallback layout)
       dwindle {
-        pseudotile = true
         preserve_split = true
         force_split = 2
       }
@@ -406,6 +405,10 @@ _: {
         disable_splash_rendering = true
         force_default_wallpaper = 0
         focus_on_activate = true
+      }
+
+      # vfr moved to debug: in hyprland 0.55
+      debug {
         vfr = true
       }
 
@@ -449,7 +452,7 @@ _: {
       windowrule = match:title ^(Windows VM), opacity 1.0 override 1.0 override
       windowrule = match:class ^(zoom)$, float on
       windowrule = match:class ^(zoom)$, match:title ^(menu window|confirm window)$, stay_focused on
-      windowrule = match:fullscreen 1, idle_inhibit on
+      windowrule = idle_inhibit fullscreen
 
       # PIP (picture-in-picture)
       windowrule = match:title ^(Picture-in-Picture)$, float on, pin on, move 73% 72%, size 25% 25%
