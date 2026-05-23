@@ -32,5 +32,14 @@ _: {
       TTYVHangup = true;
       TTYVTDisallocate = true;
     };
+
+    # uwsm's wayland-wm ExecStart embeds a versioned nix-store path, so every
+    # rebuild that bumps uwsm (or anything in its closure) changes the unit
+    # content and sd-switch restarts it, which kills hyprland and cascades
+    # through graphical-session.target back to greetd
+    systemd.user.services."wayland-wm@hyprland-uwsm.desktop" = {
+      overrideStrategy = "asDropin";
+      unitConfig.X-RestartIfChanged = false;
+    };
   };
 }
