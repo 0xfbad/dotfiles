@@ -16,6 +16,7 @@
       self.nixosModules.anonymity
       self.nixosModules.networking
       self.nixosModules.flatpak
+      self.nixosModules.yubikey
       self.nixosModules.homeManager
     ];
 
