@@ -19,7 +19,7 @@ _: {
       settings = {
         general = {
           hide_cursor = true;
-          ignore_empty_input = true;
+          ignore_empty_input = false; # allow empty Enter to trigger howdy
           text_trim = true;
         };
 
