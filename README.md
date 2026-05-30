@@ -58,7 +58,6 @@ modules/
     keepassxc.nix              password manager, browser + SSH agent integration
     btop.nix                   system monitor
     mangohud.nix               gaming overlay
-    pycharm.nix                jetbrains
 ```
 
 ## stealing this

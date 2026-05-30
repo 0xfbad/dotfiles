@@ -106,9 +106,6 @@ _: {
       # ai
       claude-code # Anthropic's slopmachine
       opencode # open-source slopmachine
-
-      # ide for notebooks
-      jetbrains.pycharm # Python IDE
     ];
   };
 }
