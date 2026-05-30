@@ -283,7 +283,14 @@ _: {
             --lwt-accent-color: ${c.bg} !important;
             --toolbar-bgcolor: ${c.bg} !important;
             --lwt-toolbarbutton-icon-fill: ${c.text} !important;
+            --listbox-selected-background: ${c.accent} !important;
+            --listbox-selected-color: ${c.bg} !important;
+            --listbox-hover-background: ${c.mantle} !important;
+            --listbox-color: ${c.text} !important;
+            --tab-shadow: 0 0 4px #111;
+            --toolbar-field-background-color: ${c.mantle} !important;
           }
+
           #messengerWindow,
           #folderPaneBox,
           #folderTree,
@@ -303,23 +310,107 @@ _: {
           #messagepanebox {
             border-top: 1px solid ${c.surface0} !important;
           }
-          /* selected tab */
+
+          /* modern-thunderbird tabs */
+          #navigation-toolbox,
+          #tabmail-tabs,
+          #tabmail-arrowscrollbox {
+            min-height: 44px !important;
+          }
+          .tabmail-tab {
+            margin: 4px !important;
+          }
+          .tab-background {
+            padding: 6px;
+            border-radius: 4px;
+          }
+          .tab-line {
+            height: 0 !important;
+            display: none !important;
+          }
+          .tabmail-tab::after,
+          .tabmail-tab::before {
+            border: none !important;
+          }
+          .tab-background[selected="true"] {
+            box-shadow: var(--tab-shadow) !important;
+          }
+          .tabmail-tab:hover .tab-background:not([selected="true"]) {
+            background-color: color-mix(in srgb, currentColor 11%, transparent) !important;
+          }
           .tabmail-tab[selected] {
             background-color: ${c.accent} !important;
             color: ${c.bg} !important;
           }
-          /* selected folder/thread row */
-          #folderTree tr.selected,
+          .tab-close-button {
+            padding: 6px !important;
+          }
+          .tab-close-icon {
+            width: 12px !important;
+            height: 12px !important;
+          }
+          .contentTabToolbar {
+            height: 40px !important;
+          }
+
+          /* modern-thunderbird buttons + search */
+          .toolbarbutton-1,
+          .searchBox,
+          .themeableSearchBox {
+            border: none !important;
+            border-radius: 5px !important;
+            height: 31px !important;
+          }
+          .contentTabUrlInput {
+            height: 26px !important;
+          }
+          #urlbar-background {
+            border: none;
+            box-shadow: none !important;
+          }
+
+          /* modern-thunderbird popups */
+          .panel-arrowbox {
+            display: none;
+          }
+          .panel-arrowcontent {
+            padding: 5px !important;
+            border-radius: 5px;
+            border: none;
+          }
+
+          /* folder pane selection */
+          #folderTree tr.selected {
+            background-color: ${c.accent} !important;
+            color: ${c.bg} !important;
+          }
+          #folderTree tr:hover:not(.selected) {
+            background-color: ${c.mantle} !important;
+          }
+
+          /* thread cards view, TB 128+ paints .card-container not the row */
+          #threadTree tr[is="thread-card"].selected .card-container,
+          #threadTree tr[is="thread-card"][selected] .card-container {
+            background-color: ${c.accent} !important;
+            color: ${c.bg} !important;
+          }
+          #threadTree tr[is="thread-card"].selected .card-container *,
+          #threadTree tr[is="thread-card"][selected] .card-container * {
+            color: ${c.bg} !important;
+          }
+          #threadTree tr[is="thread-card"]:hover:not(.selected) .card-container {
+            background-color: ${c.mantle} !important;
+          }
+
+          /* thread table view fallback */
           #threadTree tr.selected {
             background-color: ${c.accent} !important;
             color: ${c.bg} !important;
           }
-          /* hover */
-          #folderTree tr:hover:not(.selected),
           #threadTree tr:hover:not(.selected) {
             background-color: ${c.mantle} !important;
           }
-          /* text colors */
+
           #folderTree, #threadTree, #messagepanebox {
             color: ${c.text} !important;
           }
