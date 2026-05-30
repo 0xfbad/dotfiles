@@ -41,41 +41,49 @@ _: {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
+            private_browsing = true;
           };
           "keepassxc-browser@keepassxc.org" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/keepassxc-browser/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
+            private_browsing = true;
           };
           "addon@darkreader.org" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/darkreader/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
+            private_browsing = true;
           };
           "firefox@tampermonkey.net" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/tampermonkey/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
+            private_browsing = true;
           };
           "myallychou@gmail.com" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/youtube-recommended-videos/latest.xpi";
             installation_mode = "force_installed";
             default_area = "menupanel";
+            private_browsing = true;
           };
           "{a6c4a591-f1b2-4f03-b3ff-767e5bedf4e7}" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/user-agent-string-switcher/latest.xpi";
             installation_mode = "force_installed";
             default_area = "navbar";
+            private_browsing = true;
           };
           "{DEBA3021-9876-4702-89BA-42D095339A0A}" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/disable-page-visibility/latest.xpi";
             installation_mode = "force_installed";
             default_area = "menupanel";
+            private_browsing = true;
           };
           "{7343f7d1-e6ef-4d8a-8449-d4c18850f559}" = {
             install_url = "https://addons.mozilla.org/firefox/downloads/latest/clipboard2file/latest.xpi";
             installation_mode = "force_installed";
             default_area = "menupanel";
+            private_browsing = true;
           };
         };
       };
