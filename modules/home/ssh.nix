@@ -4,14 +4,12 @@ _: {
     programs.ssh = {
       enable = true;
       enableDefaultConfig = false;
-      matchBlocks."*" = {
-        addKeysToAgent = "yes";
-        compression = true;
-        extraOptions = {
-          ControlMaster = "auto";
-          ControlPath = "~/.ssh/master-%C";
-          ControlPersist = "600";
-        };
+      settings."*" = {
+        AddKeysToAgent = "yes";
+        Compression = true;
+        ControlMaster = "auto";
+        ControlPath = "~/.ssh/master-%C";
+        ControlPersist = "600";
       };
     };
   };
