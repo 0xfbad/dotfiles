@@ -7,7 +7,7 @@
   }: let
     c = config.colors;
     ext = inputs.vicinae-extensions.packages.${pkgs.stdenv.hostPlatform.system};
-    mkRaycast = inputs.vicinae.packages.${pkgs.stdenv.hostPlatform.system}.mkRayCastExtension;
+    mkRaycast = inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkRayCastExtension;
     raycastRev = "05f80223a5cad6e11c71878bf1888e5d44b36c7a";
 
     # write settings to a separate file and import it from settings.json
