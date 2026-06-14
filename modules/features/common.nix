@@ -57,6 +57,14 @@
           };
         });
       })
+
+      # 2026-06-12: uefi-firmware-parser 1.16 build needs setuptools-scm but the
+      # nixos-unstable derivation omits it so binwalk fails, fixed on master b641518, drop when the channel catches up
+      (_: prev: {
+        uefi-firmware-parser = prev.uefi-firmware-parser.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or []) ++ [prev.python3Packages.setuptools-scm];
+        });
+      })
     ];
 
     # strip default packages (perl, rsync, strace)
