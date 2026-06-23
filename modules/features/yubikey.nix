@@ -16,8 +16,8 @@ _: {
       enable = true;
       control = "sufficient";
       settings = {
-        cue = true; # print "Please touch the device" while waiting
-        interactive = true; # explicit prompt, helps when no led is visible
+        cue = true; # prompts "Please touch the device"
+        interactive = true; # explicit prompt when no led is visible
         # kept in /etc instead of ~/.config so users can't add their own keys
         authfile = "/etc/u2f-mappings";
       };
@@ -26,7 +26,7 @@ _: {
     security.pam.services = {
       sudo.u2fAuth = true;
       login.u2fAuth = true;
-      hyprlock.u2fAuth = true;
+      swaylock.u2fAuth = true;
     };
   };
 }
