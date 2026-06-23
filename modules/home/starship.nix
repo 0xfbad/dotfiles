@@ -12,7 +12,6 @@ _: {
         format = "$all";
         right_format = "";
 
-        # second line is just the prompt
         line_break.disabled = false;
 
         character = {
@@ -70,7 +69,7 @@ _: {
           style = langStyle;
         };
 
-        # hide stuff we don't need on the prompt
+        battery.disabled = true;
         package.disabled = true;
         aws.disabled = true;
         gcloud.disabled = true;
