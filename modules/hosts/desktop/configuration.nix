@@ -8,7 +8,7 @@
       self.nixosModules.desktopHardware
       self.nixosModules.determinate
       self.nixosModules.common
-      self.nixosModules.hyprland
+      self.nixosModules.niri
       self.nixosModules.greetd
       self.nixosModules.nvidia
       self.nixosModules.audio
@@ -26,7 +26,6 @@
 
     networking.hostName = "desktop";
 
-    # always run at max performance
     powerManagement.cpuFreqGovernor = "performance";
 
     boot.loader.grub = {

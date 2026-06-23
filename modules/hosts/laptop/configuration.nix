@@ -8,7 +8,7 @@
       self.nixosModules.laptopHardware
       self.nixosModules.determinate
       self.nixosModules.common
-      self.nixosModules.hyprland
+      self.nixosModules.niri
       self.nixosModules.greetd
       self.nixosModules.nvidia
       self.nixosModules.audio

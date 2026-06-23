@@ -1,25 +1,11 @@
 _: {
-  flake.nixosModules.greetd = {
-    pkgs,
-    lib,
-    ...
-  }: {
+  flake.nixosModules.greetd = {pkgs, ...}: {
     services.greetd = {
       enable = true;
       settings.default_session = {
-        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember-session --asterisks --issue --cmd 'uwsm start hyprland-uwsm.desktop'";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --remember-session --asterisks --issue --cmd niri-session";
         user = "greeter";
       };
-    };
-
-    # nixpkgs commit 9128dd3 made the hyprland module wire UWSM to launch
-    # the Hyprland binary directly, skipping start-hyprland which sets up
-    # XDG_CURRENT_DESKTOP and portal integration. without it, screen sharing
-    # and some electron apps break silently.
-    programs.uwsm.waylandCompositors.hyprland = {
-      prettyName = "Hyprland";
-      comment = "Hyprland compositor managed by UWSM";
-      binPath = "/run/current-system/sw/bin/start-hyprland";
     };
 
     # prevent late boot messages from printing over tuigreet
@@ -31,15 +17,6 @@ _: {
       TTYReset = true;
       TTYVHangup = true;
       TTYVTDisallocate = true;
-    };
-
-    # uwsm's wayland-wm ExecStart embeds a versioned nix-store path, so every
-    # rebuild that bumps uwsm (or anything in its closure) changes the unit
-    # content and sd-switch restarts it, which kills hyprland and cascades
-    # through graphical-session.target back to greetd
-    systemd.user.services."wayland-wm@hyprland-uwsm.desktop" = {
-      overrideStrategy = "asDropin";
-      unitConfig.X-RestartIfChanged = false;
     };
   };
 }
