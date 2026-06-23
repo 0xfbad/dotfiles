@@ -5,6 +5,7 @@ _: {
     pkgs,
     ...
   }: {
+    # remember to run:
     # sudo linux-enable-ir-emitter configure --no-gui
     # sudo howdy add
     # sudo howdy test (needs nix shell nixpkgs#xorg.xhost -c xhost +SI:localuser:root)
@@ -22,7 +23,7 @@ _: {
     };
 
     security.pam.services = {
-      hyprlock = {};
+      swaylock = {};
       # boltgolt/howdy#991: greetd worker crashes on pam_howdy
       greetd.howdy.enable = false;
     };
@@ -35,9 +36,9 @@ _: {
       howdy.order = config.security.pam.services.login.rules.auth.unix.order + 50;
       u2f.order = config.security.pam.services.login.rules.auth.unix.order + 100;
     };
-    security.pam.services.hyprlock.rules.auth = {
-      howdy.order = config.security.pam.services.hyprlock.rules.auth.unix.order + 50;
-      u2f.order = config.security.pam.services.hyprlock.rules.auth.unix.order + 100;
+    security.pam.services.swaylock.rules.auth = {
+      howdy.order = config.security.pam.services.swaylock.rules.auth.unix.order + 50;
+      u2f.order = config.security.pam.services.swaylock.rules.auth.unix.order + 100;
     };
   };
 }
