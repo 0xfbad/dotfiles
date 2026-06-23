@@ -8,7 +8,14 @@
     c = config.colors;
     ext = inputs.vicinae-extensions.packages.${pkgs.stdenv.hostPlatform.system};
     mkRaycast = inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkRayCastExtension;
+    mkVicinae = inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension;
     raycastRev = "05f80223a5cad6e11c71878bf1888e5d44b36c7a";
+
+    niriKeybinds = mkVicinae {
+      pname = "niri-keybinds";
+      version = "0";
+      src = ./niri-keybinds;
+    };
 
     # write settings to a separate file and import it from settings.json
     # avoids the circular import bug with VICINAE_OVERRIDES + nix store paths
@@ -32,10 +39,11 @@
       };
 
       providers = {
-        applications.preferences.launchPrefix = "uwsm app -- ";
+        # empty (not absent) so the settings.json deep-merge overwrites the old uwsm prefix
+        applications.preferences.launchPrefix = "";
 
         wm.enabled = false;
-        power.enabled = false;
+        power.enabled = true;
         developer.enabled = false;
         browser-extension.enabled = false;
 
@@ -100,8 +108,7 @@
           "awww-switcher"
           "dashboard-icons"
           "fuzzy-files"
-          "hypr-keybinds"
-          "hyprland-monitors"
+          "niri"
           "bluetooth"
           "wifi-commander"
           "it-tools"
@@ -128,6 +135,7 @@
             rev = raycastRev;
             hash = "sha256-332DOAKVOnXkL/tLpQXlSPYl2fveAX46e9vfC7RoyVA=";
           })
+          niriKeybinds
         ];
 
       themes.catppuccin-mocha = {
