@@ -154,10 +154,6 @@ _: {
 
         # system tools
         libnotify # notify-send for desktop notifications
-        hyprmon # hyprland monitor management
-        hyprpicker # screen color picker for hyprland
-        hyprsunset # blue light filter for hyprland
-        hyprdim # dims inactive windows in hyprland
         wl-clip-persist # keeps clipboard alive after source app closes on Wayland
         gum # charm's shell scripting toolkit, interactive prompts and spinners
         lazydocker # TUI for docker containers, images, volumes, logs

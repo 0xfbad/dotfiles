@@ -87,9 +87,6 @@ _: {
       # prose
       harper # grammar checker LSP, works in any editor
 
-      # hyprland
-      hyprls # Hyprland config LSP
-
       # parser tools
       tree-sitter
       ast-grep # structural search/replace via tree-sitter, match code by pattern

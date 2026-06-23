@@ -40,9 +40,6 @@ _: {
       # wallpaper
       awww # animated wallpaper transitions (fade, wipe, grow)
 
-      # hyprland tools
-      pyprland # scratchpads, expose mode, lost window recovery
-
       # gaming
       prismlauncher # open-source minecraft launcher
       supertuxkart # open-source kart racing game

@@ -82,10 +82,6 @@ _: {
             command = "harper-ls";
             args = ["--stdio"];
           };
-          hyprls = {
-            command = "hyprls";
-            args = ["--stdio"];
-          };
         };
         language = [
           {
@@ -176,10 +172,6 @@ _: {
           {
             name = "git-commit";
             language-servers = ["harper-ls"];
-          }
-          {
-            name = "hyprlang";
-            language-servers = ["hyprls"];
           }
         ];
       };
