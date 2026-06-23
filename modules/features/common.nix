@@ -141,7 +141,7 @@
     environment.etc."issue".enable = false;
 
     # locale
-    time.timeZone = "America/Los_Angeles";
+    time.timeZone = "America/New_York";
     i18n.defaultLocale = "en_US.UTF-8";
     i18n.extraLocaleSettings = {
       LC_ADDRESS = "en_US.UTF-8";
@@ -158,7 +158,11 @@
     # sudo
     security.sudo.extraConfig = "Defaults pwfeedback";
 
-    security.pam.services.hyprlock = {};
+    security.pam.services.swaylock = {};
+
+    # fully tear down the user session on logout so a stale niri socket
+    # doesn't block the next login with "niri session already running"
+    services.logind.settings.Login.KillUserProcesses = true;
 
     # bluetooth (needs to be up before greetd for wireless keyboards)
     hardware.bluetooth.enable = true;
@@ -248,9 +252,9 @@
       DefaultTimeoutStopSec = "5s";
       DefaultOOMPolicy = "stop";
       StatusUnitFormat = "combined";
-      RuntimeWatchdogSec = "15"; # seconds before hard-reset on hang
-      RebootWatchdogSec = "30"; # seconds to wait for clean reboot
-      KexecWatchdogSec = "60"; # seconds to wait for kexec
+      RuntimeWatchdogSec = "15"; # hard-reset on hang
+      RebootWatchdogSec = "30"; # wait for clean reboot
+      KexecWatchdogSec = "60"; # wait for kexec
     };
 
     # systemd-oomd acts on memory pressure before the kernel OOM killer fires
