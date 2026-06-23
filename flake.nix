@@ -20,6 +20,10 @@
       url = "github:aashish-thapa/wlctl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # don't follow nixpkgs, keeps niri.cachix.org cache hits (slow rust build)
+    niri.url = "github:sodiboo/niri-flake";
+    # pinned to match home-manager release
+    catppuccin.url = "github:catppuccin/nix/release-26.05";
     # don't follow nixpkgs, keeps vicinae cachix cache hits
     vicinae.url = "github:vicinaehq/vicinae";
     vicinae-extensions = {
