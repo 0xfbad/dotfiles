@@ -20,22 +20,14 @@ _: {
         green = "#a6e3a1";
         yellow = "#f9e2af";
         pink = "#f5c2e7";
+        flamingo = "#f2cdcd";
+        rosewater = "#f5e0dc";
+        sky = "#89dceb";
+        sapphire = "#74c7ec";
+        lavender = "#b4befe";
         teal = "#94e2d5";
 
         rounding = 12;
-
-        # hyprland uses rgb() without # prefix
-        hypr = {
-          bg = "rgb(000000)";
-          mantle = "rgb(181825)";
-          surface0 = "rgb(313244)";
-          text = "rgb(cdd6f4)";
-          accent = "rgb(cba6f7)";
-          red = "rgb(f38ba8)";
-          green = "rgb(a6e3a1)";
-          yellow = "rgb(f9e2af)";
-          surface0Alpha = "rgba(31324480)";
-        };
       };
     };
   };
