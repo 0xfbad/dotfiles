@@ -510,13 +510,9 @@
           action = spawn "vicinae" "vicinae://launch/clipboard/history?toggle=true";
           hotkey-overlay.title = "Clipboard";
         };
-        "Mod+Ctrl+L" = {
+        "Mod+Escape" = {
           action = spawn "${pkgs.swaylock-effects}/bin/swaylock";
           hotkey-overlay.title = "Lock";
-        };
-        "Mod+Escape" = {
-          action = spawn "vicinae" "vicinae://launch/power";
-          hotkey-overlay.title = "Power menu";
         };
         "Mod+Shift+W" = {
           action = spawn "vicinae" "vicinae://launch/@sovereign/vicinae-extension-awww-switcher-0/wpgrid?toggle=true";
