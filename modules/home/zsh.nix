@@ -224,6 +224,7 @@ _: {
         greet | cowsay
 
         if [[ -z "$ZELLIJ" && "$TERM" != "linux" && -z "$SSH_CONNECTION" ]]; then
+          zellij-gc
           exec zellij
         fi
       '';
