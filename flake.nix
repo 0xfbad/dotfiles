@@ -4,7 +4,7 @@
     flake-parts.url = "github:hercules-ci/flake-parts";
     import-tree.url = "github:vic/import-tree";
     home-manager = {
-      url = "github:nix-community/home-manager/release-26.05";
+      url = "github:nix-community/home-manager/master";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nix-flatpak.url = "github:gmodena/nix-flatpak";
@@ -22,8 +22,8 @@
     };
     # don't follow nixpkgs, keeps niri.cachix.org cache hits (slow rust build)
     niri.url = "github:sodiboo/niri-flake";
-    # pinned to match home-manager release
-    catppuccin.url = "github:catppuccin/nix/release-26.05";
+    # main tracks unstable to match home-manager master
+    catppuccin.url = "github:catppuccin/nix/main";
     # don't follow nixpkgs, keeps vicinae cachix cache hits
     vicinae.url = "github:vicinaehq/vicinae";
     vicinae-extensions = {
