@@ -92,7 +92,7 @@
       ' > "$CONF.tmp" && mv "$CONF.tmp" "$CONF"
     '';
 
-    services.vicinae = {
+    programs.vicinae = {
       enable = true;
       systemd.enable = true;
 

@@ -5,6 +5,8 @@
     # scoped opt-in only: gtk, qt/kvantum, icons and cursors are themed by hand
     # in gtk.nix, and waybar is self-themed from config.colors
     catppuccin = {
+      enable = true;
+      autoEnable = false;
       flavor = "mocha";
       accent = "mauve";
       mako.enable = true;
