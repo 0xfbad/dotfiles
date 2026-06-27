@@ -33,6 +33,9 @@
     # intel iGPU VA-API for hardware video encode/decode
     hardware.graphics.extraPackages = with pkgs; [intel-media-driver];
 
+    # render on the dGPU so the external skips the iGPU to dGPU copy
+    home-manager.users.fbad.programs.niri.settings.debug.render-drm-device = "/dev/dri/by-path/pci-0000:01:00.0-render";
+
     boot.loader.systemd-boot.enable = true;
     boot.loader.systemd-boot.configurationLimit = 5;
     boot.loader.efi.canTouchEfiVariables = true;
