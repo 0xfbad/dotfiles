@@ -257,16 +257,6 @@
           clip-to-geometry = true;
         }
         {
-          # dim inactive windows
-          matches = [{is-active = false;}];
-          opacity = 0.95;
-        }
-        {
-          # must be after the dim rule otherwise it'll get written over
-          matches = [{app-id = "^(vlc|mpv|com\\.obsproject\\.Studio|.*[Zz]oom.*|org\\.kde\\.kdenlive)$";}];
-          opacity = 1.0;
-        }
-        {
           # file/app choosers run as a separate portal process, niri won't auto-float them
           matches = [{app-id = "^xdg-desktop-portal";}];
           open-floating = true;
