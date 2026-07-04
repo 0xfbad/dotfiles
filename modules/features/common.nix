@@ -18,6 +18,9 @@
     nix.settings.download-attempts = 5;
     nix.settings.connect-timeout = 10;
     nix.settings.stalled-download-timeout = 30;
+
+    nix.settings.extra-substituters = ["https://vicinae.cachix.org"];
+    nix.settings.extra-trusted-public-keys = ["vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="];
     programs.nix-ld.enable = true;
     programs.nix-index-database.comma.enable = true;
     programs.nh = {
