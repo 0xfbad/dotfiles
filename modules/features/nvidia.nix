@@ -15,9 +15,8 @@ _: {
     };
     hardware.nvidia = {
       modesetting.enable = true;
-      powerManagement.enable = false;
+      powerManagement.enable = true; # preserve vram across suspend so my laptop doesnt DIE when it suspends
       powerManagement.finegrained = false;
-      # open kernel modules work for turing+ (20xx and above)
       open = true;
       nvidiaSettings = true;
       package = config.boot.kernelPackages.nvidiaPackages.production;
