@@ -99,7 +99,6 @@
       extensions =
         builtins.map (n: ext.${n}) [
           "nix"
-          "process-manager"
           "case-converter"
           "firefox"
           "wikipedia"
@@ -107,10 +106,7 @@
           "keepassxc"
           "awww-switcher"
           "dashboard-icons"
-          "fuzzy-files"
           "niri"
-          "bluetooth"
-          "wifi-commander"
           "it-tools"
           "aria2-manager"
         ]
