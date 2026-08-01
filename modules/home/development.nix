@@ -40,9 +40,6 @@ _: {
       virtiofsd # virtio filesystem daemon for VM shared folders
       cloudflared # Cloudflare tunnel client
 
-      # database
-      mongodb-compass # MongoDB GUI
-
       # shell
       bash-language-server # Bash LSP
       shfmt # shell script formatter
@@ -75,7 +72,7 @@ _: {
       gef # GDB Enhanced Features, exploit dev helpers on top of gdb
       imhex # hex editor with pattern language and analysis tools
       exploitdb # offline exploit database search (searchsploit)
-      wordlists # password/fuzzing wordlists (rockyou, dirb, etc)
+      # wordlists # password/fuzzing wordlists (rockyou, dirb, etc) # TEMP 07/26/26 disabled, dependency wfuzz fails on missing pkg_resources under python 3.14
       crunch # custom wordlist generator
       john # John the Ripper password cracker
       pwntools # CTF/exploit dev framework for Python
@@ -98,7 +95,7 @@ _: {
 
       # http testing
       hurl # HTTP request runner using plain text files, chain requests, assert responses
-      harlequin # SQL IDE in terminal, autocomplete, highlighting, Postgres/DuckDB/SQLite
+      # harlequin # SQL IDE in terminal, autocomplete, highlighting, Postgres/DuckDB/SQLite # TEMP 07/26/26 disabled, dependency sqlfmt fails on pythonMetadataCheck under python 3.14
 
       # ai
       claude-code # Anthropic's slopmachine
