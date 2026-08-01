@@ -48,6 +48,9 @@
 
     nixpkgs.config.allowUnfree = true;
 
+    # TEMP find a better thing for winboat
+    nixpkgs.config.permittedInsecurePackages = ["electron-40.10.5"];
+
     # 2026-05-16: nixpkgs hash for john-rolling is stale
     nixpkgs.overlays = [
       (_: prev: {
