@@ -124,7 +124,7 @@ Copy a host dir, replace hardware config with `nixos-generate-config --show-hard
 - Gaming: proton-ge, gamescope, gamemode, mangohud
 - Security: trufflehog, gitleaks, nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex
 - age + sops for secrets, jujutsu alongside git
-- Claude Code and opencode for slopmaxxing
+- Claude Code and opencode for slopmaxxing, t3code as a GUI over both
 - jnv (interactive jq), numbat (calculator with units), ast-grep, tailspin, mods
 
 ## aliases
