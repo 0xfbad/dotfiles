@@ -101,7 +101,6 @@
           "nix"
           "case-converter"
           "firefox"
-          "wikipedia"
           "number-converter"
           "keepassxc"
           "awww-switcher"
@@ -117,19 +116,9 @@
             hash = "sha256-56LjYVHPGUr+zVbZPuXhA5VqhTe86TWqFkV16bzTKDI=";
           })
           (mkRaycast {
-            name = "hacker-news";
-            rev = raycastRev;
-            hash = "sha256-5PpTCgki2Pdm8IxaCo+RXg69h1Tl1/OQOND+g7Brr58=";
-          })
-          (mkRaycast {
             name = "todo-list";
             rev = raycastRev;
             hash = "sha256-4HbJUGhB6Yz7t/lF/saAuCOZg+pYE9S6+t3i0yPMXuM=";
-          })
-          (mkRaycast {
-            name = "spotify-player";
-            rev = raycastRev;
-            hash = "sha256-332DOAKVOnXkL/tLpQXlSPYl2fveAX46e9vfC7RoyVA=";
           })
           niriKeybinds
         ];
