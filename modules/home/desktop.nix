@@ -1,61 +1,139 @@
-_: {
-  flake.homeModules.desktop = {pkgs, ...}: {
-    home.packages = with pkgs; [
-      # browsers
-      ungoogled-chromium # chromium with google services stripped out
-      torsocks # route any app's traffic through tor
+{ inputs, ... }: {
+  flake.modules.homeManager.desktop =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      spicePkgs = inputs.spicetify.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+    in
+    {
+      imports = [
+        inputs.spicetify.homeManagerModules.spicetify
+      ];
 
-      # media
-      obs-studio # screen recording and streaming
-      vlc # video player, plays everything
-      mpv # lightweight video player, scriptable
-      yt-dlp # download videos from youtube and 1000+ sites
-      ffmpeg # video/audio conversion, encoding, streaming
-      gimp3-with-plugins # image editor
-      gimp3Plugins.gmic # advanced image processing filters for GIMP
+      programs = {
+        chromium = {
+          enable = true;
+          package = pkgs.ungoogled-chromium;
+        };
 
-      # communication
-      signal-desktop # encrypted messaging
-      vesktop # discord client with screen sharing on Wayland
-      zoom-us # video conferencing
-      weechat # IRC client, extensible, runs in terminal
+        obs-studio.enable = true;
 
-      # productivity
-      libreoffice # office suite (docs, sheets, presentations)
-      odt2txt # converts OpenDocument files to plain text
-      # video editing
-      kdePackages.kdenlive # video editor
+        mpv = {
+          enable = true;
+          scripts = [ pkgs.mpvScripts.uosc ];
+          # uosc replaces the builtin osc and window decorations
+          config = {
+            osc = false;
+            border = false;
+          };
+        };
 
-      # pdf annotation
-      xournalpp # PDF annotation and handwriting
+        yt-dlp = {
+          enable = true;
+          settings = {
+            embed-metadata = true;
+            embed-thumbnail = true;
+            sponsorblock-mark = "all";
+          };
+        };
 
-      # screenshots and recording
-      satty # screenshot annotation tool for Wayland
-      font-awesome # icon font used by status bars and widgets
-      imagemagick # image manipulation from CLI
-      wl-clipboard # copy/paste on Wayland (wl-copy, wl-paste)
-      wf-recorder # screen recording via wlroots screencopy
-      pngquant # lossy PNG compression
+        satty = {
+          enable = true;
+          settings = {
+            general = {
+              # without output-filename satty disables saving entirely
+              output-filename = "~/Pictures/satty-%Y-%m-%d_%H:%M:%S.png";
+              actions-on-enter = [ "save-to-clipboard" ];
+              early-exit = [ "all" ];
+              copy-command = "wl-copy";
+              initial-tool = "brush";
+            };
+            color-palette.palette = map (c: "${c}ff") [
+              config.colors.red
+              config.colors.peach
+              config.colors.yellow
+              config.colors.green
+              config.colors.sky
+              config.colors.accent
+            ];
+          };
+        };
 
-      # wallpaper
-      awww # animated wallpaper transitions (fade, wipe, grow)
+        prismlauncher = {
+          enable = true;
+          settings.ShowConsole = false;
+        };
 
-      # gaming
-      prismlauncher # open-source minecraft launcher
-      supertuxkart # open-source kart racing game
+        # installs the patched spotify itself, so no pkgs.spotify alongside it
+        spicetify = {
+          enable = true;
+          theme = spicePkgs.themes.catppuccin;
+          colorScheme = "mocha";
+        };
 
-      # vpn and networking
-      openconnect # Cisco/Juniper VPN client
-      wireguard-tools # WireGuard VPN utilities
-      netbird # peer-to-peer VPN mesh
-      netbird-ui # GUI for netbird
-      remmina # remote desktop client (RDP, VNC, SSH)
+        aria2 = {
+          enable = true;
+          # the vicinae aria2-manager extension drives the rpc daemon on 6800
+          systemd.enable = true;
+          settings = {
+            dir = "${config.home.homeDirectory}/Downloads";
+            continue = true;
+            max-connection-per-server = 16;
+            min-split-size = "1M";
+            split = 16;
+          };
+        };
+      };
 
-      # downloads
-      aria2 # multi-protocol download utility (HTTP, FTP, BitTorrent, Metalink)
+      # catppuccin.obs drops the theme files in place, obs still has to be told to load them
+      home.activation.obsTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        # rewritten on exit so it cannot be a store symlink
+        obsIni="$HOME/.config/obs-studio/user.ini"
 
-      # misc
-      spotify # music streaming
-    ];
-  };
+        # seed only when missing so a theme picked in the ui sticks
+        if ! ${pkgs.crudini}/bin/crudini --get "$obsIni" Appearance Theme >/dev/null 2>&1; then
+          run mkdir -p "$(dirname "$obsIni")"
+          run ${pkgs.crudini}/bin/crudini --set "$obsIni" Appearance Theme com.obsproject.Catppuccin.Mocha
+        fi
+      '';
+
+      services.awww.enable = true;
+
+      home.packages = with pkgs; [
+        torsocks # route any app traffic through tor
+
+        # media
+        vlc
+        ffmpeg
+        gimp-with-plugins
+
+        # communication
+        signal-desktop
+        zoom-us
+        weechat # irc client
+
+        # productivity
+        libreoffice
+        odt2txt
+        kdePackages.kdenlive
+        xournalpp # pdf annotation and handwriting
+
+        # screenshots and recording
+        imagemagick
+        wl-clipboard # provides wl-copy and wl-paste
+        pngquant # lossy png compression
+
+        # gaming
+        supertuxkart
+
+        # vpn and networking
+        openconnect # cisco and juniper vpn client
+        wireguard-tools
+        remmina # remote desktop client for rdp vnc ssh
+      ];
+    };
 }

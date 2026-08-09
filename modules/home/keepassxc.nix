@@ -1,82 +1,62 @@
 _: {
-  flake.homeModules.keepassxc = _: {
-    programs.keepassxc = {
-      enable = true;
+  flake.modules.homeManager.keepassxc =
+    { config, ... }:
+    let
+      # keeps history out of the synced db directory, gives the retention rule a stable path
+      backupDir = "${config.xdg.dataHome}/keepassxc/backups";
+    in
+    {
+      # the keepassxc module asserts on this whenever autostart is set
+      xdg.autostart.enable = true;
 
-      settings = {
-        General = {
-          SingleInstance = true;
-          RememberLastDatabases = true;
-          OpenPreviousDatabasesOnStartup = true;
-          AutoSaveAfterEveryChange = true;
-          AutoSaveOnExit = true;
-          UseAtomicSaves = true;
-          BackupBeforeSave = true;
-          BackupFilePathPattern = "{DB_FILENAME}.old.kdbx";
-          MinimizeOnCopy = true;
-          DropToBackgroundOnCopy = true;
-          UseGroupIconOnEntryCreation = true;
-        };
+      # 2.7.12 has no retention of its own, so every save would accumulate forever
+      systemd.user.tmpfiles.rules = [
+        "d ${backupDir} 0700 - - 30d"
+      ];
 
-        Browser = {
-          Enabled = true;
-          SearchInAllDatabases = true;
-          UnlockDatabase = true;
-          MatchUrlScheme = true;
-          SupportBrowserProxy = true;
-          # home-manager handles the native messaging manifest
-          UpdateBinaryPath = false;
-        };
+      programs.keepassxc = {
+        enable = true;
+        # gnome-keyring is gone, so this is the only org.freedesktop.secrets owner
+        autostart = true;
 
-        GUI = {
-          # defer to kvantum/catppuccin system theme
-          ApplicationTheme = "classic";
-          CompactMode = true;
-          HidePasswords = true;
-          ColorPasswords = true;
-          MonospaceNotes = true;
-          ShowTrayIcon = true;
-          MinimizeToTray = true;
-          MinimizeOnClose = true;
-          MinimizeOnStartup = false;
-          CheckForUpdates = false;
-          ShowExpiredEntriesOnDatabaseUnlock = true;
-          ShowExpiredEntriesOnDatabaseUnlockOffsetDays = 3;
-        };
+        settings = {
+          General = {
+            BackupBeforeSave = true;
+            # {TIME} keeps every save instead of one rolling copy, aged out by the rule above
+            BackupFilePathPattern = "${backupDir}/{DB_FILENAME}_{TIME:yyyy-MM-dd_HH-mm-ss}.old.kdbx";
+            AutoGeneratePasswordForNewEntries = true;
+          };
 
-        Security = {
-          ClearClipboard = true;
-          ClearClipboardTimeout = 10;
-          ClearSearch = true;
-          ClearSearchTimeout = 5;
-          LockDatabaseIdle = true;
-          LockDatabaseIdleSeconds = 300;
-          LockDatabaseScreenLock = true;
-          LockDatabaseOnUserSwitch = true;
-          HidePasswordPreviewPanel = true;
-          EnableCopyOnDoubleClick = true;
-        };
+          Browser = {
+            Enabled = true;
+            SearchInAllDatabases = true;
+            BestMatchOnly = true;
+            ShowNotification = false;
+            # home-manager handles the native messaging manifest
+            UpdateBinaryPath = false;
+          };
 
-        SSHAgent.Enabled = true;
+          GUI = {
+            # still serves fdosecrets, ssh agent, and browser integration
+            MinimizeOnStartup = true;
+            # defer to the darkly/catppuccin system theme
+            ApplicationTheme = "classic";
+            CompactMode = true;
+            ColorPasswords = true;
+            MonospaceNotes = true;
+          };
 
-        FdoSecrets = {
-          Enabled = true;
-          ShowNotification = true;
-          ConfirmAccessItem = true;
-          ConfirmDeleteItem = true;
-          UnlockBeforeSearch = true;
-        };
+          Security = {
+            ClearSearch = true;
+            LockDatabaseIdleSeconds = 300;
+            LockDatabaseMinimize = true;
+            EnableCopyOnDoubleClick = true;
+          };
 
-        PasswordGenerator = {
-          Length = 24;
-          LowerCase = true;
-          UpperCase = true;
-          Numbers = true;
-          SpecialChars = true;
-          ExcludeAlike = true;
-          EnsureEvery = true;
+          SSHAgent.Enabled = true;
+
+          FdoSecrets.Enabled = true;
         };
       };
     };
-  };
 }

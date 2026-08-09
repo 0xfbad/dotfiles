@@ -1,25 +1,38 @@
 _: {
-  flake.homeModules.btop = {pkgs, ...}: {
-    # catppuccin mocha with oled black background
-    xdg.configFile."btop/themes/catppuccin_mocha.theme".text =
-      builtins.replaceStrings
-      [''theme[main_bg]="#1e1e2e"'']
-      [''theme[main_bg]="#000000"'']
-      (builtins.readFile (builtins.fetchurl {
-        url = "https://raw.githubusercontent.com/catppuccin/btop/main/themes/catppuccin_mocha.theme";
-        sha256 = "0i263xwkkv8zgr71w13dnq6cv10bkiya7b06yqgjqa6skfmnjx2c";
-      }));
-
-    programs.btop = {
-      enable = true;
-      package = pkgs.btop.override {cudaSupport = true;};
-      settings = {
-        color_theme = "catppuccin_mocha";
-        shown_boxes = "cpu mem net proc gpu0";
-        vim_keys = true;
-        update_ms = 200;
-        truecolor = true;
+  flake.modules.homeManager.btop =
+    {
+      config,
+      pkgs,
+      ...
+    }:
+    let
+      upstream = builtins.readFile "${config.catppuccin.sources.btop}/catppuccin_mocha.theme";
+      oled =
+        builtins.replaceStrings
+          [ ''theme[main_bg]="#1e1e2e"'' ]
+          [ ''theme[main_bg]="${config.colors.bg}"'' ]
+          upstream;
+    in
+    {
+      programs.btop = {
+        enable = true;
+        # cudaSupport only adds autoAddDriverRunpath so the nvml dlopen resolves
+        package = pkgs.btop.override { cudaSupport = true; };
+        # fails loudly instead of silently rendering #1e1e2e if upstream moves the line
+        themes.catppuccin_mocha =
+          assert oled != upstream;
+          oled;
+        settings = {
+          color_theme = "catppuccin_mocha";
+          shown_boxes = "cpu mem net proc gpu0";
+          shown_gpus = "nvidia";
+          vim_keys = true;
+          update_ms = 200;
+          nvml_measure_pcie_speeds = false;
+          save_config_on_exit = false;
+          # rapl needs root, row hidden unless the binary has cap_perfmon and cap_dac_read_search
+          show_cpu_watts = true;
+        };
       };
     };
-  };
 }

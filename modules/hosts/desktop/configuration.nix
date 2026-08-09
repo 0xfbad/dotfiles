@@ -1,43 +1,36 @@
-{
-  self,
-  inputs,
-  ...
-}: {
-  flake.nixosModules.desktopConfiguration = {pkgs, ...}: {
+{ self, ... }: {
+  flake.modules.nixos.desktopConfiguration = _: {
     imports = [
-      self.nixosModules.desktopHardware
-      self.nixosModules.determinate
-      self.nixosModules.common
-      self.nixosModules.niri
-      self.nixosModules.greetd
-      self.nixosModules.nvidia
-      self.nixosModules.audio
-      self.nixosModules.virtualization
-      self.nixosModules.anonymity
-      self.nixosModules.networking
-      self.nixosModules.flatpak
-      self.nixosModules.yubikey
-      self.nixosModules.homeManager
-    ];
-
-    nixpkgs.overlays = [
-      (final: prev: {wlctl = inputs.wlctl.packages.${final.stdenv.hostPlatform.system}.default;})
+      self.modules.nixos.desktopHardware
+      self.modules.nixos.determinate
+      self.modules.nixos.common
+      self.modules.nixos.niri
+      self.modules.nixos.greetd
+      self.modules.nixos.nvidia
+      self.modules.nixos.audio
+      self.modules.nixos.virtualization
+      self.modules.nixos.anonymity
+      self.modules.nixos.networking
+      self.modules.nixos.flatpak
+      self.modules.nixos.yubikey
+      self.modules.nixos.homeManager
     ];
 
     networking.hostName = "desktop";
 
     powerManagement.cpuFreqGovernor = "performance";
 
+    # the firefox rdd sandbox cannot open nvidia device nodes, vaapi decode falls back to software
+    environment.sessionVariables.MOZ_DISABLE_RDD_SANDBOX = "1";
+
     boot.loader.grub = {
       enable = true;
+      # TODO this name is enumeration order, repoint at the path from ls -l /dev/disk/by-id | grep nvme
       device = "/dev/nvme0n1";
-      useOSProber = false;
       configurationLimit = 5;
+      # hidden still honours esc/f4/shift during the timeout, menu at timeout 0 does not
+      timeoutStyle = "hidden";
     };
-    boot.loader.timeout = 0;
-    boot.kernelModules = ["kvm-intel"];
-    boot.extraModprobeConfig = ''
-      options kvm-intel nested=1
-    '';
+    boot.loader.timeout = 1;
   };
 }

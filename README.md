@@ -1,154 +1,57 @@
 # dotfiles
 
-NixOS + home-manager dotfiles. [Dendritic pattern](https://vimjoyer.dev/p/organizing-nix-config/) via flake-parts + import-tree, everything in `modules/` auto-discovered
+NixOS + home-manager, [dendritic](https://vimjoyer.dev/p/organizing-nix-config/) flake-parts + import-tree, everything in `modules/` is auto-discovered
 
-Stolen from:
-- https://github.com/JakeGinesin/nix-config
-- NSS, not public :( (thx for nixpilling me)
+Some inspirations:
 
-## layout
+- [JakeGinesin](https://github.com/JakeGinesin/nix-config)
+- NSS (not public, thx for always showing me cool things)
+- [Omarchy](https://github.com/basecamp/omarchy), not specifically nix related but I've found some cool tools through the slop tweets I see of it
 
-```
-flake.nix
-modules/
-  flake-parts.nix
-  formatting.nix              treefmt, alejandra, statix
-  hosts/
-    desktop/                   RTX 3090, dual monitor, GRUB, intel cpu, xpadneo
-    laptop/                    Discrete RTX 4090, systemd-boot, LUKS, intel cpu
-  features/
-    hyprland.nix               compositor, scrolling layout, keybinds, wallpaper, window rules
-    greetd.nix                 tuigreet + uwsm
-    common.nix                 nix settings, locale, bluetooth, user, fontconfig
-    nvidia.nix                 GPU drivers, wayland session vars
-    audio.nix                  pipewire, audio tools (sox, pwvucontrol)
-    virtualization.nix         docker, libvirt, qemu
-    anonymity.nix              tor, dnscrypt
-    networking.nix             networkmanager, dns
-    flatpak.nix                flatpak, sober
-    determinate.nix            determinate nix
-  home/
-    default.nix                home-manager wiring
-    terminal.nix               CLI packages
-    desktop.nix                GUI packages
-    development.nix            LSPs, dev tools, security, AI, direnv
-    quickshell.nix             desktop shell (bar, notifications, OSD, session menu, cheatsheet)
-    quickshell/                QML components for quickshell
-    helix.nix                  editor, nixd + nil + harper + hyprls
-    vcs.nix                    git (histogram diffs, rerere, difftastic), gitui, jujutsu, gh
-    ssh.nix                    SSH agent, multiplexing, compression
-    shell-functions.nix        ff, git worktree helpers, ssh port forwarding
-    hyprlock.nix               lock screen
-    hypridle.nix               idle management
-    firefox.nix                declarative profile, search engines, privacy, policies, extensions
-    zsh.nix                    shell, aliases, tab completion
-    wezterm.nix                terminal emulator
-    atuin.nix                  shell history
-    bat.nix                    cat replacement
-    eza.nix                    ls replacement
-    yazi.nix                   file manager
-    zellij.nix                 multiplexer
-    starship.nix               prompt
-    zoxide.nix                 smart cd
-    colors.nix                 centralized catppuccin palette
-    gtk.nix                    GTK/Qt theming
-    tealdeer.nix               tldr pages
-    dolphin.nix                file manager config
-    thunderbird.nix            email, OLED userChrome, telemetry hardened
-    keepassxc.nix              password manager, browser + SSH agent integration
-    btop.nix                   system monitor
-    mangohud.nix               gaming overlay
-```
+## modern replacements
+
+- [niri](https://github.com/YaLTeR/niri) over a workspace tiler, columns on a scrollable strip, opening a window never resizes the others
+- [helix](https://helix-editor.com) over neovim, selection first editing, native multicursor and tree-sitter
+- [zellij](https://zellij.dev) over tmux, sessions attach from the browser for pairing, floating panes
+- [jujutsu](https://github.com/jj-vcs/jj) alongside git, the working copy is a commit and every operation is undoable, mergiraf syntax aware merges, difftastic diffs
+- [atuin](https://atuin.sh) owns the up arrow, every command logged to sqlite with exit code and duration, searchable across all sessions
+- [zoxide](https://github.com/ajeetdsouza/zoxide) over cd, learns every directory you visit, `z par` jumps to the best frecency match from anywhere
+- [starship](https://starship.rs) prompt with the jj change id inline
+- [carapace](https://carapace.sh) completions for hundreds of clis from one binary, same behavior in every shell
+- [vicinae](https://github.com/vicinaehq/vicinae) over rofi, raycast style launcher with nix search and clipboard history
+- [determinate nix](https://github.com/DeterminateSystems/determinate) with nh, channels killed, registry pinned to the lockfile
+- [yazi](https://github.com/sxyazi/yazi) over ranger, async previews
+- [comma](https://github.com/nix-community/comma), `, cowsay` runs uninstalled tools from the binary cache
+- [tealdeer](https://github.com/tealdeer-rs/tealdeer) over man, `batman` for the full page
+- [jnv](https://github.com/ynqa/jnv) for interactive jq, [numbat](https://numbat.dev) for unit aware math
+- [ast-grep](https://ast-grep.github.io) over grep for code, search and rewrite the syntax tree with patterns that look like the code itself, [tailspin](https://github.com/bensadeh/tailspin) highlights logs
+- [viddy](https://github.com/sachaos/viddy) over watch, records every run so you can rewind and diff them
+- [rip2](https://github.com/MilesCranmer/rip2) over rm, deletions land in a graveyard and `rip -u` brings them back
+- [q](https://github.com/natesales/q) over dig, supports doh, dot and doq
+- [ouch](https://github.com/ouch-org/ouch) over tar flags, infers the format from the extension in both directions
+- gh-dash, jjui, lazydocker, bluetui tuis
+- bat/cat, eza/ls, sd/sed, procs/ps, duf/df, dua/du, choose/cut, gping/ping, trippy/traceroute, miniserve/http.server
+
+Other bits:
+
+- lanzaboote secure boot, tpm2 luks unlock, hibernate to encrypted swap
+- keepassxc as the only secrets provider, fdosecrets, ssh agent, with browser integrations
+- dnscrypt-proxy doh, tor/i2p, no fallback to plaintext dns
+- oled black catppuccin everywhere, see palette in `colors.nix`
+- declarative firefox and thunderbird profiles
+- scx_lavd scheduler, zram + systemd-oomd
+- dev tooling in a flake partition, consumers never evaluate treefmt, statix or the git hooks
+- screenshots freeze the frame first via wayfreeze + slurp, wl-screenrec for clips
+- winboat runs windows apps, `docs/windows-vm.md` for the full vm
 
 ## stealing this
 
-Clone to `~/dotfiles` on a bare NixOS system. Grep for `fbad`, swap in your username
+Clone to `~/dotfiles`, grep for `fbad`, swap in your username. Copy a host dir, regenerate the hardware config, import the features you want. `nh os switch` and pray
 
-Copy a host dir, replace hardware config with `nixos-generate-config --show-hardware-config` output. Features are all optional, import what you want in your host's `configuration.nix`
-
-`nh os switch` and pray
-
-## cool stuff
-
-**desktop shell**
-- Quickshell (QML) bar: workspaces, clock, media with cava visualizer, system stats + network graph popout, battery timeline + power profile control, weather + hourly forecast, notifications, caffeine toggle, recording indicator with region overlay
-- Vicinae launcher on Super+Space with extensions (nix search, firefox bookmarks, todo, hypr keybinds, bluetooth, wifi, etc), clipboard on Super+V, wallpaper switcher on Super+Shift+W
-- Quickshell keybind cheatsheet on Super+D, session menu, OSD
-
-**hyprland**
-- Niri-style scrolling layout (infinite horizontal columns, Super+[/] to scroll, Super+Alt+=/- for widths), Super+\\ toggles dwindle
-- Scratchpad workspace (Super+S), window groups (Super+G), float+pin (Super+O)
-- pyprland scratchpads: dropdown terminal, volume mixer
-- hyprdim dims inactive windows, hypr-dynamic-cursors (tilt + shake-to-find), Super+Ctrl+Scroll zoom
-- Wallpaper rotation via awww, per-monitor, animated transitions, shuffles every 30 min
-- Screenshots via grim + slurp + satty annotation, wf-recorder for recording with dashed region overlay
-- Random dictionary-word filenames for recordings (`coffee-telescope.mp4`)
-- Monitor config in mutable `monitors.conf` so hyprmon layouts survive rebuilds
-- Super+Shift+C color picker
-
-**terminal**
-- Wezterm + zellij, helix with LSPs for ~10 languages (nixd, harper, hyprls)
-- Atuin history, zoxide cd, starship prompt, carapace completions
-- `ff` fzf+bat file finder, `gl`/`gdf` fzf git log/diff browsers, `ga`/`gd` worktree helpers
-- Ctrl+X Ctrl+E to edit commands in helix, Double-Esc for sudo, 30s command notification
-
-**git**
-- Histogram diffs, colorMoved, rerere, zdiff3 conflicts, autoSquash + autoStash, force-push safety, difftastic
-
-**cli replacements**
-- bat/cat, eza/ls, dua/du, sd/sed, procs/ps, q/dig, duf/df, viddy/watch, choose/cut, trippy/traceroute, gping/ping, ouch/tar+zip+gz+bz2+rar+7z, rip2/rm, miniserve/http.server
-
-**nix**
-- [Determinate Nix](https://github.com/DeterminateSystems/determinate), channels killed, flake registry pinned to lockfile
-- `rebuild`/`update` aliases lint (alejandra + statix) before applying, nh for diffs
-- Auto-GC at 5GB free, comma via nix-index-database, nix-ld for random binaries
-
-**system**
-- DNS over HTTPS via dnscrypt-proxy, mDNS/LLMNR disabled
-- OLED black catppuccin mocha everywhere, centralized palette in `colors.nix`
-- systemd-oomd, watchdog timers, caps rebound to escape (mainly for helix, works in tty), network services don't restart during rebuild
-- Greetd login with 4-line system specs (OS, CPU, GPU, disk/IP), Bibata cursor
-- SSH agent with multiplexing, connection keep-alive, compression
-
-**firefox**
-- Declarative profile, extensions force-installed (uBlock, Bitwarden, Dark Reader, etc), telemetry nuked, OLED userChrome
-- Custom search engines (`@np` nix packages, `@no` options, `@nw` wiki, `@hm` home-manager)
-
-**email + passwords**
-- Thunderbird with OLED black userChrome, compact density, telemetry/crash reports nuked, remote images blocked, mailto handler, 18 declarative extensions (send later, conversations, DKIM verifier, snooze, Gmail-style keybinds, expression search, quick folder move, filter tools, unsubscribe, identity management)
-- KeePassXC with Firefox browser integration (native messaging auto-wired), SSH agent, FdoSecrets, Kvantum/Catppuccin theming via classic mode, 24-char password generator
-
-**other**
-- Vicinae built-in clipboard history
-- Lazydocker, bluetui, wlctl TUIs
-- Gaming: proton-ge, gamescope, gamemode, mangohud
-- Security: trufflehog, gitleaks, nmap, burpsuite, ghidra, gdb+gef, pwntools, binwalk, imhex
-- age + sops for secrets, jujutsu alongside git
-- Claude Code and opencode for slopmaxxing, t3code as a GUI over both
-- jnv (interactive jq), numbat (calculator with units), ast-grep, tailspin, mods
-
-## aliases
-
-- `rebuild` / `update` - lint + apply (update also bumps flake lock)
-- `gc` - nh clean all (3 generations, 7 days)
-- `ls` / `la` / `lt` - eza
-- `cat` / `man` / `diff` / `grep` - bat variants
-- `cc` - claude code
-- `clip` / `pwdc` / `lcc` - clipboard helpers
-- `ff` / `gl` / `gdf` - fzf file/git browsers
-- `ga` / `gd` - git worktree add/remove
-- `fip` / `dip` / `lip` - ssh port forwarding
-- `ns` - nix package search
-- `dupe` - new terminal in same dir
-- `port` - what's on a port
-- `mkcd` - mkdir + cd
-
-## determinate nix
-
-First rebuild needs cache flags:
+First rebuild needs the determinate cache, and `boot` not `switch` since it swaps dbus:
 
 ```
-sudo nixos-rebuild boot --flake ~/dotfiles --option extra-substituters https://install.determinate.systems --option extra-trusted-public-keys "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
+sudo nixos-rebuild boot --flake ~/dotfiles \
+  --option extra-substituters https://install.determinate.systems \
+  --option extra-trusted-public-keys "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
 ```
-
-Use `boot` not `switch` for the first one, it swaps dbus. Reboot and every rebuild after is normal

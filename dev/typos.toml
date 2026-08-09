@@ -1,0 +1,7 @@
+# false positives, a kde package, a udev hid id, ANDed, nixos-facter, a dnscrypt minisign key
+[default.extend-words]
+thumbnailers = "thumbnailers"
+abd = "abd"
+ded = "ded"
+iz = "iz"
+facter = "facter"

@@ -2,8 +2,9 @@
   self,
   inputs,
   ...
-}: {
-  flake.nixosModules.homeManager = {...}: {
+}:
+{
+  flake.modules.nixos.homeManager = { ... }: {
     imports = [
       inputs.home-manager.nixosModules.home-manager
     ];
@@ -11,16 +12,15 @@
     home-manager.useGlobalPkgs = true;
     home-manager.useUserPackages = true;
     home-manager.backupFileExtension = "hm-bak";
-    home-manager.users.fbad = {lib, ...}: {
-      imports = builtins.attrValues self.homeModules;
-      # skip home-manager manpages, silences the options.json eval warning
+    # clobber a stale .hm-bak instead of failing the rebuild
+    home-manager.overwriteBackup = true;
+    home-manager.users.fbad = {
+      imports = builtins.attrValues self.modules.homeManager;
+      home.stateVersion = "24.11";
+      # the manpage build pulls the full options doc eval into the closure
       manual.manpages.enable = false;
-      # hm doesnt follow same release cycle as nixpkgs
+      # hm does not follow the nixpkgs release cycle
       home.enableNixpkgsReleaseCheck = false;
-      # wipe stale hm backups before activation so they never block a rebuild
-      home.activation.cleanupBackups = lib.hm.dag.entryBefore ["checkLinkTargets"] ''
-        find /home/fbad -name "*.hm-bak" -delete 2>/dev/null || true
-      '';
     };
   };
 }

@@ -1,105 +1,107 @@
 _: {
-  flake.homeModules.development = {
-    pkgs,
-    lib,
-    ...
-  }: {
-    programs.direnv = {
-      enable = true;
-      silent = true;
-      nix-direnv.enable = true;
+  flake.modules.homeManager.development = { pkgs, ... }: {
+    programs = {
+      direnv = {
+        enable = true;
+        silent = true;
+        nix-direnv.enable = true;
+      };
+
+      go = {
+        enable = true;
+        telemetry.mode = "off";
+      };
+
+      opencode.enable = true;
+      nix-search-tv.enable = true;
     };
 
     home.packages = with pkgs; [
       # python
-      python3 # follows nixpkgs default Python version
-      ty # Python type checker by Astral (ruff team)
-      ruff # fast Python linter and formatter
+      # pwntools is toPythonApplication, so it only imports from an interpreter env
+      (python3.withPackages (ps: with ps; [ pwntools ]))
+      ty # python type checker from the ruff team
+      ruff
 
       # rust
-      rust-analyzer # Rust LSP
-      rustfmt # Rust code formatter
+      cargo # rust-analyzer shells out to it for workspace metadata
+      rustc
+      rustfmt
 
       # go
-      gopls # Go LSP
-      # lowPrio because gotools ships an older lib that conflicts with sox
-      (lib.lowPrio gotools) # extra Go dev tools (goimports, godoc)
-      delve # Go debugger
+      gotools # goimports, godoc
+      delve # go debugger
 
       # zig
-      zls # Zig LSP
-      zig # Zig compiler
+      zig
 
-      # typescript/javascript
-      typescript-language-server # TypeScript/JavaScript LSP
-      prettierd # daemon mode Prettier for fast formatting
+      # javascript and typescript
+      prettierd
 
-      # docker
-      docker # container runtime
-      dockerfile-language-server # Dockerfile LSP
-      virtiofsd # virtio filesystem daemon for VM shared folders
-      cloudflared # Cloudflare tunnel client
+      # networking
+      cloudflared
 
       # shell
-      bash-language-server # Bash LSP
-      shfmt # shell script formatter
+      shfmt
 
       # nix
-      nil # Nix LSP
-      nixd # Nix LSP with nixpkgs evaluation support
-      nix-inspect # inspect nix derivation details interactively
-      statix # nix linter, suggests anti-pattern fixes
-      alejandra # nix formatter, opinionated
-      manix # search NixOS/home-manager options and docs from CLI
+      nix-inspect
+      nix-tree # browse a closure interactively, find what pulls a dependency in
+      statix # nix linter, suggests antipattern fixes
+      deadnix # finds unused let bindings and function arguments
+      nixfmt # the rfc 166 style treefmt runs
+      manix # searches nixos and home-manager docs from the cli
 
       # typst
-      typst # modern LaTeX alternative, fast compilation
-      tinymist # Typst LSP
+      typst
 
       # security and secret scanning
-      trufflehog # scans git repos for leaked secrets, tests if they're still live
+      trufflehog # scans git repos for leaked secrets, tests if they are still live
       gitleaks # lighter secret scanner for git history, good for pre-commit hooks
-      age # modern GPG replacement, no keyrings, just encrypts files, SSH keys
-      sops # encrypts values in YAML/JSON but leaves keys readable for diffs
+      age
+      sops # encrypts values but leaves yaml and json keys readable for diffs
 
       # security and pentesting
-      nmap # network scanner, port/service discovery
-      strace # trace system calls for debugging
-      feroxbuster # web directory/content brute-forcer
-      burpsuite # web application security testing proxy
-      ghidra # NSA's reverse engineering tool, disassembler/decompiler
-      gdb # GNU debugger
-      gef # GDB Enhanced Features, exploit dev helpers on top of gdb
-      imhex # hex editor with pattern language and analysis tools
-      exploitdb # offline exploit database search (searchsploit)
-      # wordlists # password/fuzzing wordlists (rockyou, dirb, etc) # TEMP 07/26/26 disabled, dependency wfuzz fails on missing pkg_resources under python 3.14
-      crunch # custom wordlist generator
-      john # John the Ripper password cracker
-      pwntools # CTF/exploit dev framework for Python
+      nmap
+      strace
+      feroxbuster # web directory bruteforcer
+      burpsuite # web application testing proxy
+      ghidra
+      gdb
+      gef # exploit dev helpers on top of gdb
+      imhex # hex editor with a pattern language
+      exploitdb # searchsploit, offline exploit database
+      # wfuzz # TEMP dropped bc fails on missing pkg_resources under python 3.14
+      (wordlists.override {
+        lists = [
+          nmap
+          rockyou
+          seclists
+        ];
+      })
+      crunch # wordlist generator
+      john # password cracker
+      pwninit # patches a downloaded challenge binary against its libc, writes a solve template
+      pwncat # post exploitation shell handler
       binwalk # firmware analysis, finds embedded files and filesystems
-      glances # system monitor like htop with more detail
-      xxd # hex dump and reverse hex dump
-      expect # automate interactive CLI programs
+      xxd
+      expect # automates interactive cli programs
 
-      # prose
-      harper # grammar checker LSP, works in any editor
+      # monitoring
+      glances # system monitor like htop with more detail
 
       # parser tools
       tree-sitter
-      ast-grep # structural search/replace via tree-sitter, match code by pattern
-      scooter # interactive find-and-replace TUI, toggle individual replacements, helix integration
+      ast-grep # structural search and replace via tree-sitter
+      scooter # find and replace tui, toggle individual replacements, helix integration
 
       # benchmarking and analysis
-      hyperfine # benchmarks CLI commands, warmup runs, confidence intervals
-      tokei # code stats by language (lines, blanks, comments), faster than cloc
+      hyperfine # benchmarks cli commands
+      tokei # code stats by language, faster than cloc
 
       # http testing
-      hurl # HTTP request runner using plain text files, chain requests, assert responses
-      # harlequin # SQL IDE in terminal, autocomplete, highlighting, Postgres/DuckDB/SQLite # TEMP 07/26/26 disabled, dependency sqlfmt fails on pythonMetadataCheck under python 3.14
-
-      # ai
-      claude-code # Anthropic's slopmachine
-      opencode # open-source slopmachine
+      hurl # http request runner driven by plain text files
+      # harlequin # tui SQL editor TEMP DISABLED bc a sqlfmt dependency fails pythonMetadataCheck under python 3.14
     ];
   };
 }

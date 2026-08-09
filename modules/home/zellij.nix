@@ -1,46 +1,43 @@
 _: {
-  flake.homeModules.zellij = {
-    pkgs,
-    lib,
-    ...
-  }: let
-    zellij-gc = pkgs.writeShellScriptBin "zellij-gc" (
-      ''
-        export PATH=${lib.makeBinPath [pkgs.zellij pkgs.iproute2 pkgs.procps pkgs.coreutils pkgs.gnugrep]}:$PATH
-      ''
-      + builtins.readFile ./zellij-gc.sh
-    );
-  in {
-    home.packages = [zellij-gc];
+  flake.modules.homeManager.zellij =
+    {
+      pkgs,
+      lib,
+      ...
+    }:
+    {
+      programs.zellij = {
+        enable = true;
 
-    programs.zellij = {
-      enable = true;
-      settings = {
-        theme = "catppuccin-mocha";
-        default_layout = "compact";
-        show_startup_tips = false;
-        copy_on_select = true;
-        pane_frames = false;
-        # scrollback opens in helix
-        scrollback_editor = "hx";
+        # only background 24 24 37 is chrome, the base lines are text drawn on colored ribbons
+        themes.catppuccin-oled =
+          builtins.replaceStrings
+            [ "catppuccin-mocha" "background 24 24 37" ]
+            [ "catppuccin-oled" "background 0 0 0" ]
+            (
+              builtins.readFile (
+                builtins.fetchurl {
+                  url = "https://raw.githubusercontent.com/zellij-org/zellij/v0.44.3/zellij-utils/assets/themes/catppuccin-mocha.kdl";
+                  sha256 = "1pb039n0w4wgdc4xk795b68q3qq410dirn2pjbf6qcn6yfa9j06d";
+                }
+              )
+            );
+
+        settings = {
+          theme = "catppuccin-oled";
+          default_layout = "compact";
+          pane_frames = false;
+          show_startup_tips = false;
+          show_release_notes = false;
+          # quit on window close so detached servers do not pile up, ctrl+o d still detaches
+          on_force_close = "quit";
+          # nothing survives a window close, so serializing sessions is pure waste
+          session_serialization = false;
+          # off still lets a session opt in at runtime, disabled forbids it
+          web_server = false;
+          web_sharing = "disabled";
+          scrollback_editor = lib.getExe pkgs.helix;
+        };
       };
     };
-
-    systemd.user.services.zellij-gc = {
-      Unit.Description = "Reap idle and exited zellij sessions";
-      Service = {
-        Type = "oneshot";
-        ExecStart = "${zellij-gc}/bin/zellij-gc";
-      };
-    };
-
-    systemd.user.timers.zellij-gc = {
-      Unit.Description = "Periodically reap idle zellij sessions";
-      Timer = {
-        OnBootSec = "2min";
-        OnUnitActiveSec = "5min";
-      };
-      Install.WantedBy = ["timers.target"];
-    };
-  };
 }
