@@ -1,5 +1,0 @@
-# revs git blame skips: tree-wide formatting churn only, one sha per line.
-# set repo-side with: git config blame.ignoreRevsFile .git-blame-ignore-revs
-
-# chore: reformat with nixfmt
-f1917e122049b2bd5c66c66d98c33d631ce20f96
