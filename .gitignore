@@ -2,10 +2,6 @@ wallpapers/
 result
 *.md
 !README.md
-!docs/*.md
-# skill and context files consumed by nix modules
+# slopmachine stuff
 !modules/**/*.md
-.audit/
-coverage.html
 .direnv/
-facter.json
