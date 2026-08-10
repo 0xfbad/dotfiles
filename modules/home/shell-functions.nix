@@ -104,6 +104,30 @@ _: {
         (( $# < 1 )) && { print -u2 "usage: port <port>"; return 1 }
         ss -tulpnH "sport = :$1" | grep . || print "nothing on port $1"
       '';
+
+      termwatch = ''
+        local -a loop msg
+        zparseopts -D -F -- l=loop m:=msg || return 1
+        (( $# < 1 )) && { print -u2 "usage: termwatch [-l] [-m <msg>] <video> [mpv-args...]"; return 1 }
+        local -a args=( --vo=tct --vo-tct-256 )
+        (( $#loop )) && args+=( --loop-file=inf )
+        if (( $#msg )); then
+          args+=( --msg-level=all=no,statusline=status --term-status-msg="''${msg[2]}" )
+        else
+          args+=( --really-quiet )
+        fi
+        mpv "''${args[@]}" "$@"
+      '';
+
+      adroll = ''
+        emulate -L zsh
+        [[ -o interactive && -t 0 && -t 1 && -z $CLAUDECODE && -z $AI_AGENT ]] || return
+        (( RANDOM % 1000 )) && return
+        local -a ads=( ~/Videos/ads/*(N.) )
+        (( $#ads )) || return
+        termwatch -m 'your command will be executed shortly after this ad' "$ads[RANDOM % $#ads + 1]"
+        clear
+      '';
     };
   };
 }

@@ -315,6 +315,9 @@ _: {
             '')
 
             (lib.mkOrder 1400 ''
+              autoload -Uz add-zsh-hook
+              add-zsh-hook preexec adroll
+
               greet | cowsay
             '')
           ];
