@@ -35,14 +35,14 @@ Some inspirations:
 Other bits:
 
 - lanzaboote secure boot, tpm2 luks unlock, hibernate to encrypted swap
-- keepassxc as the only secrets provider, fdosecrets, ssh agent, with browser integrations
-- dnscrypt-proxy doh, tor/i2p, no fallback to plaintext dns
-- oled black catppuccin everywhere, see palette in `colors.nix`
+- keepassxc as the secrets provider, fdosecrets, ssh agent, with browser integrations
+- dnscrypt-proxy doh and tor/i2p
+- oled black catppuccin theme, palette in `colors.nix`
 - declarative firefox and thunderbird profiles
 - scx_lavd scheduler, zram + systemd-oomd
-- dev tooling in a flake partition, consumers never evaluate treefmt, statix or the git hooks
-- screenshots freeze the frame first via wayfreeze + slurp, wl-screenrec for clips
-- winboat runs windows apps, `docs/windows-vm.md` for the full vm
+- dev tooling in a flake partition (consumers never evaluate treefmt, statix or git hooks)
+- screenshots via wayfreeze + slurp, wl-screenrec for quick recordings
+- winboat for windows apps
 
 ## stealing this
 
