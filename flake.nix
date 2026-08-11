@@ -51,6 +51,11 @@
     };
     # no nixpkgs follows here, keeps flakehub cache hits
     determinate.url = "https://flakehub.com/f/DeterminateSystems/determinate/*";
+    # unofficial linux repack of codex desktop app
+    codex-desktop-linux = {
+      url = "github:ilysenko/codex-desktop-linux/8bc6bead687f719d9835c426b431f09f4acbc277";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # source only, no upstream flake, rebuilding it needs a fresh cargoHash
     ouch = {
       url = "github:ouch-org/ouch/384384286fa575975e088f14f71b5ccd039bedf4";
