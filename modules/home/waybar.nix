@@ -216,13 +216,13 @@ _: {
           };
 
           idle_inhibitor = {
-            format = "{icon}";
+            format = "{icon} {timeleft}m";
             format-icons = {
               activated = g "f06e";
               deactivated = g "f070";
             };
             timeout = 60;
-            tooltip-format-activated = "screenlock off";
+            tooltip-format-activated = "screenlock off - {timeleft}m of {timeout}m left";
             tooltip-format-deactivated = "screenlock on";
           };
         };
