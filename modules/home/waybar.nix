@@ -222,7 +222,7 @@ _: {
               deactivated = g "f070";
             };
             timeout = 60;
-            tooltip-format-activated = "screenlock off - {timeout}m left";
+            tooltip-format-activated = "screenlock off - {timeleft}m left";
             tooltip-format-deactivated = "screenlock on";
           };
         };
