@@ -5,6 +5,8 @@ _: {
       logDriver = "json-file";
       daemon.settings = {
         live-restore = true;
+        # without this docker strips loopback nameservers
+        dns = [ "172.17.0.1" ];
         log-opts = {
           max-size = "10m";
           max-file = "3";
@@ -27,6 +29,14 @@ _: {
       nss.enableGuest = true;
     };
     virtualisation.spiceUSBRedirection.enable = true;
+
+    networking.firewall.interfaces."docker0" = {
+      allowedUDPPorts = [ 53 ];
+      allowedTCPPorts = [ 53 ];
+    };
+
+    # dnscrypt binds 172.17.0.1 before docker0 exists
+    boot.kernel.sysctl."net.ipv4.ip_nonlocal_bind" = 1;
 
     programs.virt-manager.enable = true;
     programs.dconf.enable = true;

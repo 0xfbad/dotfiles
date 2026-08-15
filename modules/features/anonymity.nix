@@ -12,6 +12,8 @@ _: {
         listen_addresses = [
           "127.0.0.1:53"
           "[::1]:53"
+          # docker strips loopback nameservers
+          "172.17.0.1:53"
         ];
 
         # upstream default bootstraps plaintext to quad9 and google and holds nss-lookup.target 60s offline
