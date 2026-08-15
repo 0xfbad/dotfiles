@@ -8,6 +8,9 @@
       # niri-flake is less up to date than nixpkgs
       programs.niri.package = pkgs.niri;
 
+      # setcap kms helper, no polkit prompts
+      programs.gpu-screen-recorder.enable = true;
+
       # gnome-keyring from niri-flake claims org.freedesktop.secrets before keepassxc fdosecrets can
       services.gnome.gnome-keyring.enable = lib.mkForce false;
 
@@ -124,7 +127,7 @@
         pkgs.writeShellApplication {
           name = "record-toggle";
           runtimeInputs = with pkgs; [
-            wl-screenrec
+            gpu-screen-recorder
             slurp
             libnotify
             procps
@@ -144,12 +147,18 @@
             PIDFILE="/tmp/qs-rec-pid"
             FILEFILE="/tmp/qs-rec-file"
 
-            if pgrep -x wl-screenrec > /dev/null; then
-              pkill -INT -x wl-screenrec
-              # wait for wl-screenrec to flush and exit
-              PID=$(cat "$PIDFILE" 2>/dev/null || true)
-              if [ -n "$PID" ]; then
-                tail --pid="$PID" -f /dev/null 2>/dev/null || sleep 2
+            # pgrep cannot match the wrapped gsr binary
+            PID=$(cat "$PIDFILE" 2>/dev/null || true)
+            if [ -n "$PID" ] && grep -qa gpu-screen-recorder "/proc/$PID/cmdline" 2>/dev/null; then
+              # sigint finalizes the mp4
+              kill -INT "$PID" 2>/dev/null || true
+              for _ in $(seq 50); do
+                kill -0 "$PID" 2>/dev/null || break
+                sleep 0.1
+              done
+              if kill -0 "$PID" 2>/dev/null; then
+                kill -9 "$PID" 2>/dev/null || true
+                notify-send -u critical -a "recording" -t 5000 "recording force-killed" "file may be corrupt"
               fi
               LAST=$(cat "$FILEFILE" 2>/dev/null || true)
               rm -f "$PIDFILE" "$FILEFILE"
@@ -160,20 +169,12 @@
               pgrep -x slurp && exit 0
               NAME=$(gen_name)
               FILE="$VIDDIR/$NAME.mp4"
-              GEOM=$(slurp -b 000000CC -s 00000000) || exit 0
+              GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -s 00000000) || exit 0
               echo "$FILE" > "$FILEFILE"
               notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
 
-              # niri renders on the dgpu here, but vaapi encode only exists on the intel or amd node
-              DRI="/dev/dri/renderD128"
-              for NODE in /dev/dri/renderD*; do
-                if ! grep -qx "DRIVER=nvidia" "/sys/class/drm/''${NODE##*/}/device/uevent"; then
-                  DRI="$NODE"
-                  break
-                fi
-              done
-
-              wl-screenrec --dri-device "$DRI" -g "$GEOM" --audio -f "$FILE" &
+              gpu-screen-recorder -w region -region "$GEOM" -f 60 -fm cfr \
+                -a default_output -ac aac -fallback-cpu-encoding yes -o "$FILE" &
               echo $! > "$PIDFILE"
             fi
           '';
