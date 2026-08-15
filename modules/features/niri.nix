@@ -239,7 +239,14 @@
         gtk.enable = true;
       };
 
-      services.wl-clip-persist.enable = true;
+      services.wl-clip-persist = {
+        enable = true;
+        # keepassxc tags password copies with this mime hint
+        extraOptions = [
+          "--all-mime-type-regex"
+          "^(?!x-kde-passwordManagerHint).+"
+        ];
+      };
 
       home.sessionVariables = {
         QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
