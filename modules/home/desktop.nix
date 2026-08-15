@@ -81,6 +81,8 @@
           systemd.enable = true;
           settings = {
             dir = "${config.home.homeDirectory}/Downloads";
+            # vicinae.nix patches the same literal
+            rpc-secret = "vicinae-local";
             continue = true;
             max-connection-per-server = 16;
             min-split-size = "1M";

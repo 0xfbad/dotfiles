@@ -105,9 +105,20 @@
             "dashboard-icons"
             "niri"
             "it-tools"
-            "aria2-manager"
           ]
           ++ [
+            # no secret preference, patch it in
+            (ext.aria2-manager.overrideAttrs (o: {
+              postPatch = (o.postPatch or "") + ''
+                substituteInPlace src/index.tsx src/quick-add.ts \
+                  --replace-fail "const RPC_SECRET: string | null = null;" \
+                                 "const RPC_SECRET: string | null = 'vicinae-local';"
+                # secretless status check spawns a second daemon
+                substituteInPlace src/lib/aria2-client.ts \
+                  --replace-fail "secret: string | null = null): Aria2Client" \
+                                 "secret: string | null = 'vicinae-local'): Aria2Client"
+              '';
+            }))
             (mkRaycast {
               name = "tailwindcss";
               rev = raycastRev;
