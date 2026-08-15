@@ -34,6 +34,7 @@
         # settings go in VICINAE_OVERRIDES, which outranks anything the gui writes to settings.json
         settings = {
           telemetry.system_info = false;
+          launcher_window.clock.enabled = false;
           activate_on_single_click = true;
           pop_to_root_on_close = true;
           keybinding = "vim";

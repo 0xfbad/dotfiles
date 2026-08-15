@@ -48,7 +48,7 @@
     # main matches home-manager master, no follows since ports are cached against catppuccin pkgs
     catppuccin.url = "github:catppuccin/nix/main";
     # no nixpkgs follows and release tags only, both keep vicinae cachix hits
-    vicinae.url = "github:vicinaehq/vicinae/v0.24.0";
+    vicinae.url = "github:vicinaehq/vicinae/v0.25.0";
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
       inputs.vicinae.follows = "vicinae";
