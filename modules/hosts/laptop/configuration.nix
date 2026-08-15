@@ -26,6 +26,13 @@
 
       system.stateVersion = "24.11";
 
+      # luks at boot already authenticates
+      services.greetd.settings.initial_session = {
+        # logout falls back to default_session, setting this drops systemd Restart=
+        command = "niri-session";
+        user = "fbad";
+      };
+
       services.upower = {
         enable = true;
         # the suspend half of HybridSleep still drains and at 3% there is nothing left to drain
