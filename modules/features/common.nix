@@ -190,8 +190,10 @@ in
         # the override has to match modules/home/btop.nix or this builds a second closure
         source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop";
         capabilities = "cap_perfmon,cap_dac_read_search+ep";
-        owner = "root";
-        group = "root";
+        # cap_dac_read_search reads any file
+        owner = "fbad";
+        group = "users";
+        permissions = "u+rx";
       };
 
       # tear down the session on logout so a stale niri socket does not block the next login
