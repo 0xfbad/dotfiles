@@ -66,6 +66,8 @@ in
         removeAttrs inputs [
           "self"
           "nixpkgs"
+          # not a flake
+          "ouch"
         ]
       );
 
