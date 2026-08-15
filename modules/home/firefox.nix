@@ -38,6 +38,10 @@ _: {
             ConvenienceExceptions = false;
           };
           HttpsOnlyMode = "force_enabled";
+          DNSOverHTTPS = {
+            Enabled = false;
+            Locked = true;
+          };
           PostQuantumKeyAgreementEnabled = true;
           PasswordManagerEnabled = false;
           OfferToSaveLogins = false;
@@ -48,6 +52,12 @@ _: {
               Value = "blocked";
               Locked = true;
             };
+          };
+          FirefoxSuggest = {
+            WebSuggestions = false;
+            SponsoredSuggestions = false;
+            OnlineEnabled = false;
+            Locked = true;
           };
           UserMessaging = {
             ExtensionRecommendations = false;
@@ -191,6 +201,7 @@ _: {
             "toolkit.telemetry.archive.enabled" = false;
             "toolkit.telemetry.server" = "data:,";
             "toolkit.coverage.opt-out" = true;
+            "toolkit.telemetry.coverage.opt-out" = true;
             "toolkit.coverage.endpoint.base" = "";
             "datareporting.healthreport.uploadEnabled" = false;
             "datareporting.policy.dataSubmissionEnabled" = false;
@@ -218,9 +229,10 @@ _: {
 
             # the strict category itself comes from the EnableTrackingProtection policy
             "privacy.purge_trackers.enabled" = true;
-            "privacy.donottrackheader.enabled" = true;
             "privacy.globalprivacycontrol.enabled" = true;
             "privacy.globalprivacycontrol.functionality.enabled" = true;
+            # https only mode fires a plaintext background probe on slow upgrades, leaking the hostname
+            "dom.security.https_only_mode_send_http_background_request" = false;
 
             "network.dns.disablePrefetch" = true;
             "network.dns.disablePrefetchFromHTTPS" = true;
@@ -268,6 +280,30 @@ _: {
             "extensions.formautofill.creditCards.supported" = "off";
             "browser.formfill.enable" = false;
 
+            "browser.urlbar.quicksuggest.enabled" = false;
+            "browser.urlbar.suggest.quicksuggest.all" = false;
+            "browser.urlbar.suggest.quicksuggest.sponsored" = false;
+            # pre fx146 name for suggest.quicksuggest.all, kept for esr and downgrades
+            "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
+            "browser.urlbar.quicksuggest.online.enabled" = false;
+            "browser.urlbar.quicksuggest.contextualOptIn" = false;
+            "browser.urlbar.suggest.realtimeOptIn" = false;
+            "browser.urlbar.quicksuggest.mlEnabled" = false;
+            # gate list tracks arkenfox v144
+            "browser.urlbar.trending.featureGate" = false;
+            "browser.urlbar.addons.featureGate" = false;
+            "browser.urlbar.mdn.featureGate" = false;
+            "browser.urlbar.yelp.featureGate" = false;
+            "browser.urlbar.yelpRealtime.featureGate" = false;
+            "browser.urlbar.amp.featureGate" = false;
+            "browser.urlbar.wikipedia.featureGate" = false;
+            "browser.urlbar.market.featureGate" = false;
+            "browser.urlbar.importantDates.featureGate" = false;
+            "browser.urlbar.fakespot.featureGate" = false;
+            "browser.urlbar.flightStatus.featureGate" = false;
+            "browser.urlbar.sports.featureGate" = false;
+            "places.semanticHistory.featureGate" = false;
+
             "browser.urlbar.suggest.trending" = false;
             "browser.urlbar.suggest.weather" = false;
             "browser.urlbar.suggest.mdn" = false;
@@ -284,7 +320,6 @@ _: {
             "browser.discovery.enabled" = false;
 
             # apis that leak info
-            "dom.battery.enabled" = false;
             # gamepad api allows usb device enumeration
             "dom.gamepad.enabled" = false;
             # beacon carries async analytics transfers
