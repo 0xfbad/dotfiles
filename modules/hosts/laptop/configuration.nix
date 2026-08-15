@@ -9,7 +9,6 @@
       imports = [
         self.modules.nixos.laptopHardware
         self.modules.nixos.lanzaboote
-        self.modules.nixos.determinate
         self.modules.nixos.common
         self.modules.nixos.niri
         self.modules.nixos.greetd

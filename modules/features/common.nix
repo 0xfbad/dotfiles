@@ -16,6 +16,12 @@ in
         inputs.catppuccin.nixosModules.catppuccin
       ];
 
+      nix.package = pkgs.nixVersions.latest;
+      nix.settings.experimental-features = [
+        "nix-command"
+        "flakes"
+      ];
+
       nix.settings.warn-dirty = false;
       nix.settings.connect-timeout = 10;
       nix.settings.stalled-download-timeout = 30;

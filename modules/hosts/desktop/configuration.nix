@@ -2,7 +2,6 @@
   flake.modules.nixos.desktopConfiguration = _: {
     imports = [
       self.modules.nixos.desktopHardware
-      self.modules.nixos.determinate
       self.modules.nixos.common
       self.modules.nixos.niri
       self.modules.nixos.greetd
