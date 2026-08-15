@@ -17,8 +17,8 @@ _: {
         askUserQuestionTimeout = "5m";
 
         env = {
-          # supersedes DISABLE_TELEMETRY and DISABLE_ERROR_REPORTING
-          CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1";
+          # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"; # good but disables /remote-control :(
+          DISABLE_ERROR_REPORTING = "1";
           # since nix owns the package, kill background checks and claude update alike
           DISABLE_AUTOUPDATER = "1";
           DISABLE_UPDATES = "1";
