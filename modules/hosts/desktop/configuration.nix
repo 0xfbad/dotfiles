@@ -17,6 +17,8 @@
 
     networking.hostName = "desktop";
 
+    system.stateVersion = "24.11";
+
     powerManagement.cpuFreqGovernor = "performance";
 
     # the firefox rdd sandbox cannot open nvidia device nodes, vaapi decode falls back to software

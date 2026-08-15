@@ -46,7 +46,6 @@ in
         clean.extraArgs = "--keep-since 7d --keep 3";
         flake = "/home/fbad/dotfiles";
       };
-      system.stateVersion = "24.11";
 
       # keep build deps in store so nix develop does not redownload after gc
       nix.settings.keep-outputs = true;

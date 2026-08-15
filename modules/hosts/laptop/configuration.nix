@@ -24,6 +24,8 @@
 
       networking.hostName = "laptop";
 
+      system.stateVersion = "24.11";
+
       services.upower = {
         enable = true;
         # the suspend half of HybridSleep still drains and at 3% there is nothing left to drain
