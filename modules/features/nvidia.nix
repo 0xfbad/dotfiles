@@ -19,7 +19,6 @@ _: {
       nvidia = {
         branch = "production";
         open = true;
-        powerManagement.enable = true; # preserve vram across suspend, otherwise the laptop dies on resume
       };
       # cdi passthrough for docker, run containers with --device=nvidia.com/gpu=all
       nvidia-container-toolkit.enable = true;

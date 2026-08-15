@@ -46,6 +46,8 @@
       services.thermald.enable = true;
       services.fwupd.enable = true;
       hardware.nvidia.dynamicBoost.enable = true;
+      # resume dies without it
+      hardware.nvidia.powerManagement.enable = true;
 
       # ppd holds no ac or battery policy of its own, that lives in gnome and kde daemons
       services.udev.extraRules = ''
