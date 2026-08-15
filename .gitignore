@@ -5,3 +5,7 @@ result
 # slopmachine stuff
 !modules/**/*.md
 .direnv/
+
+modules/home/claude-code/skills/
+modules/home/claude-code/hooks/
+modules/home/claude-code/CLAUDE.md

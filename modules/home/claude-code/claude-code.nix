@@ -1,5 +1,10 @@
 _: {
-  flake.modules.homeManager.claude-code = { pkgs, ... }: {
+  flake.modules.homeManager.claude-code = { config, pkgs, ... }: {
+    home.file.".claude/CLAUDE.md".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/modules/home/claude-code/CLAUDE.md";
+    home.file.".claude/skills".source =
+      config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/modules/home/claude-code/skills";
+
     programs.claude-code = {
       enable = true;
       package = pkgs.claude-code;
@@ -52,10 +57,6 @@ _: {
           repo = "anthropics/claude-code";
         };
       };
-
-      context = ./CLAUDE.md;
-
-      skills = ./skills;
     };
   };
 }
