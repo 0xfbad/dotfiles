@@ -14,6 +14,26 @@
       # gnome-keyring from niri-flake claims org.freedesktop.secrets before keepassxc fdosecrets can
       services.gnome.gnome-keyring.enable = lib.mkForce false;
 
+      # hypridle cannot delay suspend on niri
+      systemd.services.lock-before-sleep = {
+        description = "Lock sessions before sleep";
+        before = [ "sleep.target" ];
+        wantedBy = [ "sleep.target" ];
+        serviceConfig.Type = "oneshot";
+        path = [
+          pkgs.systemd
+          pkgs.procps
+          pkgs.coreutils
+        ];
+        script = ''
+          loginctl lock-sessions
+          for _ in $(seq 20); do
+            if pgrep -x hyprlock >/dev/null; then exit 0; fi
+            sleep 0.1
+          done
+        '';
+      };
+
       # the gnome portal file chooser is broken, add gtk and route choosers to it
       xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
       xdg.portal.config.niri = {

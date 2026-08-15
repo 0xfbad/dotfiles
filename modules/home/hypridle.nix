@@ -31,6 +31,7 @@ _: {
           general = {
             # the logind Lock signal is the single lock path, keepassxc and Mod+Escape use it too
             lock_cmd = "${lock}";
+            # ordering is in niri.nix
             before_sleep_cmd = "${loginctl} lock-session";
             after_sleep_cmd = "${niri} msg action power-on-monitors";
           };
