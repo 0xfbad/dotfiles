@@ -169,7 +169,8 @@ _: {
         arguments = [
           "--smart-case"
           "--hidden"
-          "--glob=!.git/*"
+          # an inner slash would root anchor the glob
+          "--glob=!.git/"
           "--max-columns=150"
           "--max-columns-preview"
         ];
@@ -183,6 +184,7 @@ _: {
           ".git/"
           "node_modules/"
           "result"
+          "result-*"
         ];
       };
 

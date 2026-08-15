@@ -10,6 +10,7 @@ _: {
       includes = [ "~/.ssh/config.d/*" ];
       settings."*" = {
         AddKeysToAgent = "yes";
+        SetEnv.TERM = "xterm-256color";
         ControlMaster = "auto"; # most goated feature of ssh btw
         ControlPath = "~/.ssh/master-%C";
         ControlPersist = "600";

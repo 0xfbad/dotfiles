@@ -65,7 +65,6 @@ _: {
           setOptions = [
             "ALWAYS_TO_END"
             "AUTO_CD"
-            "AUTO_MENU"
             "AUTO_PUSHD"
             "COMPLETE_IN_WORD"
             "HIST_REDUCE_BLANKS"
@@ -103,7 +102,7 @@ _: {
             open = "xdg-open";
             lint = "nix flake check ~/dotfiles";
             rebuild = "nix flake check ~/dotfiles && nh os switch";
-            update = "nix flake check ~/dotfiles && nh os switch -u";
+            update = "nix flake update --flake ~/dotfiles && nix flake check ~/dotfiles && nh os switch";
             gc = "nh clean all --keep 3 --keep-since 7d";
             cc = "claude --dangerously-skip-permissions";
             qalc = "qalc -s 'autocalc' -s 'decimal comma off'";
