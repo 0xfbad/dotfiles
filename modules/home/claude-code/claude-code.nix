@@ -29,9 +29,13 @@ _: {
         };
 
         permissions = {
-          allow = [ ];
-          deny = [ ];
-          ask = [ ];
+          deny = [
+            "Read(./.env)"
+            "Read(./.env.*)"
+            "Read(//home/fbad/.config/sops/age/**)"
+            "Read(**/id_ed25519*)"
+            "Read(**/*.pem)"
+          ];
           defaultMode = "auto";
         };
 
