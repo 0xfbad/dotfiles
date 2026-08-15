@@ -202,7 +202,8 @@ in
       hardware.bluetooth.settings = {
         General = {
           FastConnectable = true;
-          JustWorksRepairing = "always";
+          # always allows silent bond replacement
+          JustWorksRepairing = "confirm";
           # bluez gates the battery service behind this flag, the waybar battery tooltip reads it
           Experimental = true;
         };
@@ -213,10 +214,9 @@ in
           ConnectionLatency = 0;
         };
       };
-      # xpadneo pairing pin workaround, relaxes hid bonding for every classic device
       hardware.bluetooth.input.General = {
         UserspaceHID = true;
-        ClassicBondedOnly = false;
+        # ClassicBondedOnly = false fixes pad pairing but reopens cve-2023-45866
       };
 
       # firmware 5.09 drops reconnects after sleep, fix is the xbox accessories app then repairing
