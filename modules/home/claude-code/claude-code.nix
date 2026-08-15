@@ -52,10 +52,6 @@ _: {
 
         enabledPlugins."frontend-design@claude-plugins-official" = true;
 
-        extraKnownMarketplaces.claude-code-plugins.source = {
-          source = "github";
-          repo = "anthropics/claude-code";
-        };
       };
     };
   };
