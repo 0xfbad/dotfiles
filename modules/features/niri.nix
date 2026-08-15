@@ -73,11 +73,16 @@
           text = ''
             pgrep -x wayfreeze > /dev/null && exit 0
 
-            wayfreeze --hide-cursor &
+            # a fixed sleep raced the freeze layer
+            SYNC=$(mktemp -u)
+            wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
             FREEZE=$!
             # without a trap any later failure leaves the frozen overlay covering the session
-            trap 'kill "$FREEZE" 2>/dev/null || true' EXIT
-            sleep 0.1
+            trap 'kill "$FREEZE" 2>/dev/null || true; rm -f "$SYNC"' EXIT
+            for _ in $(seq 50); do
+              [ -e "$SYNC" ] && break
+              sleep 0.01
+            done
 
             # shellcheck disable=SC2086
             GEOM=$(slurp ''${SLURP_ARGS:-}) || exit 0
@@ -100,17 +105,22 @@
           text = ''
             pgrep -x wayfreeze > /dev/null && exit 0
 
-            wayfreeze --hide-cursor &
+            # a fixed sleep raced the freeze layer
+            SYNC=$(mktemp -u)
+            wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
             FREEZE=$!
             unfreeze() { kill "$FREEZE" 2>/dev/null || true; }
-            trap unfreeze EXIT
-            sleep 0.1
+            trap 'unfreeze; rm -f "$SYNC"' EXIT
+            for _ in $(seq 50); do
+              [ -e "$SYNC" ] && break
+              sleep 0.01
+            done
 
             # shellcheck disable=SC2086
             GEOM=$(slurp ''${SLURP_ARGS:-}) || exit 0
 
             TMP=$(mktemp --suffix=.png)
-            trap 'unfreeze; rm -f "$TMP"' EXIT
+            trap 'unfreeze; rm -f "$TMP" "$SYNC"' EXIT
 
             grim -g "$GEOM" "$TMP"
             unfreeze
