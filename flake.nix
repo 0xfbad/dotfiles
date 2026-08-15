@@ -41,6 +41,10 @@
       url = "github:Gerg-L/spicetify-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # main matches home-manager master, no follows since ports are cached against catppuccin pkgs
     catppuccin.url = "github:catppuccin/nix/main";
     # no nixpkgs follows and release tags only, both keep vicinae cachix hits
