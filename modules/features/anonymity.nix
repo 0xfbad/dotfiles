@@ -21,7 +21,24 @@ _: {
         netprobe_address = "9.9.9.9:53";
         netprobe_timeout = 10;
 
-        dnscrypt_servers = false;
+        dnscrypt_servers = true;
+        # anonymized dns is dnscrypt only
+        doh_servers = false;
+        anonymized_dns = {
+          # otherwise unrelayable servers go direct
+          skip_incompatible = true;
+          # unrelated operators
+          routes = [
+            {
+              server_name = "*";
+              via = [
+                "anon-cs-de"
+                "anon-kama"
+                "anon-dnswarden-swiss"
+              ];
+            }
+          ];
+        };
         require_dnssec = true;
 
         # quic only where alt-svc advertises it, http3_probe stays off since it slows servers without h3
