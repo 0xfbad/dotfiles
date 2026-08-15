@@ -21,6 +21,11 @@ _: {
         cleanupPeriodDays = 5;
         askUserQuestionTimeout = "5m";
 
+        attribution = {
+          commit = "";
+          pr = "";
+        };
+
         env = {
           # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"; # good but disables /remote-control :(
           DISABLE_ERROR_REPORTING = "1";
