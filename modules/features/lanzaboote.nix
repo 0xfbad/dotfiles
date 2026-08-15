@@ -11,8 +11,8 @@
       configurationLimit = 5;
       # the systemd-boot bootCounting.tries default, carried across the move
       bootCounting.initialTries = 3;
-      # keys generate on next boot not at switch, allowUnsigned follows so the unsigned pass boots
-      autoGenerateKeys.enable = true;
+      # implies allowUnsigned
+      autoGenerateKeys.enable = false;
     };
 
     # sbctl reads /etc/sbctl/sbctl.conf, which the module writes
