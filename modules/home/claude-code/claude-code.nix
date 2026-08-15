@@ -52,6 +52,17 @@ _: {
 
         enabledPlugins."frontend-design@claude-plugins-official" = true;
 
+        hooks.PreToolUse = [
+          {
+            matcher = "Bash";
+            hooks = [
+              {
+                type = "command";
+                command = "${config.home.homeDirectory}/dotfiles/modules/home/claude-code/hooks/git-guard.sh";
+              }
+            ];
+          }
+        ];
       };
     };
   };
