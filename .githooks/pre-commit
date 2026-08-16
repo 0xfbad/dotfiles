@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+command -v prompts-pack >/dev/null 2>&1 || exit 0
+[ "$(prompts-pack)" = packed ] || exit 0
+git add secrets/prompts.age
