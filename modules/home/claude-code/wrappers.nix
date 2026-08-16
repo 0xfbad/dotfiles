@@ -2,7 +2,6 @@ _: {
   flake.modules.homeManager.claude-wrappers =
     { pkgs, ... }:
     let
-      # impure so secretspec set needs no rebuild
       manifest = "/home/fbad/dotfiles/secretspec.toml";
 
       # secretspec demands --reason inside agents
@@ -26,7 +25,6 @@ _: {
         pkgs.secretspec
 
         # secretspec set MOONSHOT_API_KEY --reason setup first
-        # verify the provider with /status, not /model
         (mkClaudeWrapper "claude-kimi" ''
           ${getToken "claude-kimi" "MOONSHOT_API_KEY"}
           # kimi membership uses https://api.kimi.com/coding/ and a console key
@@ -38,16 +36,14 @@ _: {
           export ANTHROPIC_DEFAULT_FABLE_MODEL="kimi-k3[1m]"
           export CLAUDE_CODE_SUBAGENT_MODEL="kimi-k3[1m]"
           export CLAUDE_CODE_AUTO_COMPACT_WINDOW="1000000"
-          # moonshot prescribes max
           export CLAUDE_CODE_EFFORT_LEVEL="max"
           export API_TIMEOUT_MS="900000"
           unset ANTHROPIC_API_KEY
         '')
 
         # secretspec set OPENROUTER_API_KEY --reason setup first
-        # model slugs move, recheck with curl -s https://openrouter.ai/api/v1/models | jq -r '.data[].id' | grep openai
-        (mkClaudeWrapper "claude-gpt" ''
-          ${getToken "claude-gpt" "OPENROUTER_API_KEY"}
+        (mkClaudeWrapper "claude-openrouter" ''
+          ${getToken "claude-openrouter" "OPENROUTER_API_KEY"}
           # not /api/v1, claude appends /v1/messages itself
           export ANTHROPIC_BASE_URL="https://openrouter.ai/api"
           export ANTHROPIC_API_KEY=""
@@ -59,11 +55,11 @@ _: {
           export CLAUDE_CODE_SUBAGENT_MODEL="openai/gpt-5.6-luna"
         '')
 
-        # subscription oauth gateway
         # cli-proxy-api --codex-login or --kimi-login first
-        (mkClaudeWrapper "claude-cpa" ''
+        (mkClaudeWrapper "claude-proxy" ''
           export ANTHROPIC_BASE_URL="http://127.0.0.1:8317"
           export ANTHROPIC_AUTH_TOKEN="local-dev-key"
+          export CLAUDE_CODE_ENABLE_GATEWAY_MODEL_DISCOVERY="1"
           unset ANTHROPIC_API_KEY
         '')
       ];

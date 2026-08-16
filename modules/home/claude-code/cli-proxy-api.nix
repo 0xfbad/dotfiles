@@ -5,7 +5,6 @@
       cli-proxy-api = inputs.llm-agents.packages.${pkgs.stdenv.hostPlatform.system}.cli-proxy-api;
     in
     {
-      # cli for the oauth logins
       home.packages = [ cli-proxy-api ];
 
       home.file.".cli-proxy-api/config.yaml".text = ''
