@@ -19,7 +19,7 @@ Some inspirations:
 - [starship](https://starship.rs) prompt with the jj change id inline
 - [carapace](https://carapace.sh) completions for hundreds of clis from one binary, same behavior in every shell
 - [vicinae](https://github.com/vicinaehq/vicinae) over rofi, raycast style launcher with nix search and clipboard history
-- [determinate nix](https://github.com/DeterminateSystems/determinate) with nh, channels killed, registry pinned to the lockfile
+- [nh](https://github.com/nix-community/nh) over nixos-rebuild, channels killed, registry pinned to the lockfile
 - [yazi](https://github.com/sxyazi/yazi) over ranger, async previews
 - [comma](https://github.com/nix-community/comma), `, cowsay` runs uninstalled tools from the binary cache
 - [tealdeer](https://github.com/tealdeer-rs/tealdeer) over man, `batman` for the full page
@@ -36,22 +36,21 @@ Other bits:
 
 - lanzaboote secure boot, tpm2 luks unlock, hibernate to encrypted swap
 - keepassxc as the secrets provider, fdosecrets, ssh agent, with browser integrations
-- dnscrypt-proxy doh and tor/i2p
+- secretspec + age for api keys, encrypted blob for slop skills
+- dnscrypt-proxy through anonymized relays, tor/i2p
 - oled black catppuccin theme, palette in `colors.nix`
 - declarative firefox and thunderbird profiles
 - scx_lavd scheduler, zram + systemd-oomd
 - dev tooling in a flake partition (consumers never evaluate treefmt, statix or git hooks)
-- screenshots via wayfreeze + slurp, wl-screenrec for quick recordings
+- screenshots via wayfreeze + slurp, gpu-screen-recorder for quick recordings
 - winboat for windows apps
 
 ## stealing this
 
 Clone to `~/dotfiles`, grep for `fbad`, swap in your username. Copy a host dir, regenerate the hardware config, import the features you want. `nh os switch` and pray
 
-First rebuild needs the determinate cache, and `boot` not `switch` since it swaps dbus:
+First rebuild will need `boot` instead of `switch` since it swaps dbus:
 
 ```
-sudo nixos-rebuild boot --flake ~/dotfiles \
-  --option extra-substituters https://install.determinate.systems \
-  --option extra-trusted-public-keys "cache.flakehub.com-3:hJuILl5sVK4iKm86JzgdXW12Y2Hwd5G07qKtHTOcDCM="
+sudo nixos-rebuild boot --flake ~/dotfiles
 ```
