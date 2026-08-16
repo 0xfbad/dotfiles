@@ -15,9 +15,4 @@ _: {
         false;
     };
   };
-
-  flake.modules.homeManager.audio = _: {
-    # no preset chain here, make one in the gui, then copy the json into extraPresets
-    services.easyeffects.enable = true;
-  };
 }
