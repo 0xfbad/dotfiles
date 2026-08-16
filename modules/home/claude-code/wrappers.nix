@@ -25,8 +25,8 @@ _: {
         pkgs.secretspec
 
         # secretspec set MOONSHOT_API_KEY --reason setup first
-        (mkClaudeWrapper "claude-kimi" ''
-          ${getToken "claude-kimi" "MOONSHOT_API_KEY"}
+        (mkClaudeWrapper "claude-moonshot" ''
+          ${getToken "claude-moonshot" "MOONSHOT_API_KEY"}
           # kimi membership uses https://api.kimi.com/coding/ and a console key
           export ANTHROPIC_BASE_URL="https://api.moonshot.ai/anthropic"
           export ANTHROPIC_MODEL="kimi-k3[1m]"
