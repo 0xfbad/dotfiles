@@ -31,7 +31,7 @@
           '';
         });
 
-      # only the ports whiskers renders, opencode and vivid just name a theme the app carries
+      # only the ports whiskers renders, vivid just names a theme the app carries
       oledPorts = [
         "broot"
         "eza"
@@ -67,7 +67,6 @@
         imv.enable = true;
         mpv.enable = true;
         obs.enable = true;
-        opencode.enable = true;
         vesktop.enable = true;
         vivid.enable = true;
         zathura.enable = true;

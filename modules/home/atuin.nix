@@ -20,7 +20,6 @@ _: {
         history_filter = [
           "^claude"
           "^cc(\\s|$)"
-          "^opencode"
           "\\.claude"
           "CLAUDE\\.md"
         ];

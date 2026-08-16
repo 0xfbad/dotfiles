@@ -12,7 +12,6 @@ _: {
         telemetry.mode = "off";
       };
 
-      opencode.enable = true;
       nix-search-tv.enable = true;
     };
 
