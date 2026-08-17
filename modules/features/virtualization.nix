@@ -35,6 +35,12 @@ _: {
       allowedTCPPorts = [ 53 ];
     };
 
+    # each project via compose will have its own br-<id> bridgem, firewall.interfaces sets an unquoted iifname so it cant take the wildcard
+    networking.firewall.extraInputRules = ''
+      iifname "br-*" ip daddr 172.17.0.1 udp dport 53 accept
+      iifname "br-*" ip daddr 172.17.0.1 tcp dport 53 accept
+    '';
+
     # dnscrypt binds 172.17.0.1 before docker0 exists
     boot.kernel.sysctl."net.ipv4.ip_nonlocal_bind" = 1;
 
