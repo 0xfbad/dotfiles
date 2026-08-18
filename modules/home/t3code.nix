@@ -15,12 +15,9 @@ _: {
           enableClaude = true;
           # keep the bundled claude on the same build programs.claude-code manages
           claude-code = config.programs.claude-code.finalPackage;
-          enableCodex = false;
           enableJujutsu = true;
           enableOpencode = true;
         };
-        # codex defaults on in the settings schema, the binary would be advertised but missing
-        userSettings.providers.codex.enabled = false;
       };
     };
 }
