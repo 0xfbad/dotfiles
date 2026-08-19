@@ -1,4 +1,4 @@
-{ self, ... }: {
+{ self, inputs, ... }: {
   flake.modules.nixos.laptopConfiguration =
     {
       pkgs,
@@ -7,6 +7,7 @@
     }:
     {
       imports = [
+        inputs.windows-stealth.nixosModules.default
         self.modules.nixos.laptopHardware
         self.modules.nixos.lanzaboote
         self.modules.nixos.common
@@ -23,6 +24,11 @@
       ];
 
       networking.hostName = "laptop";
+
+      services.windows-stealth = {
+        enable = true;
+        users = [ "fbad" ];
+      };
 
       system.stateVersion = "24.11";
 
