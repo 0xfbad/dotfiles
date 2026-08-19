@@ -75,6 +75,7 @@ _: {
           promptSuggestionEnabled = true;
           skipDangerousModePermissionPrompt = true;
           switchModelsOnFlag = false;
+          remoteControlAtStartup = false;
 
           cleanupPeriodDays = 5;
           askUserQuestionTimeout = "5m";
