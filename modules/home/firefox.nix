@@ -219,6 +219,8 @@ _: {
 
             "browser.newtabpage.enabled" = false;
             "browser.startup.homepage" = "about:blank";
+            # auto restore session
+            "browser.startup.page" = 3;
             "browser.newtabpage.activity-stream.telemetry" = false;
             "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
             "browser.newtabpage.activity-stream.feeds.section.highlights" = false;
