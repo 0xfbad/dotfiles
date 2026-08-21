@@ -469,10 +469,6 @@
             action = toggle-column-tabbed-display;
             hotkey-overlay.title = "Tabbed column";
           };
-          "Mod+Shift+Q" = {
-            action = quit;
-            hotkey-overlay.title = "Exit niri";
-          };
           "Mod+Backslash" = {
             action = toggle-overview;
             hotkey-overlay.title = "Overview";
