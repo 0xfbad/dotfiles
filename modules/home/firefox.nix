@@ -325,6 +325,9 @@ _: {
             "extensions.getAddons.showPane" = false;
             "browser.discovery.enabled" = false;
 
+            "accessibility.browsewithcaret" = false;
+            "accessibility.browsewithcaret_shortcut.enabled" = false;
+
             # apis that leak info
             # gamepad api allows usb device enumeration
             "dom.gamepad.enabled" = false;
