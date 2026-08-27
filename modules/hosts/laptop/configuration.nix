@@ -88,15 +88,22 @@
       environment.sessionVariables.LIBVA_DRIVER_NAME = lib.mkForce "iHD";
 
       # render on the dGPU so the external skips the iGPU to dGPU copy
-      home-manager.users.fbad.programs.niri.settings.debug.render-drm-device =
-        "/dev/dri/by-path/pci-0000:01:00.0-render";
+      home-manager.users.fbad.programs.niri.settings = {
+        debug.render-drm-device = "/dev/dri/by-path/pci-0000:01:00.0-render";
+        outputs."HDMI-A-2" = {
+          mode = {
+            width = 3440;
+            height = 1440;
+            refresh = 240.085;
+          };
+          scale = 1.0;
+        };
+      };
 
       # modules.nixos.lanzaboote owns the systemd-boot config, lzbt does the installing
       boot.loader.efi.canTouchEfiVariables = true;
       boot.loader.timeout = 0;
       # keep flaky dell ucsi errors off the greeter tty, crit and above still print
       boot.consoleLogLevel = 3;
-
-      # default lts kernel on purpose, nvidia and out of tree modules lag newer kernels and block rebuilds
     };
 }
