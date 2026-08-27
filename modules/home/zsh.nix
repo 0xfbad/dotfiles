@@ -146,99 +146,15 @@ _: {
             '';
 
             greet = ''
-              local hour=$(date +%H)
-              local day=$(date +%u)
-              local greetings
-
-              if (( hour >= 5 && hour < 12 )); then
-                greetings=(
-                  "good morning, $USER"
-                  "wakey, wakey, $USER"
-                  "guten morgen, $USER"
-                  "rise and shine, $USER"
-                  "morning, $USER"
-                  "top of the morning to you, $USER"
-                  "have a great day, $USER"
-                  "look alive, $USER"
-                  "$USER returns!"
-                  "back at it, $USER"
-                  "welcome, $USER"
-                  "hey there, $USER"
-                  "hi $USER, how are you?"
-                  "how's it going, $USER?"
-                  "what's new, $USER?"
-                )
-              elif (( hour >= 12 && hour < 17 )); then
-                greetings=(
-                  "hiya, $USER"
-                  "hi, $USER"
-                  "guten tag, $USER"
-                  "good afternoon, $USER"
-                  "howdy, $USER"
-                  "buenos dias, $USER"
-                  "g'day, $USER"
-                  "hello there, $USER"
-                  "$USER returns!"
-                  "back at it, $USER"
-                  "welcome, $USER"
-                  "hey there, $USER"
-                  "hi $USER, how are you?"
-                  "how's it going, $USER?"
-                  "what's new, $USER?"
-                )
-              elif (( hour >= 17 && hour < 22 )); then
-                greetings=(
-                  "good evening, $USER"
-                  "evening, $USER"
-                  "nice to see you, $USER"
-                  "hellooooo, $USER"
-                  "enjoy the rest of your evening, $USER"
-                  "fancy seeing you here, $USER"
-                  "hi there, $USER"
-                  "$USER returns!"
-                  "back at it, $USER"
-                  "welcome, $USER"
-                  "hey there, $USER"
-                  "how was your day, $USER?"
-                  "how's it going, $USER?"
-                  "winding down, $USER?"
-                  "evening vibes, $USER"
-                )
-              else
-                greetings=(
-                  "$USER, you night owl"
-                  "hey $USER, it's late. time to rest"
-                  "burning the midnight oil, $USER?"
-                  "late night coding session, $USER?"
-                  "$USER, the terminal never sleeps"
-                  "can't sleep, $USER?"
-                  "shh, everyone else is asleep, $USER"
-                  "just you and the machines, $USER"
-                  "night shift, $USER?"
-                  "welcome to the graveyard shift, $USER"
-                  "$USER, the code flows better at night"
-                  "fancy seeing you here, $USER"
-                  "hey $USER, sleep is for the weak"
-                  "another late one, $USER?"
-                  "midnight hacking, $USER?"
-                  "$USER after dark"
-                  "the witching hour, $USER"
-                  "hey $USER, the bugs come out at night"
-                )
+              local hour=$(date +%H) bucket
+              if (( hour >= 5 && hour < 12 )); then bucket=morning
+              elif (( hour < 17 )); then bucket=afternoon
+              elif (( hour < 22 )); then bucket=evening
+              else bucket=night
               fi
-
-              case $day in
-                1) greetings+=("happy monday, $USER") ;;
-                2) greetings+=("happy tuesday, $USER") ;;
-                3) greetings+=("happy wednesday, $USER") ;;
-                4) greetings+=("happy thursday, $USER") ;;
-                5) greetings+=("that friday feeling, $USER" "happy friday, $USER") ;;
-                6) greetings+=("happy saturday, $USER" "welcome to the weekend, $USER") ;;
-                7) greetings+=("happy sunday, $USER" "sunday session, $USER?") ;;
-              esac
-
-              local idx=$((RANDOM % ''${#greetings[@]} + 1))
-              print -r -- "''${greetings[$idx]}"
+              local line="$(jq -r --arg b "$bucket" --arg d "''${(L)$(date +%A)}" \
+                '.any + .[$b] + .days[$d] | .[]' ${./zsh-greetings.json} | shuf -n1)"
+              print -r -- "''${line//\{name\}/$USER}"
             '';
           };
 
