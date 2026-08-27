@@ -67,7 +67,7 @@
         imv.enable = true;
         mpv.enable = true;
         obs.enable = true;
-        vesktop.enable = true;
+        # vesktop is themed from a patched local build in home/vesktop.nix
         vivid.enable = true;
         zathura.enable = true;
         zsh-syntax-highlighting.enable = true;
