@@ -69,6 +69,7 @@ _: {
 
         settings = {
           model = "fable";
+          outputStyle = "Concise";
           includeCoAuthoredBy = false;
           disableArtifact = true;
           alwaysThinkingEnabled = true;
