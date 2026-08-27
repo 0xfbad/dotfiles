@@ -26,11 +26,17 @@
       # build neutral, overlays.niri builds against our nixpkgs either way
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    rust-overlay = {
+      url = "github:oxalica/rust-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
       # upstream only vendors it for its own devshell, follow so it drops out of the lock
       inputs.pre-commit.follows = "nixpkgs";
+      # upstream pin predates the stdenv.isLinux deprecation, follow to silence eval warns
+      inputs.rust-overlay.follows = "rust-overlay";
     };
     plasma-manager = {
       url = "github:nix-community/plasma-manager";

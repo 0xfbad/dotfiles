@@ -25,6 +25,8 @@ _: {
           openSha256 = "sha256-pEmA2tUcOKwUPKy6N0QvS49Pdut4/7Phs/JhjdyBcNY=";
           settingsSha256 = "sha256-QrnBM+sdWO4GanO62rxpHmRrjYkYpl5RD6fIiHq4C4A=";
           persistencedSha256 = "sha256-50xYdgx7EEThbaMp4QS8GADbxj0mhBXh8QQN0tWMwRg=";
+          # cachyos compat patch, 595 predates the 7.2 strncpy removal
+          patchesOpen = [ ./nvidia-kernel-7.2.patch ];
         };
         open = true;
       };

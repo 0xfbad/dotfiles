@@ -189,7 +189,9 @@
         "pre-commit": [
           "nixpkgs"
         ],
-        "rust-overlay": "rust-overlay"
+        "rust-overlay": [
+          "rust-overlay"
+        ]
       },
       "locked": {
         "lastModified": 1782141370,
@@ -503,6 +505,7 @@
         "nixpkgs": "nixpkgs_2",
         "ouch": "ouch",
         "plasma-manager": "plasma-manager",
+        "rust-overlay": "rust-overlay",
         "spicetify": "spicetify",
         "vicinae": "vicinae",
         "vicinae-extensions": "vicinae-extensions",
@@ -513,16 +516,15 @@
     "rust-overlay": {
       "inputs": {
         "nixpkgs": [
-          "lanzaboote",
           "nixpkgs"
         ]
       },
       "locked": {
-        "lastModified": 1782012058,
-        "narHash": "sha256-9mWUnReOUXfKjZuJAL/bAFH3LUyECTRtXgSNVjRw3UY=",
+        "lastModified": 1787834454,
+        "narHash": "sha256-jXSvqn04IOecJCvSvl8+g3PsbDVNP6qKs6dKUs/b16k=",
         "owner": "oxalica",
         "repo": "rust-overlay",
-        "rev": "8534567325bd8a8d2928e6afd81e0a87d19efd3c",
+        "rev": "dc2fd1acc537f3583744e1373597a5731ff7a6e3",
         "type": "github"
       },
       "original": {

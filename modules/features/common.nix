@@ -85,6 +85,8 @@ in
 
       # bootloader is per host, no quiet boot, greetd covers the scrolling logs
 
+      boot.kernelPackages = pkgs.linuxPackages_latest;
+
       # obs virtual camera needs a loopback device, out of tree so it can hold back a kernel bump
       boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
       boot.kernelModules = [ "v4l2loopback" ];
