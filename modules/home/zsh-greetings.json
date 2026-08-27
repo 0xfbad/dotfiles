@@ -53,6 +53,7 @@
   ],
   "afternoon": [
     "good afternoon, {name}",
+    "afternoon, {name}",
     "guten tag, {name}",
     "buenos dias, {name}",
     "g'day, {name}",
@@ -65,6 +66,7 @@
     "good evening, {name}",
     "evening, {name}",
     "evening vibes, {name}",
+    "golden hour thinking",
     "konbanwa, {name}",
     "nice to see you, {name}",
     "hellooooo, {name}",
@@ -92,7 +94,10 @@
     "{name} after dark",
     "the witching hour, {name}",
     "hey {name}, the bugs come out at night",
-    "what's on your mind tonight?"
+    "what's on your mind tonight?",
+    "it's late-night, {name}",
+    "moonlit chat?",
+    "what shall we think through?"
   ],
   "days": {
     "monday": ["happy monday, {name}"],
