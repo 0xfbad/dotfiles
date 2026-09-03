@@ -33,6 +33,7 @@ _: {
           on_force_close = "quit";
           # nothing survives a window close, so serializing sessions is pure waste
           session_serialization = false;
+          scroll_mode_sync = false;
           # off still lets a session opt in at runtime, disabled forbids it
           web_server = false;
           web_sharing = "disabled";
