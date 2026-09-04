@@ -59,15 +59,6 @@
     let
       c = config.colors;
 
-      copilotControl = lib.getExe (
-        pkgs.writeShellApplication {
-          name = "copilot-control";
-          text = ''
-            exec "${config.home.homeDirectory}/git/copilot/target/debug/copilotctl" "$@"
-          '';
-        }
-      );
-
       screenshotArea = lib.getExe (
         pkgs.writeShellApplication {
           name = "screenshot-area";
@@ -381,18 +372,6 @@
             };
           }
           {
-            matches = [ { app-id = "^dev\\.copilot\\.Overlay$"; } ];
-            open-floating = true;
-            draw-border-with-background = false;
-            border.enable = false;
-            block-out-from = "screen-capture";
-            default-floating-position = {
-              x = 0;
-              y = 48;
-              relative-to = "top";
-            };
-          }
-          {
             # zoom is xwayland, float only its popups so the main and meeting windows stay tiled
             matches = [
               {
@@ -422,12 +401,6 @@
         ];
 
         binds = with config.lib.niri.actions; {
-          "Mod+A" = {
-            action = spawn copilotControl "capture";
-            hotkey-overlay.title = "Copilot";
-            repeat = false;
-          };
-
           "Mod+Return" = {
             action = spawn (lib.getExe pkgs.wezterm);
             hotkey-overlay.title = "Terminal";
