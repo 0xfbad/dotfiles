@@ -87,6 +87,10 @@ in
 
       boot.kernelPackages = pkgs.linuxPackages_latest;
 
+      # 7.2 split locks a misaligned skb dataref, dumps land in pstore
+      boot.kernelParams = [ "split_lock_detect=warn" ];
+      boot.kernel.sysctl."kernel.panic" = 10;
+
       # obs virtual camera needs a loopback device, out of tree so it can hold back a kernel bump
       boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
       boot.kernelModules = [ "v4l2loopback" ];

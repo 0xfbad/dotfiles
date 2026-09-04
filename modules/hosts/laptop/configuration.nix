@@ -48,6 +48,9 @@
         percentageAction = 3;
       };
 
+      # screens off undocks logind, it then replays the closed lid as suspend
+      services.logind.settings.Login.HandleLidSwitchExternalPower = "ignore";
+
       services.power-profiles-daemon.enable = true;
       services.thermald.enable = true;
       services.fwupd.enable = true;
