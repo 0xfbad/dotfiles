@@ -29,12 +29,12 @@ _: {
           pane_frames = false;
           show_startup_tips = false;
           show_release_notes = false;
-          # quit on window close so detached servers do not pile up, ctrl+o d still detaches
           on_force_close = "quit";
-          # nothing survives a window close, so serializing sessions is pure waste
-          session_serialization = false;
+          session_serialization = true;
+          serialize_pane_viewport = true;
+          scrollback_lines_to_serialize = 1000;
+          serialization_interval = 10;
           scroll_mode_sync = false;
-          # off still lets a session opt in at runtime, disabled forbids it
           web_server = false;
           web_sharing = "disabled";
           scrollback_editor = lib.getExe pkgs.helix;
