@@ -60,28 +60,12 @@ _: {
       age
       sops # encrypts values but leaves yaml and json keys readable for diffs
 
-      # security and pentesting
+      # security, more tooling in ctf flake
       nmap
       strace
-      feroxbuster # web directory bruteforcer
-      burpsuite # web application testing proxy
-      ghidra
       gdb
       gef # exploit dev helpers on top of gdb
       imhex # hex editor with a pattern language
-      exploitdb # searchsploit, offline exploit database
-      # wfuzz # TEMP dropped bc fails on missing pkg_resources under python 3.14
-      (wordlists.override {
-        lists = [
-          nmap
-          rockyou
-          seclists
-        ];
-      })
-      crunch # wordlist generator
-      john # password cracker
-      pwninit # patches a downloaded challenge binary against its libc, writes a solve template
-      pwncat # post exploitation shell handler
       binwalk # firmware analysis, finds embedded files and filesystems
       xxd
       expect # automates interactive cli programs
