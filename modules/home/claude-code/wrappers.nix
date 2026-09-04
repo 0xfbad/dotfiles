@@ -1,12 +1,12 @@
 _: {
   flake.modules.homeManager.claude-wrappers =
-    { pkgs, ... }:
+    { config, pkgs, ... }:
     let
-      manifest = "/home/fbad/dotfiles/secretspec.toml";
+      manifest = "${config.home.homeDirectory}/dotfiles/secretspec.toml";
 
       # secretspec demands --reason inside agents
       getToken = name: secret: ''
-        ANTHROPIC_AUTH_TOKEN="$(SECRETSPEC_FILE=${manifest} secretspec get ${secret} --reason "launching ${name}")"
+        ANTHROPIC_AUTH_TOKEN="$(SECRETSPEC_FILE=${manifest} secretspec get -P default ${secret} --reason "launching ${name}")"
         export ANTHROPIC_AUTH_TOKEN
       '';
 

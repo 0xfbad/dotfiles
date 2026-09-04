@@ -70,6 +70,7 @@ _: {
         settings = {
           model = "fable";
           outputStyle = "Concise";
+          tui = "fullscreen";
           includeCoAuthoredBy = false;
           disableArtifact = true;
           alwaysThinkingEnabled = true;
@@ -98,11 +99,14 @@ _: {
             CLAUDE_CODE_RETRY_WATCHDOG = "1";
           };
 
+          enabledMcpjsonServers = [ "canvas" ];
+
           permissions = {
+            ask = [ "mcp__canvas__delete_*" ];
             deny = [
               "Read(./.env)"
               "Read(./.env.*)"
-              "Read(//home/fbad/.config/sops/age/**)"
+              "Read(~/.config/sops/age/**)"
               "Read(**/id_ed25519*)"
               "Read(**/*.pem)"
             ];
