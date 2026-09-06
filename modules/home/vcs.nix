@@ -1,6 +1,11 @@
 _: {
   flake.modules.homeManager.vcs =
-    { config, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       identity = {
         name = "0xfbad";
@@ -11,13 +16,58 @@ _: {
       signingKeyText = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG/CORmjMr16B7/idRN9cBiHisej26eyEnIe0ULE/Tlt";
       allowedSigners = "${config.xdg.configHome}/git/allowed_signers";
 
+      nixGithubTokenFile = "${config.xdg.configHome}/nix/github-access-token.conf";
+      nixGithubAuthSync = pkgs.writeShellApplication {
+        name = "nix-github-auth-sync";
+        runtimeInputs = [
+          config.programs.gh.package
+          pkgs.coreutils
+        ];
+        text = ''
+          token_file=${lib.escapeShellArg nixGithubTokenFile}
+
+          if ! token="$(gh auth token --hostname github.com 2>/dev/null)"; then
+            if [ -s "$token_file" ]; then
+              echo "no gh token, keeping the existing nix token" >&2
+              exit 0
+            fi
+
+            echo "no gh token, run gh auth login then nix-github-auth-sync" >&2
+            exit 1
+          fi
+
+          install -d -m 700 "$(dirname "$token_file")"
+          temporary="$(mktemp "$token_file.tmp.XXXXXX")"
+          trap 'rm -f "$temporary"' EXIT
+          printf 'access-tokens = github.com=%s\n' "$token" > "$temporary"
+          chmod 600 "$temporary"
+          mv -f "$temporary" "$token_file"
+          trap - EXIT
+          unset token
+        '';
+      };
+
       inherit (config) colors;
     in
     {
+      home.packages = [ nixGithubAuthSync ];
+
       programs.gh = {
         enable = true;
+        gitCredentialHelper.enable = true;
         settings.git_protocol = "ssh";
       };
+
+      # nix.settings would put the token in the store
+      xdg.configFile."nix/nix.conf".text = ''
+        !include ${nixGithubTokenFile}
+      '';
+
+      home.activation.nixGithubAuth = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+        if ! ${lib.getExe nixGithubAuthSync}; then
+          verboseEcho "nix github token not set"
+        fi
+      '';
 
       # registers itself as a gh extension, so this is gh dash
       programs.gh-dash = {
