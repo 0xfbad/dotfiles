@@ -85,6 +85,7 @@ _: {
           attribution = {
             commit = "";
             pr = "";
+            sessionUrl = false;
           };
 
           env = {
