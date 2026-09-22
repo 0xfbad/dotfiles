@@ -221,9 +221,9 @@ _: {
               activated = g "f06e";
               deactivated = g "f070";
             };
-            timeout = 120;
-            tooltip-format-activated = "screenlock off - {timeleft}m left";
-            tooltip-format-deactivated = "screenlock on";
+            timeout = 0;
+            tooltip-format-activated = "screenlock disabled";
+            tooltip-format-deactivated = "screenlock enabled";
           };
         };
 
