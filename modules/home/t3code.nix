@@ -6,15 +6,14 @@ _: {
       ...
     }:
     {
-      # electron app checks for updates it can never install from the store
-      home.sessionVariables.T3CODE_DISABLE_AUTO_UPDATE = "1";
+      home.sessionVariables.T3CODE_DISABLE_AUTO_UPDATE = "1"; # the updater cannot replace a package in the nix store
 
       programs.t3code = {
         enable = true;
         package = pkgs.t3code.override {
           enableClaude = true;
-          # keep the bundled claude on the same build programs.claude-code manages
           claude-code = config.programs.claude-code.finalPackage;
+          codex = config.programs.codex.package;
           enableJujutsu = true;
           enableOpencode = true;
         };
