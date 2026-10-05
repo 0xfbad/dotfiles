@@ -202,6 +202,8 @@ _: {
               zle -N edit-command-line
               bindkey '^X^E' edit-command-line
 
+              bindkey '^X^A' autosuggest-toggle
+
               _ctrl_z_toggle() {
                 if [[ $#BUFFER -eq 0 ]]; then
                   BUFFER="fg"
