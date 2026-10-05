@@ -25,17 +25,14 @@ in
       nix.settings.warn-dirty = false;
       nix.settings.connect-timeout = 10;
       nix.settings.stalled-download-timeout = 30;
-      # the 1 mib default stalls large nars into the timeout above
-      nix.settings.download-buffer-size = 536870912;
+      nix.settings.download-buffer-size = 536870912; # the default buffer stalls large nars into the download timeout
       nix.settings.use-xdg-base-directories = true;
 
-      # single user machine, untrusted users get flake nixConfig ignored with a warning
       nix.settings.trusted-users = [
         "root"
         "fbad"
       ];
 
-      # mirrored from the flake bootstrap nixConfig so the lists cannot drift
       nix.settings.extra-substituters = nixConfig.extra-substituters;
       nix.settings.extra-trusted-public-keys = nixConfig.extra-trusted-public-keys;
       programs.nix-ld.enable = true;
@@ -47,27 +44,21 @@ in
         flake = "/home/fbad/dotfiles";
       };
 
-      # keep build deps in store so nix develop does not redownload after gc
       nix.settings.keep-outputs = true;
 
-      # auto gc when disk gets tight instead of failing during a build
-      nix.settings.min-free = 5368709120; # 5 gb
-      nix.settings.max-free = 21474836480; # 20 gb
+      nix.settings.min-free = 5368709120;
+      nix.settings.max-free = 21474836480;
 
-      # keep-outputs pins every devShell closure, so dedupe the store on a timer
       nix.optimise.automatic = true;
       nix.optimise.dates = [ "weekly" ];
 
-      # no channels or global flake registry, pin inputs so nix run x# resolves from the lockfile
       nix.settings.flake-registry = "";
       nix.channel.enable = false;
-      # nixpkgs and NIX_PATH already come from nixpkgs.flake.setFlakeRegistry
       nix.registry = builtins.mapAttrs (_: flake: { inherit flake; }) (
         removeAttrs inputs [
           "self"
-          "nixpkgs"
-          # not a flake
-          "ouch"
+          "nixpkgs" # supplied by nixpkgs.flake.setFlakeRegistry
+          "ouch" # not a flake
         ]
       );
 
@@ -77,18 +68,13 @@ in
 
       nixpkgs.config.allowUnfree = true;
 
-      # drop the default perl, rsync, strace
       environment.defaultPackages = [ ];
-
-      # bootloader is per host, no quiet boot, greetd covers the scrolling logs
 
       boot.kernelPackages = pkgs.linuxPackages_latest;
 
-      # 7.2 split locks a misaligned skb dataref in irq, warn still panics kernel mode
-      boot.kernelParams = [ "split_lock_detect=off" ];
+      boot.kernelParams = [ "split_lock_detect=off" ]; # kernel 7.2 panics on skb split locks even in warn mode
       boot.kernel.sysctl."kernel.panic" = 10;
 
-      # obs virtual camera needs a loopback device, out of tree so it can hold back a kernel bump
       boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
       boot.kernelModules = [ "v4l2loopback" ];
       boot.extraModprobeConfig = ''
@@ -181,61 +167,48 @@ in
         LC_TIME = "en_US.UTF-8";
       };
 
-      # recovery if polkitd breaks, su with the root password or boot an older generation
-      security.sudo.enable = false;
-      # privilege escalation without a setuid binary, run0 asks polkitd through the agent
+      security.sudo.enable = false; # if polkitd fails, use su or boot an older generation
       security.run0 = {
         enable = true;
-        # keeps sudo working for scripts and the zsh double esc binding, -e -l -k error out
-        sudo-shim.enable = true;
+        sudo-shim.enable = true; # the shim does not support -e -l -k
       };
 
-      # rapl is root gated, the btop watts row stays hidden without these capabilities
       security.wrappers.btop = {
-        # the override has to match modules/home/btop.nix or this builds a second closure
-        source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop";
-        capabilities = "cap_perfmon,cap_dac_read_search+ep";
-        # cap_dac_read_search reads any file
+        source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop"; # must match modules/home/btop.nix to share its closure
+        capabilities = "cap_perfmon,cap_dac_read_search+ep"; # rapl power readings require these capabilities
         owner = "fbad";
         group = "users";
-        permissions = "u+rx";
+        permissions = "u+rx"; # cap_dac_read_search permits reading any file
       };
 
-      # tear down the session on logout so a stale niri socket does not block the next login
-      services.logind.settings.Login.KillUserProcesses = true;
+      services.logind.settings.Login.KillUserProcesses = true; # stale niri sockets block the next login
 
-      # bluetooth needs to be up before greetd for wireless keyboards
       hardware.bluetooth.enable = true;
       hardware.bluetooth.settings = {
         General = {
           FastConnectable = true;
-          # always allows silent bond replacement
-          JustWorksRepairing = "confirm";
-          # bluez gates the battery service behind this flag, the waybar battery tooltip reads it
-          Experimental = true;
+          JustWorksRepairing = "confirm"; # the always setting permits silent bond replacement
+          Experimental = true; # the battery service requires this flag
         };
         LE = {
-          # xpadneo wants 8.75 to 11.25ms to match the controller 100hz protocol
-          MinConnectionInterval = 7;
+          MinConnectionInterval = 7; # the controller polls at 100 hz
           MaxConnectionInterval = 9;
           ConnectionLatency = 0;
         };
       };
       hardware.bluetooth.input.General = {
         UserspaceHID = true;
-        # ClassicBondedOnly = false fixes pad pairing but reopens cve-2023-45866
       };
 
-      # firmware 5.09 drops reconnects after sleep, fix is the xbox accessories app then repairing
-      hardware.xpadneo.enable = true;
-      # nixpkgs xpadneo only runs modules_install, upstream 60-xpadneo.rules restored by hand
-      services.udev.extraRules = ''
-        # the two KERNEL== keys are anded by udev, merged into one they can never match a hid name
-        ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:045E:*", KERNEL=="*:02FD.*|*:02E0.*|*:0B05.*|*:0B13.*|*:0B20.*|*:0B22.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
-        ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:0B05:1ABD.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
-        ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="input", ENV{ID_INPUT_JOYSTICK}=="1", TAG+="uaccess", MODE="0664", ENV{LIBINPUT_IGNORE_DEVICE}="1"
-        ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="hidraw", MODE:="0000", TAG-="uaccess"
-      '';
+      hardware.xpadneo.enable = true; # if reconnects fail after sleep, update firmware in the xbox accessories app and pair again
+      services.udev.extraRules = # nixpkgs omits the upstream xpadneo device rules
+        ''
+          # udev combines separate KERNEL matches with logical and
+          ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:045E:*", KERNEL=="*:02FD.*|*:02E0.*|*:0B05.*|*:0B13.*|*:0B20.*|*:0B22.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
+          ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:0B05:1ABD.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
+          ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="input", ENV{ID_INPUT_JOYSTICK}=="1", TAG+="uaccess", MODE="0664", ENV{LIBINPUT_IGNORE_DEVICE}="1"
+          ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="hidraw", MODE:="0000", TAG-="uaccess"
+        '';
 
       services.printing = {
         enable = true;
@@ -245,7 +218,7 @@ in
         enable = true;
         ui.enable = true;
       };
-      services.udisks2.enable = true; # dolphin needs it to discover and mount removable drives
+      services.udisks2.enable = true;
 
       systemd.packages = [ pkgs.swayosd ];
       systemd.services.swayosd-libinput-backend.wantedBy = [ "graphical.target" ];
@@ -257,13 +230,12 @@ in
       systemd.services.swayosd-libinput-backend.restartTriggers = [
         config.environment.etc."xdg/swayosd/backend.toml".source
       ];
-      # the dbus policy lets root own the name the session server listens on
       services.dbus.packages = [ pkgs.swayosd ];
 
       programs.steam = {
         enable = true;
         protontricks.enable = true;
-        extest.enable = true; # steam input needs x11 events translated to uinput under wayland
+        extest.enable = true;
         extraCompatPackages = with pkgs; [ proton-ge-bin ];
         extraPackages = with pkgs; [ gamescope ];
       };
@@ -277,9 +249,8 @@ in
         package = pkgs.wireshark;
       };
 
-      # dolphin needs this for open with outside plasma
       environment.etc."xdg/menus/applications.menu".source =
-        "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
+        "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu"; # dolphin requires this menu outside plasma
 
       programs.zsh.enable = true;
       users.defaultUserShell = pkgs.zsh;
@@ -287,58 +258,48 @@ in
       environment.variables.EDITOR = "hx";
       environment.variables.VISUAL = "hx";
 
-      # hunspell dictionaries for thunderbird and firefox spell check
       environment.variables.DICPATH = "/run/current-system/sw/share/hunspell";
 
-      # wayland env vars for electron apps
       environment.sessionVariables.NIXOS_OZONE_WL = "1";
 
       systemd.settings.Manager = {
         DefaultTimeoutStopSec = "5s";
         StatusUnitFormat = "combined";
-        RuntimeWatchdogSec = "15"; # hard reset on hang
-        RebootWatchdogSec = "30"; # wait for clean reboot
-        KExecWatchdogSec = "60"; # wait for kexec
+        RuntimeWatchdogSec = "15";
+        RebootWatchdogSec = "30";
+        KExecWatchdogSec = "60";
       };
 
-      # oomd does nothing without slice settings, these tell it what to watch
       systemd.oomd = {
         enableRootSlice = true;
         enableSystemSlice = true;
         enableUserSlices = true;
       };
 
-      # oomd has nothing to reclaim without swap, neither host has a swap partition
       zramSwap.enable = true;
 
-      # the kernel watchdog ejects a misbehaving sched_ext scheduler back to eevdf
       services.scx.enable = true;
-      # latency first and hybrid core aware
       services.scx.scheduler = "scx_lavd";
 
-      # redundant with declarative fileSystems, and it logs spurious dissect errors during rebuild
-      systemd.generators.systemd-gpt-auto-generator = "/dev/null";
+      systemd.generators.systemd-gpt-auto-generator = "/dev/null"; # autodetection causes dissect errors with declarative mounts
 
       services.xserver.xkb.options = "caps:escape";
       console.useXkbConfig = true;
 
-      # scoped enables matching modules/home/catppuccin.nix
       catppuccin = {
         enable = true;
         autoEnable = false;
         flavor = "mocha";
-        # covers the bare vt before greetd, the emergency shell and early boot
         tty.enable = true;
       };
 
-      # slot 0 paints the vt background, mocha base glows grey on oled so true black instead
       console.colors =
         let
           palette = (lib.importJSON "${config.catppuccin.sources.palette}/palette.json").mocha.colors;
           hex = name: lib.substring 1 6 palette.${name}.hex;
         in
         lib.mkForce (
-          [ "000000" ]
+          [ "000000" ] # true black avoids gray backgrounds on oled
           ++ map hex [
             "red"
             "green"
@@ -358,7 +319,6 @@ in
           ]
         );
 
-      # system level so defaultFonts resolves for every process, not just the fbad profile
       fonts.packages = with pkgs; [
         nerd-fonts.jetbrains-mono
         material-symbols
@@ -405,12 +365,10 @@ in
       };
     };
 
-  # nix records accepted nixConfig here, preseeding it stops the prompt direnv hits on fresh evals
   flake.modules.homeManager.nix-trusted-settings = {
-    # readonly symlink, trust answers for other flakes will not persist, transient y still works
     xdg.dataFile."nix/trusted-settings.json" = {
       force = true;
-      text = builtins.toJSON (builtins.mapAttrs (_: value: { ${toString value} = true; }) nixConfig);
+      text = builtins.toJSON (builtins.mapAttrs (_: value: { ${toString value} = true; }) nixConfig); # trust answers for other flakes cannot persist through this readonly symlink
     };
   };
 }

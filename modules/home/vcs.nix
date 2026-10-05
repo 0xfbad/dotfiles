@@ -58,10 +58,7 @@ _: {
         settings.git_protocol = "ssh";
       };
 
-      # nix.settings would put the token in the store
-      xdg.configFile."nix/nix.conf".text = ''
-        !include ${nixGithubTokenFile}
-      '';
+      xdg.configFile."nix/nix.conf".text = "!include ${nixGithubTokenFile}\n"; # nix.settings would put the token in the store
 
       home.activation.nixGithubAuth = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         if ! ${lib.getExe nixGithubAuthSync}; then
@@ -69,7 +66,6 @@ _: {
         fi
       '';
 
-      # registers itself as a gh extension, so this is gh dash
       programs.gh-dash = {
         enable = true;
         settings = {
@@ -92,7 +88,6 @@ _: {
         };
       };
 
-      # ssh signing has no keyring to consult, reads this instead
       xdg.configFile."git/allowed_signers".text = ''
         ${identity.email} namespaces="git" ${signingKeyText}
       '';
@@ -152,7 +147,6 @@ _: {
         jujutsu.enable = true;
       };
 
-      # syntax aware merges, owns merge.conflictStyle as diff3 so no zdiff3 in git settings above
       programs.mergiraf = {
         enable = true;
         enableGitIntegration = true;
@@ -164,7 +158,6 @@ _: {
         theme = builtins.readFile "${config.catppuccin.sources.gitui}/catppuccin-${config.catppuccin.flavor}.ron";
       };
 
-      # renders through jj itself, so the colors below carry into the tui
       programs.jjui.enable = true;
 
       programs.jujutsu = {
@@ -198,14 +191,12 @@ _: {
           ui = {
             default-command = [ "log" ];
             log-word-wrap = true;
-            # git style markers so colocated conflicts stay readable to git tooling
             conflict-marker-style = "git";
           };
 
-          # jj resolves the most specific label, every working_copy default needs its own entry
           colors = {
             change_id = colors.accent;
-            "working_copy change_id" = colors.accent;
+            "working_copy change_id" = colors.accent; # working_copy defaults override the base colors
             commit_id = colors.blue;
             "working_copy commit_id" = colors.blue;
             rest = colors.surface1;
@@ -233,7 +224,6 @@ _: {
             "working_copy empty" = colors.green;
             conflict = colors.red;
             "working_copy conflict" = colors.red;
-            # table form, a bare string would drop the bold half of the default
             error = {
               fg = colors.red;
               bold = true;
