@@ -30,6 +30,7 @@ _: {
           ControlPersist = "600";
           ServerAliveInterval = 60;
           ServerAliveCountMax = 3;
+          StrictHostKeyChecking = "no";
           # HashKnownHosts off otherwise it kills hostname completion
         };
       };
