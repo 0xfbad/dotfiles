@@ -19,6 +19,9 @@ _: {
         "::1"
       ];
 
+      environment.etc."hosts".mode = "0644"; # activation replaces edits with generated host entries
+      environment.systemPackages = [ pkgs.hostctl ];
+
       # scanning is already randomised by default, association is not
       networking.networkmanager.ethernet.macAddress = "stable";
       # stable-ssid ignores connection.stable-id, stable takes the daily seed below
