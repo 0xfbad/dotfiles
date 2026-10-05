@@ -93,13 +93,30 @@
       # render on the dGPU so the external skips the iGPU to dGPU copy
       home-manager.users.fbad.programs.niri.settings = {
         debug.render-drm-device = "/dev/dri/by-path/pci-0000:01:00.0-render";
-        outputs."HDMI-A-2" = {
+        outputs."LG Electronics LG ULTRAGEAR+ 301NTMX55883" = {
+          mode = {
+            width = 2560;
+            height = 1440;
+            refresh = 239.970;
+          };
+          scale = 1.0;
+          transform.rotation = 90;
+          position = {
+            x = -1440;
+            y = -560;
+          };
+        };
+        outputs."LG Electronics LG ULTRAGEAR+ 407NTWG1S097" = {
           mode = {
             width = 3440;
             height = 1440;
             refresh = 240.085;
           };
           scale = 1.0;
+          position = {
+            x = 0;
+            y = 0;
+          };
         };
       };
 
