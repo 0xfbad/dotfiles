@@ -77,9 +77,6 @@ in
 
       nixpkgs.config.allowUnfree = true;
 
-      # temporary for winboat, find a better fix
-      nixpkgs.config.permittedInsecurePackages = [ "electron-40.10.5" ];
-
       # drop the default perl, rsync, strace
       environment.defaultPackages = [ ];
 
