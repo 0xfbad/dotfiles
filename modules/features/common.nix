@@ -250,9 +250,16 @@ in
       };
       services.udisks2.enable = true; # dolphin needs it to discover and mount removable drives
 
-      # the caps lock osd needs this root side libinput watcher, home manager only runs the client
       systemd.packages = [ pkgs.swayosd ];
       systemd.services.swayosd-libinput-backend.wantedBy = [ "graphical.target" ];
+      environment.etc."xdg/swayosd/backend.toml".source =
+        (pkgs.formats.toml { }).generate "swayosd-backend.toml"
+          {
+            input.ignore_caps_lock_key = true;
+          };
+      systemd.services.swayosd-libinput-backend.restartTriggers = [
+        config.environment.etc."xdg/swayosd/backend.toml".source
+      ];
       # the dbus policy lets root own the name the session server listens on
       services.dbus.packages = [ pkgs.swayosd ];
 
