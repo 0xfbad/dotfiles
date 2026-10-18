@@ -10,7 +10,10 @@ _: {
       programs = {
         carapace = {
           enable = true;
-          ignoreCase = true;
+          environment = {
+            CARAPACE_MATCH = true;
+            CARAPACE_BRIDGES = "zsh,bash";
+          };
         };
 
         # LS_COLORS for eza and the completion list
@@ -24,9 +27,6 @@ _: {
           enableCompletion = true;
           # the hm default flips to this at stateVersion 26.05, pinned now to move the files once
           dotDir = "${config.xdg.configHome}/zsh";
-
-          # carapace has no hm option for the bridges, only these two shells exist here
-          sessionVariables.CARAPACE_BRIDGES = "zsh,bash";
 
           autosuggestion = {
             enable = true;
@@ -102,7 +102,7 @@ _: {
             open = "xdg-open";
             lint = "nix flake check ~/dotfiles";
             rebuild = "nix flake check ~/dotfiles && nh os switch";
-            update = "nix flake update --flake ~/dotfiles && nix flake check ~/dotfiles && nh os switch";
+            update = "nix flake update --flake ~/dotfiles && nix flake update --flake ~/dotfiles/dev && nix flake check ~/dotfiles && nh os switch";
             gc = "nh clean all --keep 3 --keep-since 7d";
             cc = "claude --dangerously-skip-permissions";
             qalc = "qalc -s 'autocalc' -s 'decimal comma off'";
