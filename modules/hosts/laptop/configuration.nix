@@ -58,7 +58,7 @@
       # resume dies without it
       hardware.nvidia.powerManagement.enable = true;
 
-      # ppd holds no ac or battery policy of its own, that lives in gnome and kde daemons
+      # ppd never switches profiles on its own
       services.udev.extraRules = ''
         # type Mains only, usb pd ports are power_supply devices too and raced this at coldplug
         SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-battery.service"
@@ -67,19 +67,33 @@
       '';
       systemd.services =
         let
-          setProfile = profile: {
-            description = "Set power profile to ${profile}";
+          onPowerChange = description: script: {
+            inherit description script;
             requires = [ "power-profiles-daemon.service" ];
             after = [ "power-profiles-daemon.service" ];
+            path = [ pkgs.power-profiles-daemon ];
             serviceConfig = {
               Type = "oneshot";
-              ExecStart = "${lib.getExe' pkgs.power-profiles-daemon "powerprofilesctl"} set ${profile}";
+              RuntimeDirectory = "power-profile";
+              RuntimeDirectoryPreserve = true;
             };
           };
         in
         {
-          power-profile-battery = setProfile "power-saver";
-          power-profile-ac = setProfile "balanced";
+          power-profile-battery = onPowerChange "Drop to power-saver on battery" ''
+            current=$(powerprofilesctl get)
+            if [ "$current" = power-saver ]; then exit 0; fi
+
+            echo "$current" > "$RUNTIME_DIRECTORY/previous"
+            powerprofilesctl set power-saver
+          '';
+          power-profile-ac = onPowerChange "Restore the power profile on ac" ''
+            if [ "$(powerprofilesctl get)" != power-saver ]; then exit 0; fi
+
+            previous=$(cat "$RUNTIME_DIRECTORY/previous" 2>/dev/null || echo balanced)
+            rm -f "$RUNTIME_DIRECTORY/previous"
+            powerprofilesctl set "$previous"
+          '';
         };
 
       hardware.graphics.extraPackages = with pkgs; [
