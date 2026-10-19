@@ -11,10 +11,9 @@ _: {
       };
     in
     {
-      # not covered by catppuccin/nix
       services.swayosd = {
         enable = true;
-        # read once at startup, going through ExecStart makes sd-switch restart on css changes
+        # via ExecStart so sd-switch restarts on css changes
         stylePath = pkgs.writeText "swayosd-style.css" ''
           window {
             background: ${config.colors.bg};
@@ -62,7 +61,6 @@ _: {
 
       xdg.configFile."swayosd/config.toml".source = serverConfig;
 
-      # config.toml is read once at startup and lives outside the unit
       systemd.user.services.swayosd.Unit.X-Restart-Triggers = [ serverConfig ];
     };
 }

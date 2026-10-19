@@ -16,9 +16,8 @@ _: {
     {
       programs.btop = {
         enable = true;
-        # cudaSupport only adds autoAddDriverRunpath so the nvml dlopen resolves
+        # cudaSupport just makes the nvml dlopen resolve
         package = pkgs.btop.override { cudaSupport = true; };
-        # fails loudly instead of silently rendering #1e1e2e if upstream moves the line
         themes.catppuccin_mocha =
           assert oled != upstream;
           oled;
@@ -30,7 +29,7 @@ _: {
           update_ms = 200;
           nvml_measure_pcie_speeds = false;
           save_config_on_exit = false;
-          # rapl needs root, row hidden unless the binary has cap_perfmon and cap_dac_read_search
+          # needs the caps from the wrapper in common.nix
           show_cpu_watts = true;
         };
       };

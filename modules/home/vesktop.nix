@@ -36,7 +36,7 @@ _: {
             "en"
           ];
         };
-        # settings.json lives in the store, ui toggled plugins must be restated here
+        # settings.json is in the store, ui plugin toggles do not persist
         vencord.settings = {
           useQuickCss = true;
           enabledThemes = [ "catppuccin-mocha-mauve-oled.theme.css" ];

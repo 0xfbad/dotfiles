@@ -6,7 +6,7 @@ _: {
       extraOptions = [ "--group-directories-first" ];
     };
 
-    # the icons option only ships as a zsh alias, so fzf previews miss it
+    # the icons option is only a zsh alias, fzf previews miss it
     home.sessionVariables.EZA_ICONS_AUTO = "1";
   };
 }

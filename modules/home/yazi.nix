@@ -15,7 +15,6 @@ _: {
         shellWrapperName = "y";
         flavors.catppuccin-mocha = "${yazi-flavors}/catppuccin-mocha.yazi";
 
-        # selected from theme.toml not yazi.toml, also points syntect at the flavor tmtheme.xml
         theme.flavor.dark = "catppuccin-mocha";
 
         plugins = {

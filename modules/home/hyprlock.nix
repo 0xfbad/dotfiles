@@ -16,10 +16,10 @@ _: {
       date = lib.getExe' pkgs.coreutils "date";
     in
     {
-      # auth:pam:module is hyprlock, the nixos side must declare security.pam.services.hyprlock
+      # needs security.pam.services.hyprlock on the nixos side
       programs.hyprlock = {
         enable = true;
-        # TODO: temp until a hyprlock release includes hyprlock#1059, a refused or aborted lock otherwise hangs forever in the pam thread
+        # TODO: temp until a release has hyprlock#1059
         package = pkgs.hyprlock.overrideAttrs (old: {
           patches = (old.patches or [ ]) ++ [
             (pkgs.fetchpatch {
@@ -35,7 +35,7 @@ _: {
             {
               monitor = "";
               path = "screenshot";
-              # painted when screencopy fails, so a broken grab stays black
+              # fallback when screencopy fails
               color = rgb c.bg;
               blur_passes = 3;
               blur_size = 8;

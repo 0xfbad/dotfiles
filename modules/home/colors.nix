@@ -2,7 +2,6 @@ _: {
   flake.modules.homeManager.colors =
     { lib, ... }:
     let
-      # catppuccin mocha, base swapped for true black on the OLED panel
       palette = {
         bg = "#000000";
         base = "#1e1e2e";
@@ -40,7 +39,6 @@ _: {
           reference these instead of hardcoding hex values.
         '';
         default = { };
-        # one option per key so a host can override a single color without wiping the rest
         type = lib.types.submodule {
           options =
             lib.mapAttrs (

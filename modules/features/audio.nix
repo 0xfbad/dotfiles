@@ -10,7 +10,6 @@ _: {
       alsa.enable = true;
       alsa.support32Bit = true;
       pulse.enable = true;
-      # otherwise bluetooth headphones drop to HSP/HFP whenever anything opens the mic
       wireplumber.extraConfig."11-bluetooth-policy"."wireplumber.settings"."bluetooth.autoswitch-to-headset-profile" =
         false;
     };

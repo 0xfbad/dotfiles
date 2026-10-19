@@ -50,7 +50,6 @@ _: {
       home.activation.promptsSync = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
         run ${pkgs.git}/bin/git -C ${dots} config core.hooksPath .githooks
         cc=${dots}/modules/home/claude-code
-        # skip when local plaintext is newer
         if [ -f ${dots}/secrets/prompts.age ]; then
           if [ ! -e "$cc/skills" ] || [ -z "$(${pkgs.findutils}/bin/find "$cc/skills" "$cc/hooks" "$cc/CLAUDE.md" -newer ${dots}/secrets/prompts.age -print -quit 2>/dev/null)" ]; then
             run ${lib.getExe prompts-unpack} || verboseEcho "prompts unpack failed"
@@ -89,13 +88,12 @@ _: {
           };
 
           env = {
-            # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC = "1"; # good but disables /remote-control :(
+            # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC disables /remote-control :(
             DISABLE_ERROR_REPORTING = "1";
-            # since nix owns the package, kill background checks and claude update alike
             DISABLE_AUTOUPDATER = "1";
             DISABLE_UPDATES = "1";
             DISABLE_BUG_COMMAND = "1";
-            # 15 is the hard cap, watchdog also retries capacity errors indefinitely
+            # 15 is the hard cap
             CLAUDE_CODE_MAX_RETRIES = "15";
             CLAUDE_CODE_RETRY_WATCHDOG = "1";
           };

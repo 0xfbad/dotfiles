@@ -6,7 +6,7 @@ _: {
       ...
     }:
     {
-      home.sessionVariables.T3CODE_DISABLE_AUTO_UPDATE = "1"; # the updater cannot replace a package in the nix store
+      home.sessionVariables.T3CODE_DISABLE_AUTO_UPDATE = "1";
 
       programs.t3code = {
         enable = true;

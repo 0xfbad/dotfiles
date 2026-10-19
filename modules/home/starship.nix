@@ -22,23 +22,20 @@ _: {
       programs.starship = {
         enable = true;
         enableZshIntegration = true;
-        # rewrites the stock emoji symbols of every module $all pulls in
         presets = [ "plain-text-symbols" ];
         extraPackages = [ pkgs.jj-starship ];
         settings = {
           command_timeout = 2000;
 
-          # this only moves the jj id in front of the git segments, $all covers the rest
           format = "$username$hostname$directory\${custom.jj}$all";
 
           custom.jj = {
             when = "jj-starship detect";
-            # no command, starship runs the shell binary itself and feeds $when to its stdin
+            # no command, starship runs the shell binary directly
             shell = [
               "jj-starship"
               "--no-symbol"
               "--no-jj-prefix"
-              # the git flags mute it in plain git repos, git_branch already reports there
               "--no-git-prefix"
               "--no-git-name"
               "--no-git-id"
@@ -112,7 +109,7 @@ _: {
           azure.disabled = true;
 
           directory = {
-            # anything above 0 drops repo_root_style once you are that deep in the repo
+            # above 0 drops repo_root_style deep in the repo
             truncation_length = 0;
             style = c.accent;
             read_only = " ro";
@@ -121,7 +118,7 @@ _: {
             repo_root_format = "[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) ";
           };
 
-          # jj colocation leaves git HEAD detached, so git_commit covers every jj repo
+          # colocated jj leaves HEAD detached, git_commit covers those
           git_branch = {
             format = "[$branch]($style) ";
             style = "italic ${c.subtext0}";
@@ -177,7 +174,7 @@ _: {
             ];
           };
 
-          # claude_cost has no style key in 1.26.0, the color goes inline or it warns
+          # no style key in 1.26.0, color goes inline
           claude_cost.format = "[\\$$cost](${c.peach}) [+$lines_added](${c.green})[-$lines_removed](${c.red}) [sess $duration, api $api_duration](${c.subtext0}) ";
         };
       };

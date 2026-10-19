@@ -25,7 +25,6 @@
         mpv = {
           enable = true;
           scripts = [ pkgs.mpvScripts.uosc ];
-          # uosc replaces the builtin osc and window decorations
           config = {
             osc = false;
             border = false;
@@ -45,7 +44,7 @@
           enable = true;
           settings = {
             general = {
-              # without output-filename satty disables saving entirely
+              # satty disables saving without it
               output-filename = "~/Pictures/satty-%Y-%m-%d_%H:%M:%S.png";
               actions-on-enter = [ "save-to-clipboard" ];
               early-exit = [ "all" ];
@@ -68,7 +67,7 @@
           settings.ShowConsole = false;
         };
 
-        # installs the patched spotify itself, so no pkgs.spotify alongside it
+        # ships its own spotify, no pkgs.spotify alongside
         spicetify = {
           enable = true;
           theme = spicePkgs.themes.catppuccin;
@@ -77,7 +76,6 @@
 
         aria2 = {
           enable = true;
-          # the vicinae aria2-manager extension drives the rpc daemon on 6800
           systemd.enable = true;
           settings = {
             dir = "${config.home.homeDirectory}/Downloads";
@@ -91,12 +89,11 @@
         };
       };
 
-      # catppuccin.obs drops the theme files in place, obs still has to be told to load them
+      # catppuccin.obs installs the theme but does not select it
       home.activation.obsTheme = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        # rewritten on exit so it cannot be a store symlink
+        # obs rewrites it on exit, cannot be a store symlink
         obsIni="$HOME/.config/obs-studio/user.ini"
 
-        # seed only when missing so a theme picked in the ui sticks
         if ! ${pkgs.crudini}/bin/crudini --get "$obsIni" Appearance Theme >/dev/null 2>&1; then
           run mkdir -p "$(dirname "$obsIni")"
           run ${pkgs.crudini}/bin/crudini --set "$obsIni" Appearance Theme com.obsproject.Catppuccin.Mocha

@@ -12,12 +12,11 @@
       ];
 
       update = {
-        # despite the readme auto.enable only drives the timer, activation reads onActivation
+        # auto.enable only drives the timer, not activation
         auto = {
           enable = true;
           onCalendar = "daily";
         };
-        # off so a switch never needs the network
         onActivation = false;
       };
 

@@ -24,10 +24,9 @@ _: {
       home.packages = [
         pkgs.secretspec
 
-        # secretspec set MOONSHOT_API_KEY --reason setup first
         (mkClaudeWrapper "claude-moonshot" ''
           ${getToken "claude-moonshot" "MOONSHOT_API_KEY"}
-          # kimi membership uses https://api.kimi.com/coding/ and a console key
+          # the kimi membership plan uses https://api.kimi.com/coding/ instead
           export ANTHROPIC_BASE_URL="https://api.moonshot.ai/anthropic"
           export ANTHROPIC_MODEL="kimi-k3[1m]"
           export ANTHROPIC_DEFAULT_OPUS_MODEL="kimi-k3[1m]"
@@ -41,7 +40,6 @@ _: {
           unset ANTHROPIC_API_KEY
         '')
 
-        # secretspec set OPENROUTER_API_KEY --reason setup first
         (mkClaudeWrapper "claude-openrouter" ''
           ${getToken "claude-openrouter" "OPENROUTER_API_KEY"}
           # not /api/v1, claude appends /v1/messages itself

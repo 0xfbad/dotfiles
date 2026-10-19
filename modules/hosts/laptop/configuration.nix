@@ -34,14 +34,13 @@
 
       # luks at boot already authenticates
       services.greetd.settings.initial_session = {
-        # logout falls back to default_session, setting this drops systemd Restart=
         command = "niri-session";
         user = "fbad";
       };
 
       services.upower = {
         enable = true;
-        # the suspend half of HybridSleep still drains and at 3% there is nothing left to drain
+        # HybridSleep still drains
         criticalPowerAction = "Hibernate";
         percentageLow = 15;
         percentageCritical = 5;
@@ -60,9 +59,9 @@
 
       # ppd never switches profiles on its own
       services.udev.extraRules = ''
-        # type Mains only, usb pd ports are power_supply devices too and raced this at coldplug
+        # usb pd ports are power_supply devices too
         SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="0", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-battery.service"
-        # SYSTEMD_WANTS not RUN, coldplug events fire before ppd is up
+        # RUN would fire at coldplug before ppd is up
         SUBSYSTEM=="power_supply", ATTR{type}=="Mains", ATTR{online}=="1", TAG+="systemd", ENV{SYSTEMD_WANTS}+="power-profile-ac.service"
       '';
       systemd.services =
@@ -104,7 +103,7 @@
       # nvidia.nix pins this globally and nvidia-vaapi-driver only decodes
       environment.sessionVariables.LIBVA_DRIVER_NAME = lib.mkForce "iHD";
 
-      # render on the dGPU so the external skips the iGPU to dGPU copy
+      # externals skip the igpu to dgpu copy
       home-manager.users.fbad.programs.niri.settings = {
         debug.render-drm-device = "/dev/dri/by-path/pci-0000:01:00.0-render";
         outputs."LG Electronics LG ULTRAGEAR+ 301NTMX55883" = {
@@ -134,10 +133,10 @@
         };
       };
 
-      # modules.nixos.lanzaboote owns the systemd-boot config, lzbt does the installing
+      # systemd-boot config is in modules.nixos.lanzaboote
       boot.loader.efi.canTouchEfiVariables = true;
       boot.loader.timeout = 0;
-      # keep flaky dell ucsi errors off the greeter tty, crit and above still print
+      # dell ucsi errors spam the greeter tty
       boot.consoleLogLevel = 3;
     };
 }

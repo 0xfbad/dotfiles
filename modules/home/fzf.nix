@@ -3,12 +3,12 @@ _: {
     programs.fzf = {
       enable = true;
       defaultCommand = "fd --type f --hidden --exclude .git";
-      # colors come from the catppuccin FZF_DEFAULT_OPTS_FILE, fzf reads it first
+      # colors come from the catppuccin FZF_DEFAULT_OPTS_FILE
       defaultOptions = [
         "--layout=reverse"
         "--border=rounded"
         "--height=40%"
-        # zellij 0.44 speaks the popup protocol, outside a multiplexer fzf ignores this
+        # needs zellij 0.44, ignored outside a multiplexer
         "--popup=80%,70%"
       ];
       fileWidget = {

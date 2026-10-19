@@ -8,10 +8,10 @@ _: {
         auto_sync = false;
         enter_accept = true;
         search_mode = "daemon-fuzzy";
-        # every zellij pane is a fresh ATUIN_SESSION, plain session mode starts empty
+        # each zellij pane is a new ATUIN_SESSION, plain session starts empty
         filter_mode_shell_up_key_binding = "session-preload";
         preview.strategy = "static";
-        # config.toml is a readonly store symlink, the interactive ai prompt cannot persist a choice
+        # unset it prompts every start, config.toml is a store symlink
         ai = {
           enabled = false;
           yolo = false;

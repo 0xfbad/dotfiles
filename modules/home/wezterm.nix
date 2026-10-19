@@ -26,7 +26,7 @@ _: {
           enable_kitty_keyboard = true;
           text_min_contrast_ratio = 4.5;
           disable_default_key_bindings = true;
-          # niri is not in tiling_desktop_environments, so wezterm would try to resize on font change
+          # wezterm does not list niri in tiling_desktop_environments
           adjust_window_size_when_changing_font_size = false;
           window_padding = {
             left = 3;
@@ -34,7 +34,7 @@ _: {
             top = 0;
             bottom = 0;
           };
-          # both fields are mandatory, WindowContentAlignment has no per field default
+          # both fields required, no per field default
           window_content_alignment = {
             horizontal = "Left";
             vertical = "Bottom";

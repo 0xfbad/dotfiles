@@ -23,7 +23,7 @@ _: {
       inherit (config) colors;
     in
     {
-      # cache refresh is the enableAutoUpdates timer, the internal updater stays off
+      # the enableAutoUpdates timer refreshes the cache
       programs.tealdeer = {
         enable = true;
         settings = {
@@ -32,7 +32,7 @@ _: {
             show_title = true;
           };
 
-          # the 1.8.0 default gained the all platform, a fallback to macos and windows pages
+          # the default also falls back to macos and windows pages
           search.platforms = [
             "current"
             "common"

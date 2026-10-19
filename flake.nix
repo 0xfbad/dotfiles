@@ -20,9 +20,8 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri = {
-      # niri.cachix.org hits need our nixpkgs rev to match niri-flake, update both together
+      # cache hits need nixpkgs and niri-flake bumped together
       url = "github:sodiboo/niri-flake";
-      # build neutral, overlays.niri builds against our nixpkgs either way
       inputs.nixpkgs.follows = "nixpkgs";
     };
     rust-overlay = {
@@ -32,9 +31,8 @@
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.1.0";
       inputs.nixpkgs.follows = "nixpkgs";
-      # upstream only vendors it for its own devshell, follow so it drops out of the lock
+      # devshell only upstream, following drops it from the lock
       inputs.pre-commit.follows = "nixpkgs";
-      # upstream pin predates the stdenv.isLinux deprecation, follow to silence eval warns
       inputs.rust-overlay.follows = "rust-overlay";
     };
     plasma-manager = {
@@ -50,15 +48,14 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # main matches home-manager master, no follows since ports are cached against catppuccin pkgs
+    # main pairs with home-manager master, no follows keeps the cache hits
     catppuccin.url = "github:catppuccin/nix/main";
-    # no nixpkgs follows and release tags only, both keep vicinae cachix hits
+    # no follows and release tags only, both keep the cache hits
     vicinae.url = "github:vicinaehq/vicinae/v0.25.0";
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
       inputs.vicinae.follows = "vicinae";
     };
-    # source only, no upstream flake, rebuilding it needs a fresh cargoHash
     ouch = {
       url = "github:ouch-org/ouch/384384286fa575975e088f14f71b5ccd039bedf4";
       flake = false;
@@ -68,7 +65,7 @@
     };
   };
 
-  # bootstrap only, covers root nixos-install before nix.settings caches exist
+  # for nixos-install, before nix.settings exists
   nixConfig = {
     extra-substituters = [
       "https://niri.cachix.org"

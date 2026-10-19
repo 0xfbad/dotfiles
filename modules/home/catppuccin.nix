@@ -13,7 +13,7 @@
         mocha.base = lib.removePrefix "#" config.colors.bg;
       };
 
-      # catppuccinBuildHook runs whiskers with no room for flags, so the phase is restated
+      # catppuccinBuildHook leaves no room for whiskers flags
       oled =
         drv:
         drv.overrideAttrs (_: {
@@ -31,7 +31,7 @@
           '';
         });
 
-      # only the ports whiskers renders, vivid just names a theme the app carries
+      # only ports whiskers renders, vivid is not one
       oledPorts = [
         "broot"
         "eza"
@@ -47,10 +47,9 @@
     {
       imports = [ inputs.catppuccin.homeModules.catppuccin ];
 
-      # the gtk theme has no upstream port and stays in home/gtk.nix
+      # gtk theme is in home/gtk.nix
       catppuccin = {
         enable = true;
-        # everything needing the OLED base is regenerated above or themed from config.colors
         autoEnable = false;
         flavor = "mocha";
         accent = "mauve";
@@ -62,12 +61,12 @@
         fzf.enable = true;
         gh-dash.enable = true;
         glamour.enable = true;
-        # papirus, it carries the kde mimetype and action icons dolphin asks for
+        # papirus has the kde icons dolphin asks for
         gtk.icon.enable = true;
         imv.enable = true;
         mpv.enable = true;
         obs.enable = true;
-        # vesktop is themed from a patched local build in home/vesktop.nix
+        # vesktop is themed in home/vesktop.nix
         vivid.enable = true;
         zathura.enable = true;
         zsh-syntax-highlighting.enable = true;

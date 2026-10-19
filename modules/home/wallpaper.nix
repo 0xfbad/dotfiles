@@ -24,13 +24,13 @@ _: {
             exit 0
           fi
 
-          # awww.service is Type=simple, started does not mean the socket is accepting yet
+          # After=awww.service does not wait for its socket
           for _ in $(seq 50); do
             awww query > /dev/null 2>&1 && break
             sleep 0.2
           done
 
-          # logical is null on disabled outputs and awww img rejects those
+          # logical is null on disabled outputs, awww img rejects those
           mapfile -t mons < <(niri msg --json outputs | jq -r 'to_entries[] | select(.value.logical != null) | .key')
 
           for i in "''${!mons[@]}"; do
@@ -61,7 +61,7 @@ _: {
           Type = "oneshot";
           ExecStart = lib.getExe wallpaper;
         };
-        # no Install, WantedBy would form an ordering cycle through awww.service, the timer starts it
+        # no Install, WantedBy cycles through awww.service, the timer starts it
       };
 
       systemd.user.timers.wallpaper = {

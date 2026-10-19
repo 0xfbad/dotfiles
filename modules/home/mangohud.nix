@@ -28,7 +28,7 @@ _: {
             "0.01"
           ];
           throttling_status = true;
-          # shows only when libgamemodeauto is mapped, set the game launch options to gamemoderun mangohud %command%
+          # only shows under gamemoderun
           gamemode = true;
 
           font_file = "${pkgs.nerd-fonts.jetbrains-mono}/share/fonts/truetype/NerdFonts/JetBrainsMono/JetBrainsMonoNerdFont-Regular.ttf";
@@ -47,7 +47,7 @@ _: {
           background_alpha = 0.8;
           round_corners = colors.rounding;
         }
-        # the igpu sits alongside the dgpu and 0.8.0 enumerates every card it finds
+        # the dgpu, otherwise the igpu is shown too
         // lib.optionalAttrs (osConfig.networking.hostName == "laptop") {
           pci_dev = "0000:01:00.0";
         };

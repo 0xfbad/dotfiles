@@ -11,7 +11,7 @@ _: {
       term = lib.getExe pkgs.wezterm;
       btTui = "${term} start --class floating-term -- ${lib.getExe pkgs.bluetui}";
       wifiTui = "${term} start --class floating-term -- ${pkgs.wlctl}/bin/wlctl";
-      # the setcap wrapper, not the store path, or the watts row disables itself
+      # setcap wrapper, the store path loses the watts row
       btop = "${term} start --class floating-term -- /run/wrappers/bin/btop";
       mixer = lib.getExe pkgs.pwvucontrol;
       wpctl = "${pkgs.wireplumber}/bin/wpctl";
@@ -40,7 +40,7 @@ _: {
         enable = true;
         systemd.enable = true;
 
-        # master for hwmon-by-name and calendar css classes, nixpkgs vendors cava 0.10.7 not 1.0.0
+        # master for hwmon-by-name and calendar css classes, nixpkgs cava is 0.10.7 not 1.0.0
         package = (pkgs.waybar.override { cavaSupport = false; }).overrideAttrs (old: {
           version = "0.15.0-unstable-2026-10-10";
           src = pkgs.fetchFromGitHub {
@@ -49,9 +49,9 @@ _: {
             rev = "4e207a0cb51a9eb89b4245d90245721f5e39bf06";
             hash = "sha256-0L1elPWYo9yKgEwpXWWVWQyPVU0SW36LkWUR26CksgU=";
           };
-          # master requires mm-glib for its new modem module
+          # master needs mm-glib for the modem module
           buildInputs = old.buildInputs ++ [ pkgs.modemmanager ];
-          # meson still declares 0.15.0 on master, so the version check cannot match
+          # meson still says 0.15.0, the version check fails
           doInstallCheck = false;
         });
 
@@ -91,9 +91,8 @@ _: {
             tooltip-format = "<tt>{calendar}</tt>";
             calendar = {
               mode = "month";
-              # monday first regardless of system locale
               iso8601 = true;
-              # waybar rewrites class='x' into the color it reads off #clock.calendar-x
+              # waybar replaces each span class with the color of #clock.calendar-x below
               format = {
                 months = "<span class='months'><b>{}</b></span>";
                 weekdays = "<span class='weekdays'><b>{}</b></span>";
@@ -171,7 +170,6 @@ _: {
           };
 
           temperature = {
-            # resolved by /sys/class/hwmon/*/name, so the hwmon index can shuffle freely
             hwmon-by-name = "coretemp";
             input-filename = "temp1_input";
             critical-threshold = 90;
@@ -269,7 +267,6 @@ _: {
             font-weight: 700;
           }
 
-          /* only read to color the {calendar} tooltip, so they have to outrank #clock */
           #clock.calendar-months {
             color: ${c.accent};
           }
@@ -312,7 +309,7 @@ _: {
             color: ${c.overlay0};
           }
 
-          /* 0.15.0 tags source modules with .muted too, so .mic wins on order */
+          /* source modules get .muted too, .mic must follow .muted */
           #wireplumber.mic {
             color: ${c.rosewater};
           }

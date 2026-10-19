@@ -2,11 +2,11 @@ _: {
   flake.modules.homeManager.keepassxc =
     { config, lib, ... }:
     let
-      # keeps history out of the synced db directory, gives the retention rule a stable path
+      # the db directory is synced
       backupDir = "${config.xdg.dataHome}/keepassxc/backups";
     in
     {
-      # 2.7.12 has no retention of its own, so every save would accumulate forever
+      # keepassxc has no backup retention
       systemd.user.tmpfiles.rules = [
         "d ${backupDir} 0700 - - 30d"
       ];
@@ -39,7 +39,6 @@ _: {
         settings = {
           General = {
             BackupBeforeSave = true;
-            # {TIME} keeps every save instead of one rolling copy, aged out by the rule above
             BackupFilePathPattern = "${backupDir}/{DB_FILENAME}_{TIME:yyyy-MM-dd_HH-mm-ss}.old.kdbx";
             AutoGeneratePasswordForNewEntries = true;
           };
@@ -49,14 +48,13 @@ _: {
             SearchInAllDatabases = true;
             BestMatchOnly = true;
             ShowNotification = false;
-            # home-manager handles the native messaging manifest
+            # home-manager writes the manifest
             UpdateBinaryPath = false;
           };
 
           GUI = {
-            # no tray, so close locks instead of quitting
             MinimizeOnClose = true;
-            # defer to the darkly/catppuccin system theme
+            # classic follows the system qt theme
             ApplicationTheme = "classic";
             CompactMode = true;
             ColorPasswords = true;

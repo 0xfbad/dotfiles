@@ -13,7 +13,6 @@ _: {
     {
       programs.helix = {
         enable = true;
-        # editor only servers, keeps them off the interactive shell PATH
         extraPackages = with pkgs; [
           bash-language-server
           dockerfile-language-server
@@ -46,7 +45,6 @@ _: {
             color-modes = true;
             idle-timeout = 50;
             completion-timeout = 5;
-            # auto-save writes constantly, keep diffs free of whitespace churn
             trim-trailing-whitespace = true;
             trim-final-newlines = true;
             end-of-line-diagnostics = "hint";
@@ -98,7 +96,7 @@ _: {
               };
             }
             {
-              # upstream also lists golangci-lint-lsp, that binary is not installed
+              # upstream also lists golangci-lint-lsp
               name = "go";
               language-servers = [ "gopls" ];
             }
@@ -154,7 +152,7 @@ _: {
               name = "bash";
               language-servers = [ "bash-language-server" ];
               auto-format = true;
-              # matches the treefmt-nix shfmt defaults so nix fmt and format on save agree
+              # matches the treefmt shfmt args
               formatter = {
                 command = "shfmt";
                 args = [
@@ -178,7 +176,7 @@ _: {
               auto-format = true;
             }
             {
-              # language-servers replaces rather than appends, so marksman has to be restated
+              # language-servers replaces the default, marksman restated
               name = "markdown";
               language-servers = [
                 "marksman"

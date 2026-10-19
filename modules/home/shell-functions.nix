@@ -1,6 +1,5 @@
 _: {
   flake.modules.homeManager.shell-functions = _: {
-    # autoloaded, so the bodies are parsed on first call instead of in every pane
     programs.zsh.siteFunctions = {
       ff = ''
         local file
@@ -8,7 +7,7 @@ _: {
         [[ -n "$file" ]] && ''${=EDITOR:-hx} "$file"
       '';
 
-      # --files-from implies --relative, the selection keeps its layout under the target directory
+      # --files-from implies --relative
       sff = ''
         (( $# < 1 )) && { print -u2 "usage: sff <host>[:<path>]"; return 1 }
         local target="$1"
@@ -37,7 +36,6 @@ _: {
           print -u2 "not fully merged, tip is $(git rev-parse --short "$branch"); force with: git branch -D $branch"
       '';
 
-      # forwards go on the ControlMaster, so they outlive this command
       fip = ''
         (( $# < 2 )) && { print -u2 "usage: fip <host> <port1> [port2] ..."; return 1 }
         local host="$1" port
@@ -75,7 +73,6 @@ _: {
       gdf = ''
         local root args
         root=$(git rev-parse --show-toplevel) || return 1
-        # requote args so the preview subshell sees them intact
         args="''${(j: :)''${(q)@}}"
         git diff --name-only "$@" |
           fzf --preview "git -C ''${(q)root} diff --color=always $args -- {}" \
@@ -86,7 +83,7 @@ _: {
         nh search "$@"
       '';
 
-      # --scope takes an attached value only, detached it is parsed as the query
+      # detached --scope is parsed as the query
       no = ''
         nh search options --scope=home-manager "$@"
       '';

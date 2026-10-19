@@ -18,7 +18,6 @@
         inputs.vicinae.homeManagerModules.default
       ];
 
-      # vicinae launches script commands in the first terminal listed here
       xdg.configFile."xdg-terminals.list".text = ''
         org.wezfurlong.wezterm.desktop
       '';
@@ -27,11 +26,10 @@
         enable = true;
         systemd.enable = true;
 
-        # the native messaging host only serves the browser-extension provider, disabled below
+        # only feeds the browser-extension provider, disabled below
         enableFirefoxIntegration = false;
         enableChromeIntegration = false;
 
-        # settings go in VICINAE_OVERRIDES, which outranks anything the gui writes to settings.json
         settings = {
           telemetry.system_info = false;
           launcher_window.clock.enabled = false;
@@ -39,7 +37,7 @@
           pop_to_root_on_close = true;
           keybinding = "vim";
 
-          # missing sqlcipher key crash loops the server, enable only with a pam unlocked keyring
+          # crash loops without a pam unlocked keyring
           encrypt_sensitive_data = false;
 
           launcher_window = {
@@ -58,7 +56,6 @@
           providers = {
             clipboard.preferences.eraseOnStartup = true;
 
-            # the indexer sweeps all of $HOME on a timer, these are churn it can never search usefully
             files.preferences.excludedIndexingPaths = map (p: "${config.home.homeDirectory}/${p}") [
               ".claude"
               ".cache"
@@ -72,7 +69,6 @@
             developer.enabled = false;
             browser-extension.enabled = false;
 
-            # declarative so a settings.json wipe cannot lose it again
             "@sovereign/vicinae-extension-awww-switcher-0".preferences.wallpaperPath =
               "${config.home.homeDirectory}/dotfiles/wallpapers";
 
@@ -108,7 +104,6 @@
             "it-tools"
           ]
           ++ [
-            # no secret preference, patch it in
             (ext.aria2-manager.overrideAttrs (o: {
               postPatch = (o.postPatch or "") + ''
                 substituteInPlace src/index.tsx src/quick-add.ts \

@@ -16,7 +16,7 @@ _: {
           "172.17.0.1:53"
         ];
 
-        # upstream default bootstraps plaintext to quad9 and google and holds nss-lookup.target 60s offline
+        # the default adds google and holds nss-lookup.target 60s offline
         bootstrap_resolvers = [ "9.9.9.9:53" ];
         netprobe_address = "9.9.9.9:53";
         netprobe_timeout = 10;
@@ -25,7 +25,6 @@ _: {
         # anonymized dns is dnscrypt only
         doh_servers = false;
         anonymized_dns = {
-          # otherwise unrelayable servers go direct
           skip_incompatible = true;
           # unrelated operators
           routes = [
@@ -41,10 +40,10 @@ _: {
         };
         require_dnssec = true;
 
-        # quic only where alt-svc advertises it, http3_probe stays off since it slows servers without h3
+        # http3_probe slows servers without h3
         http3 = true;
 
-        # setting sources replaces the whole upstream table, both subtables restated
+        # sources replaces the whole default table
         sources = {
           public-resolvers = {
             urls = [
@@ -52,7 +51,7 @@ _: {
               "https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md"
               "https://cdn.jsdelivr.net/gh/DNSCrypt/dnscrypt-resolvers@master/v3/public-resolvers.md"
             ];
-            # absolute or it resolves into /nix/store and refetches every start
+            # relative resolves into /nix/store and refetches every start
             cache_file = "/var/cache/dnscrypt-proxy/public-resolvers.md";
             minisign_key = "RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3";
             refresh_delay = 73;
@@ -77,7 +76,7 @@ _: {
     services.resolved = {
       enable = true;
       settings.Resolve = {
-        # unreachable while DNS= is set, keeps the builtin cloudflare and google fallbacks out
+        # displaces the builtin cloudflare and google fallbacks
         FallbackDNS = [
           "127.0.0.1"
           "::1"

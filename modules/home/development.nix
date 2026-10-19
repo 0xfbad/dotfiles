@@ -17,8 +17,7 @@ _: {
 
     home.packages = with pkgs; [
       # python
-      # pwntools is toPythonApplication, so it only imports from an interpreter env
-      (python3.withPackages (ps: with ps; [ pwntools ]))
+      (python3.withPackages (ps: with ps; [ pwntools ])) # pkgs.pwntools is toPythonApplication, not importable
       ty # python type checker from the ruff team
       ruff
 

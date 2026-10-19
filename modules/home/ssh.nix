@@ -25,13 +25,13 @@ _: {
         settings."*" = {
           AddKeysToAgent = "yes";
           SetEnv.TERM = "xterm-256color";
-          ControlMaster = "auto"; # most goated feature of ssh btw
+          ControlMaster = "auto";
           ControlPath = "~/.ssh/master-%C";
           ControlPersist = "600";
           ServerAliveInterval = 60;
           ServerAliveCountMax = 3;
           StrictHostKeyChecking = "no";
-          # HashKnownHosts off otherwise it kills hostname completion
+          # no HashKnownHosts, it breaks hostname completion
         };
       };
     };

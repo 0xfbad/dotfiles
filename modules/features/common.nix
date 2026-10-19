@@ -25,7 +25,7 @@ in
       nix.settings.warn-dirty = false;
       nix.settings.connect-timeout = 10;
       nix.settings.stalled-download-timeout = 30;
-      nix.settings.download-buffer-size = 536870912; # the default buffer stalls large nars into the download timeout
+      nix.settings.download-buffer-size = 536870912; # the default stalls large nars into the download timeout
       nix.settings.use-xdg-base-directories = true;
 
       nix.settings.trusted-users = [
@@ -167,28 +167,28 @@ in
         LC_TIME = "en_US.UTF-8";
       };
 
-      security.sudo.enable = false; # if polkitd fails, use su or boot an older generation
+      security.sudo.enable = false; # if polkitd fails, use su or an older generation
       security.run0 = {
         enable = true;
-        sudo-shim.enable = true; # the shim does not support -e -l -k
+        sudo-shim.enable = true;
       };
 
       security.wrappers.btop = {
-        source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop"; # must match modules/home/btop.nix to share its closure
-        capabilities = "cap_perfmon,cap_dac_read_search+ep"; # rapl power readings require these capabilities
+        source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop"; # must match modules/home/btop.nix
+        capabilities = "cap_perfmon,cap_dac_read_search+ep"; # for rapl power readings
         owner = "fbad";
         group = "users";
-        permissions = "u+rx"; # cap_dac_read_search permits reading any file
+        permissions = "u+rx"; # cap_dac_read_search reads any file
       };
 
-      services.logind.settings.Login.KillUserProcesses = true; # stale niri sockets block the next login
+      services.logind.settings.Login.KillUserProcesses = true; # a leftover session keeps niri.service up and blocks the next login
 
       hardware.bluetooth.enable = true;
       hardware.bluetooth.settings = {
         General = {
           FastConnectable = true;
-          JustWorksRepairing = "confirm"; # the always setting permits silent bond replacement
-          Experimental = true; # the battery service requires this flag
+          JustWorksRepairing = "confirm";
+          Experimental = true; # for the battery service
         };
         LE = {
           MinConnectionInterval = 7; # the controller polls at 100 hz
@@ -200,10 +200,9 @@ in
         UserspaceHID = true;
       };
 
-      hardware.xpadneo.enable = true; # if reconnects fail after sleep, update firmware in the xbox accessories app and pair again
+      hardware.xpadneo.enable = true;
       services.udev.extraRules = # nixpkgs omits the upstream xpadneo device rules
         ''
-          # udev combines separate KERNEL matches with logical and
           ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:045E:*", KERNEL=="*:02FD.*|*:02E0.*|*:0B05.*|*:0B13.*|*:0B20.*|*:0B22.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
           ACTION=="bind", SUBSYSTEM=="hid", DRIVER!="xpadneo", KERNEL=="0005:0B05:1ABD.*", ATTR{driver/unbind}="%k", ATTR{[drivers/hid:xpadneo]bind}="%k"
           ACTION!="remove", DRIVERS=="xpadneo", SUBSYSTEM=="input", ENV{ID_INPUT_JOYSTICK}=="1", TAG+="uaccess", MODE="0664", ENV{LIBINPUT_IGNORE_DEVICE}="1"
@@ -250,7 +249,7 @@ in
       };
 
       environment.etc."xdg/menus/applications.menu".source =
-        "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu"; # dolphin requires this menu outside plasma
+        "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu"; # dolphin needs it outside plasma
 
       programs.zsh.enable = true;
       users.defaultUserShell = pkgs.zsh;
@@ -299,7 +298,7 @@ in
           hex = name: lib.substring 1 6 palette.${name}.hex;
         in
         lib.mkForce (
-          [ "000000" ] # true black avoids gray backgrounds on oled
+          [ "000000" ] # oled black
           ++ map hex [
             "red"
             "green"
@@ -368,7 +367,7 @@ in
   flake.modules.homeManager.nix-trusted-settings = {
     xdg.dataFile."nix/trusted-settings.json" = {
       force = true;
-      text = builtins.toJSON (builtins.mapAttrs (_: value: { ${toString value} = true; }) nixConfig); # trust answers for other flakes cannot persist through this readonly symlink
+      text = builtins.toJSON (builtins.mapAttrs (_: value: { ${toString value} = true; }) nixConfig); # trust answers for other flakes cannot persist through the symlink
     };
   };
 }

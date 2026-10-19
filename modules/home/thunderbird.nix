@@ -13,7 +13,7 @@ _: {
           DisableAppUpdate = true;
           DisableFeedbackCommands = true;
 
-          # tracking upstream keeps the xpi past strict_max_version bumps without a store pin
+          # a store pinned xpi breaks on strict_max_version bumps
           ExtensionSettings."dkim_verifier@pl" = {
             installation_mode = "force_installed";
             install_url = "https://addons.thunderbird.net/thunderbird/downloads/latest/dkim-verifier/latest.xpi";
@@ -34,7 +34,6 @@ _: {
           "toolkit.coverage.opt-out" = true;
           "breakpad.reportURL" = "";
 
-          # polls a branding endpoint for donation and release messaging
           "mail.inappnotifications.enabled" = false;
 
           "mailnews.headers.sendUserAgent" = false;
@@ -64,7 +63,6 @@ _: {
             "mailnews.sendInBackground" = true;
 
             "mailnews.mark_message_read.delay" = true;
-            # seconds
             "mailnews.mark_message_read.delay.interval" = 3;
 
             "mail.server.default.check_all_folders_for_new" = true;
@@ -74,7 +72,6 @@ _: {
             # 3 is sanitized html
             "mailnews.display.html_as" = 3;
 
-            # keep dark message mode, hide the toggle button
             "mail.dark-reader.show-toggle" = false;
 
             # defaults are 300000 and 30
@@ -117,7 +114,6 @@ _: {
               border-top: 1px solid ${c.surface0} !important;
             }
 
-            /* modern-thunderbird tabs */
             #navigation-toolbox,
             #tabmail-tabs,
             #tabmail-arrowscrollbox {
@@ -159,7 +155,6 @@ _: {
               height: 40px !important;
             }
 
-            /* modern-thunderbird buttons and search */
             .toolbarbutton-1,
             .themeableSearchBox {
               border: none !important;
@@ -170,7 +165,6 @@ _: {
               height: 26px !important;
             }
 
-            /* folder pane selection, rows are li wrapping a .container div */
             #folderTree li.selected > .container {
               background-color: ${c.accent} !important;
               color: ${c.bg} !important;
@@ -179,7 +173,7 @@ _: {
               background-color: ${c.mantle} !important;
             }
 
-            /* thread cards view, tb 128 and later paint .card-container, not the row */
+            /* tb 128 and later paint .card-container, not the row */
             #threadTree tr[is="thread-card"].selected .card-container,
             #threadTree tr[is="thread-card"][selected] .card-container {
               background-color: ${c.accent} !important;
@@ -193,7 +187,6 @@ _: {
               background-color: ${c.mantle} !important;
             }
 
-            /* thread table view fallback */
             #threadTree tr.selected {
               background-color: ${c.accent} !important;
               color: ${c.bg} !important;

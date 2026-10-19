@@ -14,7 +14,6 @@ _: {
       makoctl = lib.getExe' config.services.mako.package "makoctl";
     in
     {
-      # a unit so concurrent Lock signals collapse into one start
       systemd.user.services.hyprlock = {
         Unit = {
           Description = "Lock screen";
@@ -22,7 +21,6 @@ _: {
           PartOf = [ config.wayland.systemd.target ];
         };
         Service = {
-          # a dead mako or niri socket must not block the lock
           ExecStartPre = [
             "-${makoctl} mode -a lock"
             "-${niri} msg action do-screen-transition --delay-ms 300"
@@ -36,9 +34,9 @@ _: {
         enable = true;
         settings = {
           general = {
-            # the logind Lock signal is the single lock path, keepassxc and Mod+Escape use it too
+            # keepassxc and Mod+Escape lock through logind too
             lock_cmd = "${systemctl} --user start hyprlock.service";
-            # niri lacks hyprland-lock-notify so hypridle drops its inhibitor before the lock is up, lock-before-sleep in niri.nix waits instead
+            # lock-before-sleep in niri.nix waits instead
             inhibit_sleep = 0;
             after_sleep_cmd = "${niri} msg action power-on-monitors";
           };

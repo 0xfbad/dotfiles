@@ -10,7 +10,7 @@ _: {
       c = config.colors;
     in
     {
-      # GetLegacyOrXDGHomePath prefers ~/.mozilla/firefox when it exists and ignores the xdg path
+      # GetLegacyOrXDGHomePath prefers ~/.mozilla/firefox when it exists
       home.activation.warnLegacyMozilla = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
         if [ -e "$HOME/.mozilla/firefox" ]; then
           echo "WARNING: ~/.mozilla/firefox exists, firefox will ignore the XDG profile" >&2
@@ -209,7 +209,6 @@ _: {
             "toolkit.coverage.endpoint.base" = "";
             "datareporting.healthreport.uploadEnabled" = false;
             "datareporting.policy.dataSubmissionEnabled" = false;
-            # normandy and shield push remote experiments, https://mozilla.github.io/normandy/
             "app.shield.optoutstudies.enabled" = false;
             "app.normandy.enabled" = false;
             "app.normandy.api_url" = "";
@@ -219,7 +218,7 @@ _: {
 
             "browser.newtabpage.enabled" = false;
             "browser.startup.homepage" = "about:blank";
-            # auto restore session
+            # 3 restores the session
             "browser.startup.page" = 3;
             "browser.newtabpage.activity-stream.telemetry" = false;
             "browser.newtabpage.activity-stream.feeds.section.topstories" = false;
@@ -233,11 +232,9 @@ _: {
             "browser.newtabpage.activity-stream.system.showWeather" = false;
             "browser.newtab.preload" = false;
 
-            # the strict category itself comes from the EnableTrackingProtection policy
             "privacy.purge_trackers.enabled" = true;
             "privacy.globalprivacycontrol.enabled" = true;
             "privacy.globalprivacycontrol.functionality.enabled" = true;
-            # https only mode fires a plaintext background probe on slow upgrades, leaking the hostname
             "dom.security.https_only_mode_send_http_background_request" = false;
 
             "network.dns.disablePrefetch" = true;
@@ -245,18 +242,13 @@ _: {
             "network.prefetch-next" = false;
             "network.http.speculative-parallel-limit" = 0;
 
-            # webrtc ip leak prevention
             "media.peerconnection.ice.default_address_only" = true;
-            # 0rtt data can be replayed
             "security.tls.enable_0rtt_data" = false;
-            # prevents unicode domain spoofing
             "network.IDN_show_punycode" = true;
 
-            # drm, needed for netflix and spotify web
             "media.eme.enabled" = true;
             "media.gmp-widevinecdm.enabled" = true;
 
-            # keep the old ctrl+h history panel instead of the sidebar redesign
             "sidebar.revamp" = false;
             "sidebar.verticalTabs" = false;
 
@@ -277,7 +269,6 @@ _: {
             "browser.smartwindow.memories.generateFromHistory" = false;
             "browser.smartwindow.memories.generateFromConversation" = false;
 
-            # keepassxc handles passwords and autofill
             "signon.autofillForms" = false;
             "signon.generation.enabled" = false;
             "signon.management.page.breach-alerts.enabled" = false;
@@ -289,7 +280,7 @@ _: {
             "browser.urlbar.quicksuggest.enabled" = false;
             "browser.urlbar.suggest.quicksuggest.all" = false;
             "browser.urlbar.suggest.quicksuggest.sponsored" = false;
-            # pre fx146 name for suggest.quicksuggest.all, kept for esr and downgrades
+            # pre fx146 name of suggest.quicksuggest.all, kept for esr
             "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
             "browser.urlbar.quicksuggest.online.enabled" = false;
             "browser.urlbar.quicksuggest.contextualOptIn" = false;
@@ -328,20 +319,16 @@ _: {
             "accessibility.browsewithcaret" = false;
             "accessibility.browsewithcaret_shortcut.enabled" = false;
 
-            # apis that leak info
-            # gamepad api allows usb device enumeration
             "dom.gamepad.enabled" = false;
-            # beacon carries async analytics transfers
             "beacon.enabled" = false;
             "browser.urlbar.weather.featureGate" = false;
 
-            # 0 dark, 1 light, 2 auto, sites serve their own dark theme
+            # 0 dark, 1 light, 2 auto
             "layout.css.prefers-color-scheme.content-override" = 0;
-            # force gpu rendering even on blocklisted hardware
             "gfx.webrender.all" = true;
             "browser.compactmode.show" = true;
 
-            # session writes every 30min instead of 15s, saves ssd writes
+            # 30min, default is 15s
             "browser.sessionstore.interval" = 1800000;
 
             "browser.aboutConfig.showWarning" = false;

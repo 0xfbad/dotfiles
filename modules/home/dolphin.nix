@@ -14,7 +14,7 @@
         inputs.plasma-manager.homeModules.plasma-manager
       ];
 
-      # these plugins load only because qt.enable in gtk.nix puts this profile on QT_PLUGIN_PATH
+      # qt.enable in gtk.nix puts these on QT_PLUGIN_PATH
       home.packages = with pkgs.kdePackages; [
         dolphin
         dolphin-plugins
@@ -34,7 +34,7 @@
         baloo-widgets
       ];
 
-      # plasma-manager opens these for writing, the old generation left them as store symlinks
+      # plasma-manager writes these in place
       home.activation.unlinkKdeStoreSymlinks = lib.hm.dag.entryBefore [ "configure-plasma" ] ''
         for f in \
           "${config.xdg.configHome}/kdeglobals" \
@@ -62,7 +62,6 @@
           baloofilerc = {
             "Basic Settings"."Indexing-Enabled" = true;
             General = {
-              # ~/git and the windows image are 88G of churn that rg and filelight already cover
               "exclude folders" = lib.concatStringsSep "," [
                 "${home}/git"
                 "${home}/winboat"
@@ -80,7 +79,7 @@
         };
       };
 
-      # the shipped unit is off the user search path and its ExecCondition wants plasma-workspace
+      # the shipped unit is off the user path and its ExecCondition wants plasma-workspace
       systemd.user.services.kde-baloo = {
         Unit = {
           Description = "Baloo File Indexer Daemon";

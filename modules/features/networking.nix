@@ -9,14 +9,14 @@ _: {
     {
       networking.networkmanager.enable = true; # iwd breaks this wifi driver
 
-      networking.networkmanager.dns = lib.mkForce "none"; # resolved.nix sets a conflicting value
+      networking.networkmanager.dns = lib.mkForce "none"; # conflicts with resolved in anonymity.nix
       networking.networkmanager.settings.main.systemd-resolved = false; # dns=none still forwards dhcp resolvers to resolved
       networking.nameservers = [
         "127.0.0.1"
         "::1"
       ];
 
-      environment.etc."hosts".mode = "0644"; # activation replaces edits with generated host entries
+      environment.etc."hosts".mode = "0644"; # hostctl edits last until the next activation
       environment.systemPackages = [ pkgs.hostctl ];
 
       networking.networkmanager.ethernet.macAddress = "stable";
@@ -29,10 +29,10 @@ _: {
         path = [ pkgs.networkmanager ];
         serviceConfig.Type = "oneshot";
         script = ''
-          conf=/run/NetworkManager/conf.d/50-daily-stable-id.conf # NetworkManager.conf overrides runtime snippets
+          conf=/run/NetworkManager/conf.d/50-daily-stable-id.conf # NetworkManager.conf overrides this dir
           seed="[connection-wifi-daily]
           match-device=type:wifi
-          connection.stable-id=\''${NETWORK_SSID}-$(date +%Y%m%d)" # networkmanager has no date placeholder for the stable id
+          connection.stable-id=\''${NETWORK_SSID}-$(date +%Y%m%d)" # no date placeholder in stable-id
 
           if [ "$seed" = "$(cat "$conf" 2>/dev/null)" ]; then
             exit 0
@@ -45,7 +45,7 @@ _: {
             nmcli general reload conf
             nmcli -g UUID,TYPE connection show --active | while IFS=: read -r uuid type; do
               if [ "$type" = "802-11-wireless" ]; then
-                nmcli connection up uuid "$uuid" # the mac is chosen during activation
+                nmcli connection up uuid "$uuid"
               fi
             done
           fi

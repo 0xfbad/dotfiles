@@ -61,7 +61,7 @@ _: {
           (( $# < 1 )) && { print -u2 "usage: howto <what you want to do>"; return 1 }
           local cmd
           cmd=$(howto-query "$*") || return 1
-          # a child process needs TIOCSTI to fill the buffer and the kernel blocks it
+          # kernel blocks TIOCSTI, only the shell can fill its own buffer
           print -z -- "$cmd"
         '';
       };

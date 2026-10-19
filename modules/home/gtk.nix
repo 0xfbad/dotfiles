@@ -10,7 +10,6 @@
     let
       c = config.colors;
 
-      # read back from catppuccin gtk.icon so a flavour change cannot desync kdeglobals
       iconThemeName = config.gtk.iconTheme.name;
 
       schemeName = "CatppuccinMochaMauveOled";
@@ -21,13 +20,11 @@
         variant = "mocha";
       };
 
-      # unoverridden this builds frappe/blue, so ColorScheme below would dangle
       catppuccinKde = pkgs.catppuccin-kde.override {
         flavour = [ "mocha" ];
         accents = [ "mauve" ];
       };
 
-      # kde color schemes are decimal triplets, not hex
       kdeRgb =
         hex:
         let
@@ -36,7 +33,7 @@
         in
         "${channel 0}, ${channel 2}, ${channel 4}";
 
-      # mocha base swapped for OLED black, renamed to not shadow the scheme catppuccinKde ships
+      # renamed so it does not shadow the scheme catppuccinKde ships
       kdeColors = pkgs.runCommand "${schemeName}.colors" { } ''
         sed -e 's/${kdeRgb c.base}/${kdeRgb c.bg}/g' \
             -e 's/^ColorScheme=.*/ColorScheme=${schemeName}/' \
@@ -82,7 +79,7 @@
           "Videos"
         ];
         gtk4 = {
-          # libadwaita apps ignore the gtk3 theme, upstream bakes in mocha base so no OLED black here
+          # no oled black here, catppuccin-gtk bakes in mocha base
           theme = {
             name = gtkThemeName;
             package = catppuccinGtk;
@@ -98,27 +95,26 @@
         };
       };
 
-      # no qt.style, it sets QT_STYLE_OVERRIDE globally and darkly is qt6 only
+      # no qt.style, it sets QT_STYLE_OVERRIDE and darkly is qt6 only
       qt = {
         enable = true;
         platformTheme.name = "kde";
       };
 
-      # qt5 QKdeTheme refuses to load when this is below 4
+      # qt5 QKdeTheme needs this at 4 or above
       home.sessionVariables.KDE_SESSION_VERSION = "6";
       systemd.user.sessionVariables.KDE_SESSION_VERSION = "6";
 
       home.packages = [
-        # qt.style no longer installs this, but qt6 apps still resolve widgetStyle to it
+        # qt6 resolves widgetStyle to this, nothing else installs it
         pkgs.darkly
         pkgs.kdePackages.qqc2-desktop-style
         catppuccinKde
       ];
 
-      # readonly data kde looks up by scheme name, so a store symlink is fine here
       xdg.dataFile."color-schemes/${schemeName}.colors".source = kdeColors;
 
-      # plasma-manager owns kdeglobals so its activation can write it
+      # written in place by plasma-manager, kde apps edit kdeglobals
       programs.plasma.configFile.kdeglobals = {
         "Colors:Button" = colorGroup c.surface0 c.accent;
         "Colors:Complementary" = colorGroup c.mantle c.crust;
@@ -174,7 +170,7 @@
 
         KDE = {
           contrast = 4;
-          # qt6 resolves this to darkly6, qt5 lands on fusion still painted from the colorGroup sections above
+          # qt6 resolves darkly6, qt5 falls back to fusion with the colors above
           widgetStyle = "Darkly";
         };
       };

@@ -9,7 +9,7 @@ _: {
       programs.zellij = {
         enable = true;
 
-        # only background 24 24 37 is chrome, the base lines are text drawn on colored ribbons
+        # only background is chrome, the other base lines are text on ribbons
         themes.catppuccin-oled =
           builtins.replaceStrings
             [ "catppuccin-mocha" "background 24 24 37" ]

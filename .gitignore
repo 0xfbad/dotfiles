@@ -2,7 +2,6 @@ wallpapers/
 result
 *.md
 !README.md
-# slopmachine stuff
 !modules/**/*.md
 .direnv/
 

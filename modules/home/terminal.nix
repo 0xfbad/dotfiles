@@ -7,10 +7,9 @@ _: {
       ...
     }:
     let
-      # rar decoding lives behind the unfree unrar feature, off in nixpkgs by default
+      # enableUnfree adds rar
       ouchPkg = pkgs.ouch.override { enableUnfree = true; };
 
-      # one top dir extracts in place, otherwise ouch makes a basename folder to avoid a tarbomb
       ouch-open = pkgs.writeShellApplication {
         name = "ouch-open";
         runtimeInputs = [
@@ -32,7 +31,7 @@ _: {
           base="$(basename "$archive")"
           cd "$dir"
 
-          # --quiet drops the header and prints symlinks without the arrow to their target
+          # --quiet drops the header and the symlink arrows
           top_count=0
           if listing="$(ouch list --quiet "$archive" 2>/dev/null)"; then
             top_count="$(printf '%s\n' "$listing" \
@@ -59,7 +58,6 @@ _: {
         '';
       };
 
-      # JQ_COLORS takes sgr sequences, not hex
       sgr =
         hex:
         let
@@ -97,7 +95,6 @@ _: {
       ];
     in
     {
-      # broot needs home-manager integration for the br shell function
       programs.broot.enable = true;
 
       programs.fastfetch = {
@@ -108,7 +105,7 @@ _: {
             keys = config.colors.accent;
             title = config.colors.accent;
           };
-          # any user config replaces the builtin module list outright, omitting this renders only the logo
+          # a user config replaces the builtin module list, without this only the logo renders
           modules = [
             "title"
             "separator"
@@ -144,7 +141,6 @@ _: {
         enable = true;
         settings = {
           intro-banner = "off";
-          # otherwise numbat hits the network for currency rates on every start
           exchange-rates.fetching-policy = "on-first-use";
         };
       };
@@ -152,7 +148,6 @@ _: {
       programs.lazydocker = {
         enable = true;
         settings = {
-          # lazydocker still shells out to docker-compose without this
           commandTemplates.dockerCompose = "docker compose";
           gui = {
             returnImmediately = true;
@@ -169,14 +164,13 @@ _: {
         arguments = [
           "--smart-case"
           "--hidden"
-          # an inner slash would root anchor the glob
           "--glob=!.git/"
           "--max-columns=150"
           "--max-columns-preview"
         ];
       };
 
-      # hidden only reaches the interactive alias, ignores is the global half
+      # hidden only reaches the alias, ignores is global
       programs.fd = {
         enable = true;
         hidden = true;
@@ -287,7 +281,6 @@ _: {
         charm-freeze # generates pretty png or svg screenshots of code or terminal output
       ]);
 
-      # hidden handler entry so dolphin can route archive clicks to ouch
       xdg.desktopEntries.ouch-open = {
         name = "Ouch (Extract)";
         genericName = "Archive Extractor";

@@ -51,7 +51,7 @@ _: {
           server = config.programs.mcp.servers.excalidraw;
           exclude = [ "type" ];
         };
-        canvas = config.canvas.codexServer; # the shared canvas command has no directory restriction
+        canvas = config.canvas.codexServer; # programs.mcp.servers.canvas is unscoped
       };
 
       home.activation.claudeMcp = lib.hm.dag.entryAfter [ "writeBoundary" ] ''

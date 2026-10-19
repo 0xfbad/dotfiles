@@ -5,13 +5,13 @@
       imports = [ inputs.niri.nixosModules.niri ];
       nixpkgs.overlays = [ inputs.niri.overlays.niri ];
       programs.niri.enable = true;
-      # niri-flake is less up to date than nixpkgs
+      # niri-flake lags nixpkgs
       programs.niri.package = pkgs.niri;
 
       # setcap kms helper, no polkit prompts
       programs.gpu-screen-recorder.enable = true;
 
-      # gnome-keyring from niri-flake claims org.freedesktop.secrets before keepassxc fdosecrets can
+      # niri-flake enables it and it claims org.freedesktop.secrets before keepassxc
       services.gnome.gnome-keyring.enable = lib.mkForce false;
 
       # hypridle cannot delay suspend on niri
@@ -35,14 +35,12 @@
                 wayland | x11) ;;
                 *) continue ;;
               esac
-              # niri sets LockedHint only once every output has presented a locked frame
               [ "$(loginctl show-session "$id" -p LockedHint --value)" = yes ] || return 1
             done
           }
 
           loginctl lock-sessions
 
-          # a lock still in progress at suspend is aborted on resume by the nvidia page flip failure
           for _ in $(seq 50); do
             if locked; then exit 0; fi
             sleep 0.1
@@ -50,7 +48,7 @@
         '';
       };
 
-      # the gnome portal file chooser is broken, add gtk and route choosers to it
+      # the gnome file chooser is broken
       xdg.portal.extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
       xdg.portal.config.niri = {
         default = [
@@ -61,7 +59,7 @@
         "org.freedesktop.impl.portal.Screenshot" = [ "gnome" ];
       };
 
-      # hyprlock needs this pam stack, programs.hyprlock.enable also adds hypridle and hyprland
+      # programs.hyprlock.enable would also add hypridle and hyprland
       security.pam.services.hyprlock = { };
     };
 
@@ -89,11 +87,9 @@
           text = ''
             pgrep -x wayfreeze > /dev/null && exit 0
 
-            # a fixed sleep raced the freeze layer
             SYNC=$(mktemp -u)
             wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
             FREEZE=$!
-            # without a trap any later failure leaves the frozen overlay covering the session
             trap 'kill "$FREEZE" 2>/dev/null || true; rm -f "$SYNC"' EXIT
             for _ in $(seq 50); do
               [ -e "$SYNC" ] && break
@@ -121,7 +117,6 @@
           text = ''
             pgrep -x wayfreeze > /dev/null && exit 0
 
-            # a fixed sleep raced the freeze layer
             SYNC=$(mktemp -u)
             wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
             FREEZE=$!
@@ -237,7 +232,7 @@
             pkgs.coreutils
           ];
           text = ''
-            # cancelling the picker still exits 0, so an unguarded wl-copy would publish an empty selection
+            # cancelling the picker still exits 0
             HEX=$(niri msg pick-color | grep -oP '#[0-9a-fA-F]+' | head -n1) || exit 0
             [ -n "$HEX" ] || exit 0
             printf '%s' "$HEX" | wl-copy -n
@@ -248,7 +243,7 @@
       swayosd = lib.getExe' pkgs.swayosd "swayosd-client";
     in
     {
-      # name and package come from the catppuccin cursors port, setting them here collides
+      # name and package come from the catppuccin cursors port
       home.pointerCursor = {
         enable = true;
         size = 24;
@@ -257,7 +252,6 @@
 
       services.wl-clip-persist = {
         enable = true;
-        # keepassxc tags password copies with this mime hint
         extraOptions = [
           "--all-mime-type-regex"
           "^(?!x-kde-passwordManagerHint).+"
@@ -269,7 +263,6 @@
         QT_QPA_PLATFORM = "wayland;xcb";
         SDL_VIDEODRIVER = "wayland,x11";
 
-        # -b background -c border -s selection fill -w border width, colors are RRGGBBAA
         SLURP_ARGS = "-b 000000CC -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2";
       };
 
@@ -293,12 +286,11 @@
           focus-follows-mouse.enable = true;
         };
 
-        # clipboard managers still reach the primary selection through data-control
         clipboard.disable-primary = true;
 
         xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
 
-        # monitor scale, position and mode are per host, discover with niri msg outputs
+        # outputs are per host
         layout = {
           gaps = 8;
           preset-column-widths = [
@@ -315,7 +307,6 @@
             inactive.color = c.surface0;
           };
           focus-ring.enable = false;
-          # unset values fall back to rust defaults not the shipped kdl
           background-color = c.bg;
           insert-hint.display.color = c.accent;
           tab-indicator = {
@@ -329,7 +320,7 @@
 
         overview.backdrop-color = c.bg;
 
-        # blur and background-effect wait on niri-flake types, raw kdl replaces the whole settings block
+        # blur and background-effect wait on niri-flake types, raw kdl replaces all settings
         cursor = {
           theme = "catppuccin-mocha-mauve-cursors";
           size = 24;
@@ -361,7 +352,6 @@
             clip-to-geometry = true;
           }
           {
-            # keeps the vault out of screencasts and wlr-screencopy, not just the portal
             matches = [ { app-id = "^org\\.keepassxc\\.KeePassXC$"; } ];
             block-out-from = "screen-capture";
           }
@@ -375,12 +365,10 @@
             open-focused = false;
           }
           {
-            # choosers run as a separate portal process, niri does not float them by itself
             matches = [ { app-id = "^xdg-desktop-portal"; } ];
             open-floating = true;
             default-column-width.proportion = 0.75;
             default-window-height.proportion = 0.75;
-            # top centers horizontally, y is the offset from the edge
             default-floating-position = {
               x = 0;
               y = 48;
@@ -397,7 +385,6 @@
             };
           }
           {
-            # zoom is xwayland, float only its popups so the main and meeting windows stay tiled
             matches = [
               {
                 app-id = "(?i)zoom";
@@ -568,7 +555,7 @@
           "Mod+9".action = focus-workspace 9;
           "Mod+0".action = focus-workspace 10;
 
-          # the niri-flake parser drops the MoveWindowToWorkspace variant, raw attrset goes to niri directly
+          # niri-flake drops the MoveWindowToWorkspace variant, a raw attrset bypasses it
           "Mod+Shift+1" = {
             action.move-window-to-workspace = 1;
             hotkey-overlay.title = "Move to workspace 1";
@@ -593,7 +580,7 @@
           };
           "Mod+Ctrl+Tab".action = focus-workspace-previous;
 
-          # the builtin mru switcher claims Alt+Tab, Alt+Shift+Tab and Alt+Grave, binds here would shadow it
+          # Alt+Tab, Alt+Shift+Tab and Alt+Grave belong to the builtin mru switcher
 
           "Mod+WheelScrollDown" = {
             action = focus-column-right;
@@ -612,7 +599,7 @@
             action = spawn "vicinae" "vicinae://launch/clipboard/history?toggle=true";
             hotkey-overlay.title = "Clipboard";
           };
-          # the logind Lock signal drives the hypridle lock handler and keepassxc screen lock
+          # hypridle and keepassxc both listen for logind Lock
           "Mod+Escape" = {
             action = spawn (lib.getExe' pkgs.systemd "loginctl") "lock-session";
             hotkey-overlay.title = "Lock";
@@ -631,7 +618,6 @@
             hotkey-overlay.title = "Color picker";
           };
 
-          # wayfreeze in the capture scripts hides the cursor and avoids window border artifacts
           "Print" = {
             action = spawn screenshotArea;
             hotkey-overlay.title = "Screenshot region";
@@ -662,7 +648,6 @@
             hotkey-overlay.title = "Send to sandbox";
           };
 
-          # audio, routed through swayosd so the osd shows
           "XF86AudioRaiseVolume" = {
             action = spawn swayosd "--output-volume" "raise";
             allow-when-locked = true;

@@ -3,6 +3,6 @@
 
   systems = [ "x86_64-linux" ];
 
-  # exposes self.debug.options, which is what nixd completes flake-parts options from
+  # nixd completes flake-parts options from self.debug.options
   debug = true;
 }

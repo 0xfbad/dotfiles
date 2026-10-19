@@ -5,7 +5,7 @@ _: {
       c = config.colors;
     in
     {
-      # the catppuccin port hardcodes #1e1e2e and its include= clobbers anything sorting before it
+      # the catppuccin port hardcodes #1e1e2e and its include= clobbers earlier keys
       services.mako = {
         enable = true;
         settings = {
@@ -32,7 +32,7 @@ _: {
             default-timeout = 0;
           };
 
-          # the lock script flips this on, notifications land in history while the session is locked
+          # hyprlock.service in hypridle.nix toggles this mode
           "mode=lock".invisible = 1;
           "mode=do-not-disturb".invisible = 1;
         };

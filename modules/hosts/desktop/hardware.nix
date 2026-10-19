@@ -11,7 +11,7 @@ _: {
         (modulesPath + "/installer/scan/not-detected.nix")
       ];
 
-      # the rest of the generated list is already in boot.initrd.includeDefaultModules
+      # the rest of the generated list is in includeDefaultModules
       boot.initrd.availableKernelModules = [ "usb_storage" ];
       boot.kernelModules = [ "kvm-intel" ];
 

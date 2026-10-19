@@ -25,7 +25,7 @@ _: {
         zsh = {
           enable = true;
           enableCompletion = true;
-          # the hm default flips to this at stateVersion 26.05, pinned now to move the files once
+          # hm default from stateVersion 26.05, pinned to move the files once
           dotDir = "${config.xdg.configHome}/zsh";
 
           autosuggestion = {
@@ -39,21 +39,21 @@ _: {
 
           syntaxHighlighting = {
             enable = true;
-            # hm appends main on its own, mkForce keeps the array exactly as written
+            # hm adds main itself, mkForce avoids the duplicate
             highlighters = lib.mkForce [
               "main"
               "cursor"
             ];
           };
 
-          # atuin owns plain up arrow, substring search takes ctrl-up and ctrl-down
+          # atuin owns plain up arrow
           historySubstringSearch = {
             enable = true;
             searchUpKey = [ "^[[1;5A" ];
             searchDownKey = [ "^[[1;5B" ];
           };
 
-          # atuin is the only store, save 0 stops the file write, size still feeds autosuggestion
+          # atuin is the only store, size still feeds autosuggestion
           history = {
             size = 10000;
             save = 0;
@@ -83,7 +83,7 @@ _: {
             proj = "$HOME/projects";
           };
 
-          # the only piece of oh-my-zsh worth loading, double esc prefixes sudo
+          # double esc prefixes sudo
           plugins = [
             {
               name = "sudo";
@@ -96,7 +96,6 @@ _: {
             ls = "eza -l";
             la = "eza -la";
             cat = "bat -pp";
-            # bat-extras wrappers are not drop ins for grep/diff
             bgrep = "batgrep";
             bdiff = "batdiff";
             open = "xdg-open";
@@ -108,7 +107,6 @@ _: {
             qalc = "qalc -s 'autocalc' -s 'decimal comma off'";
             clip = "wl-copy --trim-newline";
             pwdc = "pwd | wl-copy --trim-newline";
-            # copy last command to clipboard
             lcc = "fc -ln -1 | sed 's/^[[:space:]]*//' | wl-copy --trim-newline";
             termbin = "nc termbin.com 9999";
             dupe = "setsid wezterm start --cwd \"$(pwd)\"";
@@ -159,10 +157,10 @@ _: {
           };
 
           initContent = lib.mkMerge [
-            # order 200 is the hm zellij slot, exec must replace the shell before the rest parses
+            # 200 is the hm zellij slot
             (lib.mkOrder 200 ''
               if [[ -z "$ZELLIJ" && "$TERM" != "linux" && "$TERM" != "dumb" && -z "$SSH_CONNECTION" ]]; then
-                # attach -c would mirror the newest live session into every new terminal
+                # attach -c would mirror one session into every new terminal
                 exec zellij
               fi
             '')
@@ -181,7 +179,6 @@ _: {
               zstyle ':completion:*:*:*:*:processes' command "ps -u $USER -o pid,user,comm -w -w"
               zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([0-9]#) ([0-9a-z-]#)*=01;34=0=01'
 
-              # terminal keys zsh leaves unbound, both normal and application mode
               bindkey -e
               bindkey '^[[H' beginning-of-line
               bindkey '^[OH' beginning-of-line
@@ -216,14 +213,14 @@ _: {
               zle -N _ctrl_z_toggle
               bindkey '^Z' _ctrl_z_toggle
 
-              # MANPAGER, so anything shelling out to man gets bat too
+              # sets MANPAGER
               ${pkgs.bat-extras.batman.passthru.shellInit "zsh"}
 
-              # LESSOPEN, so less previews archives, directories and binaries
+              # sets LESSOPEN
               ${pkgs.bat-extras.batpipe.passthru.shellInit "zsh"}
             ''
 
-            # after the autoload -Uz that siteFunctions emits at 1000
+            # hm sources the highlighter at 1200
             (lib.mkOrder 1300 ''
               ZSH_HIGHLIGHT_STYLES[path_pathseparator]='fg=${config.colors.overlay0}'
               ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]='fg=${config.colors.overlay0}'

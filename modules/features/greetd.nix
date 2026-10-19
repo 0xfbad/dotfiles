@@ -10,7 +10,7 @@ _: {
         enable = true;
         useTextGreeter = true;
         settings = {
-          # greetd runs this through sh -c, so the semicolons in the theme spec need quoting
+          # greetd runs this via sh -c, keep the theme quoted
           default_session.command = "${lib.getExe pkgs.tuigreet} --time --remember --remember-session --asterisks --issue --cmd niri-session --theme 'border=magenta;text=white;prompt=magenta;time=blue;action=cyan;button=magenta;container=black;input=white'";
         };
       };
