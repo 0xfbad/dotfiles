@@ -19,6 +19,15 @@ _: {
       # auth:pam:module is hyprlock, the nixos side must declare security.pam.services.hyprlock
       programs.hyprlock = {
         enable = true;
+        # TODO: temp until a hyprlock release includes hyprlock#1059, a refused or aborted lock otherwise hangs forever in the pam thread
+        package = pkgs.hyprlock.overrideAttrs (old: {
+          patches = (old.patches or [ ]) ++ [
+            (pkgs.fetchpatch {
+              url = "https://github.com/hyprwm/hyprlock/commit/1f337a4713e981e75ad4912cbbb5c3dccb7b6717.patch";
+              hash = "sha256-i/vawI+dIjGGl2nWfSMBYSulaY3YOYq3j/dtrQWbqKU=";
+            })
+          ];
+        });
         settings = {
           general.hide_cursor = true;
 

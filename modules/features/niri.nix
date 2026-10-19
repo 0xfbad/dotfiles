@@ -19,16 +19,32 @@
         description = "Lock sessions before sleep";
         before = [ "sleep.target" ];
         wantedBy = [ "sleep.target" ];
-        serviceConfig.Type = "oneshot";
+        serviceConfig = {
+          Type = "oneshot";
+          TimeoutStartSec = 15;
+        };
         path = [
           pkgs.systemd
-          pkgs.procps
           pkgs.coreutils
         ];
         script = ''
+          locked() {
+            loginctl list-sessions --no-legend | while read -r id _; do
+              [ "$(loginctl show-session "$id" -p Class --value)" = user ] || continue
+              case "$(loginctl show-session "$id" -p Type --value)" in
+                wayland | x11) ;;
+                *) continue ;;
+              esac
+              # niri sets LockedHint only once every output has presented a locked frame
+              [ "$(loginctl show-session "$id" -p LockedHint --value)" = yes ] || return 1
+            done
+          }
+
           loginctl lock-sessions
-          for _ in $(seq 20); do
-            if pgrep -x hyprlock >/dev/null; then exit 0; fi
+
+          # a lock still in progress at suspend is aborted on resume by the nvidia page flip failure
+          for _ in $(seq 50); do
+            if locked; then exit 0; fi
             sleep 0.1
           done
         '';
