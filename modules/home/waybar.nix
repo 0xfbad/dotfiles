@@ -40,15 +40,14 @@ _: {
         enable = true;
         systemd.enable = true;
 
-        # master for hwmon-by-name and calendar css classes, cava off until nixpkgs ships libcava 1.0.0
-        # TEMP: pin before #5212, because shared gtk tooltip cache leaks a modules text into another
+        # master for hwmon-by-name and calendar css classes, nixpkgs vendors cava 0.10.7 not 1.0.0
         package = (pkgs.waybar.override { cavaSupport = false; }).overrideAttrs (old: {
-          version = "0.15.0-unstable-2026-07-21";
+          version = "0.15.0-unstable-2026-10-10";
           src = pkgs.fetchFromGitHub {
             owner = "Alexays";
             repo = "Waybar";
-            rev = "7fae3d7d4341b74272ba43ce90a851e8710f4612";
-            hash = "sha256-g8gXdHTQG+Ie653+NIt501LG6+gjg6wVGoRs/y+jIms=";
+            rev = "4e207a0cb51a9eb89b4245d90245721f5e39bf06";
+            hash = "sha256-0L1elPWYo9yKgEwpXWWVWQyPVU0SW36LkWUR26CksgU=";
           };
           # master requires mm-glib for its new modem module
           buildInputs = old.buildInputs ++ [ pkgs.modemmanager ];

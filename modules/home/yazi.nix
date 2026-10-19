@@ -2,12 +2,11 @@ _: {
   flake.modules.homeManager.yazi =
     { pkgs, ... }:
     let
-      # newest rev that still parses under yazi 26.5.6, main renames the [which] mask to border
       yazi-flavors = pkgs.fetchFromGitHub {
         owner = "yazi-rs";
         repo = "flavors";
-        rev = "c02c804bb7c8873da8182745654fb57dc63b7348";
-        hash = "sha256-ZXJx4iwGCAi6qqDiLSuJvX3UL6XzypxSO7ptspDD/Yw=";
+        rev = "1183892c904f7f0efdf4473e856ed308b7bea98d";
+        hash = "sha256-E1OUF1+mT0V3crVxkewG2Y7hRu8fO+0oRl6NlINmw+o=";
       };
     in
     {
