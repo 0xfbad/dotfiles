@@ -87,8 +87,6 @@
             name = gtkThemeName;
             package = catppuccinGtk;
           };
-          # hm writes the enum ordinal here, but gtk 4.22 parses this key by nick
-          extraConfig."gtk-interface-color-scheme" = "dark";
         };
         font = {
           name = "Noto Sans";

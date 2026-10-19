@@ -84,7 +84,7 @@ _: {
 
       # http testing
       hurl # http request runner driven by plain text files
-      # harlequin # tui SQL editor TEMP DISABLED bc a sqlfmt dependency fails pythonMetadataCheck under python 3.14
+      harlequin # tui sql editor
     ];
   };
 }
