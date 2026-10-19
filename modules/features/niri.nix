@@ -366,6 +366,15 @@
             block-out-from = "screen-capture";
           }
           {
+            matches = [
+              {
+                app-id = "^org\\.keepassxc\\.KeePassXC$";
+                at-startup = true;
+              }
+            ];
+            open-focused = false;
+          }
+          {
             # choosers run as a separate portal process, niri does not float them by itself
             matches = [ { app-id = "^xdg-desktop-portal"; } ];
             open-floating = true;

@@ -1,23 +1,40 @@
 _: {
   flake.modules.homeManager.keepassxc =
-    { config, ... }:
+    { config, lib, ... }:
     let
       # keeps history out of the synced db directory, gives the retention rule a stable path
       backupDir = "${config.xdg.dataHome}/keepassxc/backups";
     in
     {
-      # the keepassxc module asserts on this whenever autostart is set
-      xdg.autostart.enable = true;
-
       # 2.7.12 has no retention of its own, so every save would accumulate forever
       systemd.user.tmpfiles.rules = [
         "d ${backupDir} 0700 - - 30d"
       ];
 
+      systemd.user.services.keepassxc = {
+        Unit = {
+          Description = "KeePassXC";
+          PartOf = [ config.wayland.systemd.target ];
+          After = [ config.wayland.systemd.target ];
+        };
+        Service = {
+          Type = "dbus";
+          BusName = "org.freedesktop.secrets";
+          ExecStart = lib.getExe config.programs.keepassxc.package;
+          Restart = "on-failure";
+        };
+        Install.WantedBy = [ config.wayland.systemd.target ];
+      };
+
+      xdg.dataFile."dbus-1/services/org.freedesktop.secrets.service".text = ''
+        [D-BUS Service]
+        Name=org.freedesktop.secrets
+        Exec=/bin/false
+        SystemdService=keepassxc.service
+      '';
+
       programs.keepassxc = {
         enable = true;
-        # gnome-keyring is gone, so this is the only org.freedesktop.secrets owner
-        autostart = true;
 
         settings = {
           General = {
@@ -37,8 +54,8 @@ _: {
           };
 
           GUI = {
-            # still serves fdosecrets, ssh agent, and browser integration
-            MinimizeOnStartup = true;
+            # no tray, so close locks instead of quitting
+            MinimizeOnClose = true;
             # defer to the darkly/catppuccin system theme
             ApplicationTheme = "classic";
             CompactMode = true;
