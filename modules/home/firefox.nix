@@ -308,6 +308,7 @@ _: {
             "browser.urlbar.suggest.yelp" = false;
             "browser.urlbar.suggest.topsites" = false;
             "browser.urlbar.suggest.searches" = false;
+            "browser.urlbar.suggest.history" = false;
             "browser.urlbar.trimURLs" = false;
             "browser.urlbar.dnsResolveSingleWordsAfterSearch" = 0;
             "browser.search.suggest.enabled" = false;
