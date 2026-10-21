@@ -75,7 +75,14 @@ in
       boot.kernelParams = [ "split_lock_detect=off" ]; # kernel 7.2 panics on skb split locks even in warn mode
       boot.kernel.sysctl."kernel.panic" = 10;
 
-      boot.extraModulePackages = [ config.boot.kernelPackages.v4l2loopback ];
+      boot.extraModulePackages = [
+        # TEMP: temp until NixOS/nixpkgs#575861
+        (config.boot.kernelPackages.v4l2loopback.overrideAttrs (old: {
+          postInstall = old.postInstall + ''
+            rm $out/lib/modules/*/modules.*
+          '';
+        }))
+      ];
       boot.kernelModules = [ "v4l2loopback" ];
       boot.extraModprobeConfig = ''
         options v4l2loopback devices=1 video_nr=1 card_label="Anker PowerConf C200" exclusive_caps=1
