@@ -46,6 +46,7 @@ _: {
       };
 
       programs.codex.enableMcpIntegration = false; # the desktop app also writes this config
+      codex.settings.mcp_oauth_credentials_store = "file"; # auto blocks thread/start on a locked keepassxc
       codex.settings.mcp_servers = {
         excalidraw = lib.hm.mcp.transformMcpServer {
           server = config.programs.mcp.servers.excalidraw;
