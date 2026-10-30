@@ -48,6 +48,7 @@ _: {
             SearchInAllDatabases = true;
             BestMatchOnly = true;
             ShowNotification = false;
+            AlwaysAllowAccess = true;
             # home-manager writes the manifest
             UpdateBinaryPath = false;
           };

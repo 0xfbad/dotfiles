@@ -132,6 +132,14 @@ _: {
               private_browsing = true;
             };
           };
+          "3rdparty".Extensions."keepassxc-browser@keepassxc.org".settings = {
+            passkeys = true;
+            # firefox's own prompt only does hardware keys
+            passkeysFallback = false;
+            autoFillSingleTotp = true;
+            usePasswordGeneratorIcons = true;
+            showGettingStartedGuideAlert = false;
+          };
         };
         profiles.default = {
           isDefault = true;
@@ -328,6 +336,8 @@ _: {
             "layout.css.prefers-color-scheme.content-override" = 0;
             "gfx.webrender.all" = true;
             "browser.compactmode.show" = true;
+            "browser.nova.enabled" = false;
+            "browser.newtabpage.activity-stream.nova.enabled" = false;
 
             # 30min, default is 15s
             "browser.sessionstore.interval" = 1800000;
