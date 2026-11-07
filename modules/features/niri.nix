@@ -386,23 +386,6 @@
           }
           {
             matches = [
-              {
-                app-id = "(?i)zoom";
-                title = "(?i)menu";
-              }
-              {
-                app-id = "(?i)zoom";
-                title = "(?i)confirm";
-              }
-              {
-                app-id = "(?i)zoom";
-                title = "(?i)options$";
-              }
-            ];
-            open-floating = true;
-          }
-          {
-            matches = [
               { app-id = "^com\\.saivert\\.pwvucontrol$"; }
               { app-id = "^floating-term$"; }
             ];

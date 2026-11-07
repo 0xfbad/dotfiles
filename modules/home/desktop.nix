@@ -112,7 +112,6 @@
 
         # communication
         signal-desktop
-        zoom-us
         weechat # irc client
 
         # productivity

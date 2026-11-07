@@ -254,6 +254,12 @@ _: {
             "security.tls.enable_0rtt_data" = false;
             "network.IDN_show_punycode" = true;
 
+            "network.protocol-handler.external.zoommtg" = false;
+            "network.protocol-handler.external.zoomus" = false;
+            "network.protocol-handler.external.zoomphonecall" = false;
+            "network.protocol-handler.external.zoomphonesms" = false;
+            "network.protocol-handler.external.zoomcontactcentercall" = false;
+
             "media.eme.enabled" = true;
             "media.gmp-widevinecdm.enabled" = true;
 
