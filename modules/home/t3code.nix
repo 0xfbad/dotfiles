@@ -15,7 +15,6 @@ _: {
           claude-code = config.programs.claude-code.finalPackage;
           codex = config.programs.codex.package;
           enableJujutsu = true;
-          enableOpencode = true;
         };
       };
     };

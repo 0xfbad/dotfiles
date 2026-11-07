@@ -19,15 +19,6 @@ _: {
       # needs security.pam.services.hyprlock on the nixos side
       programs.hyprlock = {
         enable = true;
-        # TODO: temp until a release has hyprlock#1059
-        package = pkgs.hyprlock.overrideAttrs (old: {
-          patches = (old.patches or [ ]) ++ [
-            (pkgs.fetchpatch {
-              url = "https://github.com/hyprwm/hyprlock/commit/1f337a4713e981e75ad4912cbbb5c3dccb7b6717.patch";
-              hash = "sha256-i/vawI+dIjGGl2nWfSMBYSulaY3YOYq3j/dtrQWbqKU=";
-            })
-          ];
-        });
         settings = {
           general.hide_cursor = true;
 
