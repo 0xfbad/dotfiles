@@ -60,7 +60,7 @@
       url = "github:ouch-org/ouch/384384286fa575975e088f14f71b5ccd039bedf4";
       flake = false;
     };
-    windows-stealth = {
+    windows-vm-stealth = {
       url = "path:/home/fbad/windows-sandbox";
     };
   };
