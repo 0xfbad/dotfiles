@@ -67,6 +67,7 @@ _: {
             LockDatabaseIdleSeconds = 300;
             LockDatabaseMinimize = true;
             EnableCopyOnDoubleClick = true;
+            QuickUnlock = false;
           };
 
           SSHAgent.Enabled = true;
