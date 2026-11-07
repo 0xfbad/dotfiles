@@ -7,7 +7,7 @@
     }:
     {
       imports = [
-        inputs.windows-stealth.nixosModules.default
+        inputs.windows-vm-stealth.nixosModules.default
         self.modules.nixos.laptopHardware
         self.modules.nixos.lanzaboote
         self.modules.nixos.common
@@ -25,7 +25,7 @@
 
       networking.hostName = "laptop";
 
-      services.windows-stealth = {
+      services.windows-vm-stealth = {
         enable = true;
         users = [ "fbad" ];
       };
