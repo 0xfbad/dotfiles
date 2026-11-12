@@ -29,7 +29,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     lanzaboote = {
-      url = "github:nix-community/lanzaboote/v1.1.0";
+      url = "github:nix-community/lanzaboote/v1.2.0";
       inputs.nixpkgs.follows = "nixpkgs";
       # devshell only upstream, following drops it from the lock
       inputs.pre-commit.follows = "nixpkgs";
@@ -51,7 +51,7 @@
     # main pairs with home-manager master, no follows keeps the cache hits
     catppuccin.url = "github:catppuccin/nix/main";
     # no follows and release tags only, both keep the cache hits
-    vicinae.url = "github:vicinaehq/vicinae/v0.25.0";
+    vicinae.url = "github:vicinaehq/vicinae/v0.30.0";
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
       inputs.vicinae.follows = "vicinae";
