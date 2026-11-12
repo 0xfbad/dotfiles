@@ -58,6 +58,13 @@ _: {
       };
 
       networking.firewall.enable = true;
+
+      # syncthing runs under home-manager
+      networking.firewall.allowedTCPPorts = [ 22000 ];
+      networking.firewall.allowedUDPPorts = [
+        22000
+        21027
+      ];
       networking.nftables.enable = true;
 
       assertions = [
