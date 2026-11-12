@@ -26,7 +26,7 @@ _: {
           DisableRemoteImprovements = true;
           DisableFirefoxAccounts = true;
           DisableProfileImport = true;
-          DisableFirefoxScreenshots = true;
+          DisableFirefoxScreenshots = false;
           DontCheckDefaultBrowser = true;
           EnableTrackingProtection = {
             Value = true;
