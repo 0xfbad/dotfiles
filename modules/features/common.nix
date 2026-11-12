@@ -277,8 +277,10 @@ in
 
       zramSwap.enable = true;
 
-      services.scx.enable = true;
-      services.scx.scheduler = "scx_lavd";
+      services.scx-loader = {
+        enable = true;
+        config.default_sched = "scx_lavd";
+      };
 
       systemd.generators.systemd-gpt-auto-generator = "/dev/null"; # autodetection causes dissect errors with declarative mounts
 
