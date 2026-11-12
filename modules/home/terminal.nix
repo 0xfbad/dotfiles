@@ -236,7 +236,11 @@ _: {
         procs # modern ps, tree view, ports per process, docker container names
         q # modern dig, doh/dot/doq support, json and table output
         duf # modern df, grouped table by device type, fits the terminal
-        viddy # modern watch, highlights diffs between runs, scrollable history
+        # TEMP: viddy 1.3.1 is missing its system sqlite build dependency
+        (viddy.overrideAttrs (old: {
+          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkg-config ];
+          buildInputs = (old.buildInputs or [ ]) ++ [ sqlite ];
+        })) # modern watch, highlights diffs between runs, scrollable history
         choose # modern cut/awk, simple field selection, negative indexing
 
         # file tools
