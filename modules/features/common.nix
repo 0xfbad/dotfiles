@@ -170,7 +170,9 @@ in
       security.run0 = {
         enable = true;
         sudo-shim.enable = true;
+        persistentAuth.enable = true;
       };
+      security.polkit.settings.Polkitd.ExpirationSeconds = 30; # applies to every polkit action that keeps auth
 
       security.wrappers.btop = {
         source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop"; # must match modules/home/btop.nix
