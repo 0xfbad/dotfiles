@@ -452,23 +452,6 @@
         "type": "github"
       }
     },
-    "ouch": {
-      "flake": false,
-      "locked": {
-        "lastModified": 1785295564,
-        "narHash": "sha256-cHI8PoRtT0ZuepQ2vzNnoEVs3IqdNgISBIL4cFwu19E=",
-        "owner": "ouch-org",
-        "repo": "ouch",
-        "rev": "384384286fa575975e088f14f71b5ccd039bedf4",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ouch-org",
-        "repo": "ouch",
-        "rev": "384384286fa575975e088f14f71b5ccd039bedf4",
-        "type": "github"
-      }
-    },
     "plasma-manager": {
       "inputs": {
         "home-manager": [
@@ -504,7 +487,6 @@
         "nix-flatpak": "nix-flatpak",
         "nix-index-database": "nix-index-database",
         "nixpkgs": "nixpkgs_2",
-        "ouch": "ouch",
         "plasma-manager": "plasma-manager",
         "rust-overlay": "rust-overlay",
         "spicetify": "spicetify",

@@ -58,7 +58,6 @@ in
         removeAttrs inputs [
           "self"
           "nixpkgs" # supplied by nixpkgs.flake.setFlakeRegistry
-          "ouch" # not a flake
         ]
       );
 
