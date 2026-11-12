@@ -76,15 +76,6 @@ _: {
 
         programs.codex = {
           enable = true;
-          # TEMP: codex 0.167.0 is missing dependencies required by cargoUseSystemLibs
-          package = pkgs.codex.overrideAttrs (old: {
-            buildInputs = old.buildInputs ++ [
-              pkgs.aws-lc
-              pkgs.oniguruma
-              pkgs.sqlite
-              pkgs.zstd
-            ];
-          });
 
           hooks.PreToolUse = [
             {

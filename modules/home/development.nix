@@ -75,11 +75,7 @@ _: {
       # parser tools
       tree-sitter
       ast-grep # structural search and replace via tree-sitter
-      # TEMP: scooter 0.10.0 is missing its system oniguruma build dependencies
-      (scooter.overrideAttrs (old: {
-        nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkg-config ];
-        buildInputs = (old.buildInputs or [ ]) ++ [ oniguruma ];
-      })) # find and replace tui, toggle individual replacements, helix integration
+      scooter # find and replace tui, toggle individual replacements, helix integration
 
       # benchmarking and analysis
       hyperfine # benchmarks cli commands

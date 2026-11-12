@@ -40,21 +40,6 @@ _: {
         enable = true;
         systemd.enable = true;
 
-        # master for hwmon-by-name and calendar css classes, nixpkgs cava is 0.10.7 not 1.0.0
-        package = (pkgs.waybar.override { cavaSupport = false; }).overrideAttrs (old: {
-          version = "0.15.0-unstable-2026-10-10";
-          src = pkgs.fetchFromGitHub {
-            owner = "Alexays";
-            repo = "Waybar";
-            rev = "4e207a0cb51a9eb89b4245d90245721f5e39bf06";
-            hash = "sha256-0L1elPWYo9yKgEwpXWWVWQyPVU0SW36LkWUR26CksgU=";
-          };
-          # master needs mm-glib for the modem module
-          buildInputs = old.buildInputs ++ [ pkgs.modemmanager ];
-          # meson still says 0.15.0, the version check fails
-          doInstallCheck = false;
-        });
-
         settings.mainBar = {
           layer = "top";
           position = "top";
