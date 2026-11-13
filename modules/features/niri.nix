@@ -174,7 +174,7 @@
             procps
             coreutils
             gnused
-            gnugrep
+            systemd
           ];
           text = ''
             VIDDIR="$HOME/Videos"
@@ -185,39 +185,38 @@
               shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
             }
 
-            PIDFILE="/tmp/qs-rec-pid"
-            FILEFILE="/tmp/qs-rec-file"
+            UNIT=screen-record.service
 
-            # pgrep cannot match the wrapped gsr binary
-            PID=$(cat "$PIDFILE" 2>/dev/null || true)
-            if [ -n "$PID" ] && grep -qa gpu-screen-recorder "/proc/$PID/cmdline" 2>/dev/null; then
-              # sigint finalizes the mp4
-              kill -INT "$PID" 2>/dev/null || true
-              for _ in $(seq 50); do
-                kill -0 "$PID" 2>/dev/null || break
-                sleep 0.1
-              done
-              if kill -0 "$PID" 2>/dev/null; then
-                kill -9 "$PID" 2>/dev/null || true
+            if systemctl --user is-active --quiet "$UNIT"; then
+              FILE=$(systemctl --user show -p Description --value "$UNIT")
+              systemctl --user stop "$UNIT"
+
+              if [ "$(systemctl --user show -p Result --value "$UNIT")" = timeout ]; then
                 notify-send -u critical -a "recording" -t 5000 "recording force-killed" "file may be corrupt"
               fi
-              LAST=$(cat "$FILEFILE" 2>/dev/null || true)
-              rm -f "$PIDFILE" "$FILEFILE"
-              if [ -n "$LAST" ] && [ -f "$LAST" ]; then
-                notify-send -a "recording" -t 3000 "recording saved to ~/videos" "$(basename "$LAST")"
-              fi
-            else
-              pgrep -x slurp && exit 0
-              NAME=$(gen_name)
-              FILE="$VIDDIR/$NAME.mp4"
-              GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -s 00000000) || exit 0
-              echo "$FILE" > "$FILEFILE"
-              notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
 
-              gpu-screen-recorder -w region -region "$GEOM" -f 60 -fm cfr \
-                -a default_output -ac aac -fallback-cpu-encoding yes -o "$FILE" &
-              echo $! > "$PIDFILE"
+              if [ -f "$FILE" ]; then
+                notify-send -a "recording" -t 3000 "recording saved to ~/videos" "$(basename "$FILE")"
+              fi
+
+              exit 0
             fi
+
+            pgrep -x slurp && exit 0
+
+            NAME=$(gen_name)
+            FILE="$VIDDIR/$NAME.mp4"
+            GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -s 00000000) || exit 0
+            notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
+
+            # a failed unit stays loaded and blocks the name
+            systemctl --user reset-failed "$UNIT" 2> /dev/null || true
+
+            # sigint finalizes the mp4
+            systemd-run --user --quiet --unit="$UNIT" \
+              -p KillSignal=SIGINT -p TimeoutStopSec=5 -p Description="$FILE" \
+              gpu-screen-recorder -w region -region "$GEOM" -f 60 -fm cfr \
+              -a default_output -ac aac -fallback-cpu-encoding yes -o "$FILE"
           '';
         }
       );
