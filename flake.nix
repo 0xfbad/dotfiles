@@ -24,16 +24,11 @@
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     lanzaboote = {
       url = "github:nix-community/lanzaboote/v1.2.0";
       inputs.nixpkgs.follows = "nixpkgs";
       # devshell only upstream, following drops it from the lock
       inputs.pre-commit.follows = "nixpkgs";
-      inputs.rust-overlay.follows = "rust-overlay";
     };
     plasma-manager = {
       url = "github:nix-community/plasma-manager";
@@ -47,6 +42,7 @@
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
     # main pairs with home-manager master, no follows keeps the cache hits
     catppuccin.url = "github:catppuccin/nix/main";
@@ -55,6 +51,8 @@
     vicinae-extensions = {
       url = "github:vicinaehq/extensions";
       inputs.vicinae.follows = "vicinae";
+      # read for lib only, extensions build with the vicinae nixpkgs
+      inputs.nixpkgs.follows = "nixpkgs";
     };
     windows-vm-stealth = {
       url = "path:/home/fbad/windows-sandbox";

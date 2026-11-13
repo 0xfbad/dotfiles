@@ -1,21 +1,5 @@
 {
   "nodes": {
-    "nixpkgs": {
-      "locked": {
-        "lastModified": 1790149054,
-        "narHash": "sha256-FfjXg6mAzKQBCY+7V9keGWOXG4DV2Eym/qA987lFl8A=",
-        "owner": "nixos",
-        "repo": "nixpkgs",
-        "rev": "8825bebf6324e0579d012936eff73379af284b6d",
-        "type": "github"
-      },
-      "original": {
-        "owner": "nixos",
-        "ref": "nixpkgs-unstable",
-        "repo": "nixpkgs",
-        "type": "github"
-      }
-    },
     "root": {
       "inputs": {
         "treefmt": "treefmt"
@@ -23,7 +7,7 @@
     },
     "treefmt": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "nixpkgs": []
       },
       "locked": {
         "lastModified": 1791885023,
