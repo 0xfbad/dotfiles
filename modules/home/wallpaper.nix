@@ -14,7 +14,6 @@ _: {
           pkgs.findutils
           pkgs.jq
           config.services.awww.package
-          config.programs.niri.package
         ];
         text = ''
           WALL_DIR="$HOME/dotfiles/wallpapers"
@@ -24,14 +23,14 @@ _: {
             exit 0
           fi
 
+          out=
           # After=awww.service does not wait for its socket
           for _ in $(seq 50); do
-            awww query > /dev/null 2>&1 && break
+            out=$(awww query --json 2> /dev/null) && break
             sleep 0.2
           done
 
-          # logical is null on disabled outputs, awww img rejects those
-          mapfile -t mons < <(niri msg --json outputs | jq -r 'to_entries[] | select(.value.logical != null) | .key')
+          mapfile -t mons < <(jq -r '.[][].name' <<< "$out")
 
           for i in "''${!mons[@]}"; do
             idx=$((i % ''${#walls[@]}))

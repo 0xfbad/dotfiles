@@ -73,6 +73,22 @@
     let
       c = config.colors;
 
+      freezeSelect = ''
+        pgrep -x wayfreeze > /dev/null && exit 0
+
+        SYNC=$(mktemp -u)
+        wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
+        FREEZE=$!
+        unfreeze() { kill "$FREEZE" 2>/dev/null || true; }
+        trap 'unfreeze; rm -f "$SYNC"' EXIT
+        for _ in $(seq 50); do
+          [ -e "$SYNC" ] && break
+          sleep 0.01
+        done
+
+        GEOM=$(slurp -b 000000CC -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2) || exit 0
+      '';
+
       screenshotArea = lib.getExe (
         pkgs.writeShellApplication {
           name = "screenshot-area";
@@ -85,19 +101,7 @@
             coreutils
           ];
           text = ''
-            pgrep -x wayfreeze > /dev/null && exit 0
-
-            SYNC=$(mktemp -u)
-            wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
-            FREEZE=$!
-            trap 'kill "$FREEZE" 2>/dev/null || true; rm -f "$SYNC"' EXIT
-            for _ in $(seq 50); do
-              [ -e "$SYNC" ] && break
-              sleep 0.01
-            done
-
-            # shellcheck disable=SC2086
-            GEOM=$(slurp ''${SLURP_ARGS:-}) || exit 0
+            ${freezeSelect}
             grim -g "$GEOM" - | wl-copy -t image/png
           '';
         }
@@ -115,21 +119,7 @@
             coreutils
           ];
           text = ''
-            pgrep -x wayfreeze > /dev/null && exit 0
-
-            SYNC=$(mktemp -u)
-            wayfreeze --hide-cursor --after-freeze-cmd "touch $SYNC" &
-            FREEZE=$!
-            unfreeze() { kill "$FREEZE" 2>/dev/null || true; }
-            trap 'unfreeze; rm -f "$SYNC"' EXIT
-            for _ in $(seq 50); do
-              [ -e "$SYNC" ] && break
-              sleep 0.01
-            done
-
-            # shellcheck disable=SC2086
-            GEOM=$(slurp ''${SLURP_ARGS:-}) || exit 0
-
+            ${freezeSelect}
             TMP=$(mktemp --suffix=.png)
             trap 'unfreeze; rm -f "$TMP" "$SYNC"' EXIT
 
@@ -261,8 +251,6 @@
         QT_WAYLAND_DISABLE_WINDOWDECORATION = "1";
         QT_QPA_PLATFORM = "wayland;xcb";
         SDL_VIDEODRIVER = "wayland,x11";
-
-        SLURP_ARGS = "-b 000000CC -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2";
       };
 
       programs.niri.settings = {
@@ -321,8 +309,8 @@
 
         # blur and background-effect wait on niri-flake types, raw kdl replaces all settings
         cursor = {
-          theme = "catppuccin-mocha-mauve-cursors";
-          size = 24;
+          theme = config.home.pointerCursor.name;
+          inherit (config.home.pointerCursor) size;
           hide-when-typing = true;
           hide-after-inactive-ms = 5000;
         };
