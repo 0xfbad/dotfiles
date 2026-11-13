@@ -2,17 +2,7 @@
   flake.modules.nixos.desktopConfiguration = _: {
     imports = [
       self.modules.nixos.desktopHardware
-      self.modules.nixos.common
-      self.modules.nixos.niri
-      self.modules.nixos.greetd
-      self.modules.nixos.nvidia
-      self.modules.nixos.audio
-      self.modules.nixos.virtualization
-      self.modules.nixos.anonymity
-      self.modules.nixos.networking
-      self.modules.nixos.flatpak
-      self.modules.nixos.yubikey
-      self.modules.nixos.homeManager
+      self.modules.nixos.workstation
     ];
 
     networking.hostName = "desktop";

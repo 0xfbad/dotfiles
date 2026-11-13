@@ -47,10 +47,4 @@ Other bits:
 
 ## stealing this
 
-Clone to `~/dotfiles`, grep for `fbad`, swap in your username. Copy a host dir, regenerate the hardware config, import the features you want. `nh os switch` and pray
-
-First rebuild will need `boot` instead of `switch` since it swaps dbus:
-
-```
-sudo nixos-rebuild boot --flake ~/dotfiles
-```
+Clone to `~/dotfiles`, grep for `fbad`, swap in your username. Copy a host dir, regenerate the hardware config, trim the shared `workstation` feature list in `modules/hosts/default.nix`. `nh os switch` and pray

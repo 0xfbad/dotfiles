@@ -5,6 +5,20 @@
   ...
 }:
 {
+  flake.modules.nixos.workstation.imports = with self.modules.nixos; [
+    common
+    niri
+    greetd
+    nvidia
+    audio
+    virtualization
+    anonymity
+    networking
+    flatpak
+    yubikey
+    homeManager
+  ];
+
   flake.nixosConfigurations = lib.genAttrs [ "desktop" "laptop" ] (
     host:
     inputs.nixpkgs.lib.nixosSystem {
