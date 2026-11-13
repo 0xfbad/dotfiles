@@ -3,10 +3,10 @@
     { pkgs, lib, ... }:
     {
       imports = [ inputs.niri.nixosModules.niri ];
-      nixpkgs.overlays = [ inputs.niri.overlays.niri ];
       programs.niri.enable = true;
       # niri-flake lags nixpkgs
       programs.niri.package = pkgs.niri;
+      niri-flake.cache.enable = false;
 
       # setcap kms helper, no polkit prompts
       programs.gpu-screen-recorder.enable = true;

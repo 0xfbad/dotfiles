@@ -20,7 +20,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     niri = {
-      # cache hits need nixpkgs and niri-flake bumped together
       url = "github:sodiboo/niri-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -62,12 +61,10 @@
   # for nixos-install, before nix.settings exists
   nixConfig = {
     extra-substituters = [
-      "https://niri.cachix.org"
       "https://vicinae.cachix.org"
       "https://catppuccin.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
       "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
       "catppuccin.cachix.org-1:noG/4HkbhJb+lUAdKrph6LaozJvAeEEZj4N732IysmU="
     ];
