@@ -8,6 +8,22 @@
     }:
     let
       spicePkgs = inputs.spicetify.legacyPackages.${pkgs.stdenv.hostPlatform.system};
+
+      # vicinae.nix reads the same file
+      aria2Secret = "${config.xdg.stateHome}/aria2/rpc-secret";
+      aria2Conf = pkgs.writeShellScript "aria2-conf" ''
+        umask 077
+        mkdir -p "$(dirname ${aria2Secret})"
+
+        if [ ! -s ${aria2Secret} ]; then
+          od -An -N32 -tx1 /dev/urandom | tr -d ' \n' > ${aria2Secret}
+        fi
+
+        {
+          cat ${config.xdg.configFile."aria2/aria2.conf".source}
+          printf 'rpc-secret=%s\n' "$(cat ${aria2Secret})"
+        } > "$RUNTIME_DIRECTORY/aria2.conf"
+      '';
     in
     {
       imports = [
@@ -79,14 +95,19 @@
           systemd.enable = true;
           settings = {
             dir = "${config.home.homeDirectory}/Downloads";
-            # vicinae.nix patches the same literal
-            rpc-secret = "vicinae-local";
             continue = true;
             max-connection-per-server = 16;
             min-split-size = "1M";
             split = 16;
           };
         };
+      };
+
+      # a top level browser navigation can call the rpc, the secret stays out of the store
+      systemd.user.services.aria2.Service = {
+        RuntimeDirectory = "aria2";
+        ExecStartPre = aria2Conf;
+        ExecStart = lib.mkForce "${lib.getExe config.programs.aria2.package} --enable-rpc --conf-path=%t/aria2/aria2.conf";
       };
 
       # catppuccin.obs installs the theme but does not select it

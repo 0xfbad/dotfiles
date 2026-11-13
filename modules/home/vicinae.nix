@@ -102,13 +102,28 @@
           ++ [
             (ext.aria2-manager.overrideAttrs (o: {
               postPatch = (o.postPatch or "") + ''
+                cat > src/lib/rpc-secret.ts <<'EOF'
+                import { readFileSync } from 'fs';
+
+                export const rpcSecret = (): string | null => {
+                    try {
+                        return readFileSync('${config.xdg.stateHome}/aria2/rpc-secret', 'utf8').trim();
+                    } catch {
+                        return null;
+                    }
+                };
+                EOF
+
+                sed -i "1i import { rpcSecret } from './lib/rpc-secret';" src/index.tsx src/quick-add.ts
                 substituteInPlace src/index.tsx src/quick-add.ts \
                   --replace-fail "const RPC_SECRET: string | null = null;" \
-                                 "const RPC_SECRET: string | null = 'vicinae-local';"
+                                 "const RPC_SECRET: string | null = rpcSecret();"
+
                 # secretless status check spawns a second daemon
+                sed -i "1i import { rpcSecret } from './rpc-secret';" src/lib/aria2-client.ts
                 substituteInPlace src/lib/aria2-client.ts \
                   --replace-fail "secret: string | null = null): Aria2Client" \
-                                 "secret: string | null = 'vicinae-local'): Aria2Client"
+                                 "secret: string | null = rpcSecret()): Aria2Client"
               '';
             }))
             (mkRaycast {
