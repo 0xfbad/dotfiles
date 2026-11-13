@@ -22,6 +22,7 @@ _: {
           t=$(mktemp)
           trap 'rm -f "$t"' EXIT
           tar --sort=name --owner=0 --group=0 --numeric-owner --mtime=@0 \
+            --anchored --no-wildcards-match-slash --exclude=skills/synced --exclude='skills/*-workspace' \
             -C modules/home/claude-code -cf "$t" skills hooks CLAUDE.md
           if [ -f secrets/prompts.age ] && age -d -i ${key} secrets/prompts.age 2>/dev/null | cmp -s - "$t"; then
             echo unchanged
@@ -51,7 +52,7 @@ _: {
         run ${pkgs.git}/bin/git -C ${dots} config core.hooksPath .githooks
         cc=${dots}/modules/home/claude-code
         if [ -f ${dots}/secrets/prompts.age ]; then
-          if [ ! -e "$cc/skills" ] || [ -z "$(${pkgs.findutils}/bin/find "$cc/skills" "$cc/hooks" "$cc/CLAUDE.md" -newer ${dots}/secrets/prompts.age -print -quit 2>/dev/null)" ]; then
+          if [ ! -e "$cc/skills" ] || [ -z "$(${pkgs.findutils}/bin/find "$cc/skills" "$cc/hooks" "$cc/CLAUDE.md" \( -path "$cc/skills/synced" -o -path "$cc/skills/*-workspace" ! -path "$cc/skills/*/*" \) -prune -o -newer ${dots}/secrets/prompts.age -print -quit 2>/dev/null)" ]; then
             run ${lib.getExe prompts-unpack} || verboseEcho "prompts unpack failed"
           fi
         fi
