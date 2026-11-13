@@ -10,8 +10,6 @@ _: {
 
         policies = {
           DisableTelemetry = true;
-          DisableAppUpdate = true;
-          DisableFeedbackCommands = true;
 
           # a store pinned xpi breaks on strict_max_version bumps
           ExtensionSettings."dkim_verifier@pl" = {
@@ -31,7 +29,6 @@ _: {
           "toolkit.telemetry.updatePing.enabled" = false;
           "toolkit.telemetry.bhrPing.enabled" = false;
           "toolkit.telemetry.firstShutdownPing.enabled" = false;
-          "toolkit.coverage.opt-out" = true;
           "breakpad.reportURL" = "";
 
           "mail.inappnotifications.enabled" = false;

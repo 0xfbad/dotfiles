@@ -2,7 +2,6 @@ _: {
   flake.modules.homeManager.firefox =
     {
       pkgs,
-      lib,
       config,
       ...
     }:
@@ -10,13 +9,6 @@ _: {
       c = config.colors;
     in
     {
-      # GetLegacyOrXDGHomePath prefers ~/.mozilla/firefox when it exists
-      home.activation.warnLegacyMozilla = lib.hm.dag.entryBefore [ "writeBoundary" ] ''
-        if [ -e "$HOME/.mozilla/firefox" ]; then
-          echo "WARNING: ~/.mozilla/firefox exists, firefox will ignore the XDG profile" >&2
-        fi
-      '';
-
       programs.firefox = {
         enable = true;
         configPath = "${config.xdg.configHome}/mozilla/firefox";
@@ -26,14 +18,10 @@ _: {
           DisableRemoteImprovements = true;
           DisableFirefoxAccounts = true;
           DisableProfileImport = true;
-          DisableFirefoxScreenshots = false;
           DontCheckDefaultBrowser = true;
           EnableTrackingProtection = {
-            Value = true;
             Locked = true;
             Category = "strict";
-            EmailTracking = true;
-            SuspectedFingerprinting = true;
             BaselineExceptions = true;
             ConvenienceExceptions = false;
           };
@@ -202,7 +190,6 @@ _: {
                 definedAliases = [ "@hm" ];
               };
               "bing".metaData.hidden = true;
-              "amazondotcom-us".metaData.hidden = true;
               "ebay".metaData.hidden = true;
               "perplexity".metaData.hidden = true;
             };
@@ -212,9 +199,6 @@ _: {
             "toolkit.telemetry.unified" = false;
             "toolkit.telemetry.archive.enabled" = false;
             "toolkit.telemetry.server" = "data:,";
-            "toolkit.coverage.opt-out" = true;
-            "toolkit.telemetry.coverage.opt-out" = true;
-            "toolkit.coverage.endpoint.base" = "";
             "datareporting.healthreport.uploadEnabled" = false;
             "datareporting.policy.dataSubmissionEnabled" = false;
             "app.shield.optoutstudies.enabled" = false;
@@ -242,7 +226,6 @@ _: {
 
             "privacy.purge_trackers.enabled" = true;
             "privacy.globalprivacycontrol.enabled" = true;
-            "privacy.globalprivacycontrol.functionality.enabled" = true;
             "dom.security.https_only_mode_send_http_background_request" = false;
 
             "network.dns.disablePrefetch" = true;
@@ -294,7 +277,7 @@ _: {
             "browser.urlbar.quicksuggest.enabled" = false;
             "browser.urlbar.suggest.quicksuggest.all" = false;
             "browser.urlbar.suggest.quicksuggest.sponsored" = false;
-            # pre fx146 name of suggest.quicksuggest.all, kept for esr
+            # a profile migration copies this into suggest.quicksuggest.all
             "browser.urlbar.suggest.quicksuggest.nonsponsored" = false;
             "browser.urlbar.quicksuggest.online.enabled" = false;
             "browser.urlbar.quicksuggest.contextualOptIn" = false;
