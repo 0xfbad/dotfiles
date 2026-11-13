@@ -5,20 +5,24 @@
 }:
 buildNpmPackage (finalAttrs: {
   pname = "canvas-lms-mcp";
-  version = "1.27.8";
+  version = "2.11.1";
 
   src = fetchurl {
     url = "https://registry.npmjs.org/canvas-lms-mcp/-/canvas-lms-mcp-${finalAttrs.version}.tgz";
-    hash = "sha256-uU49i8cptL2bPtGMora7R2osrYGUcAm6jIuS+cVG4jw=";
+    hash = "sha256-vqM8tC4/GNigzuPSi+Xmshgi5B9xMKifZi2MSoDCIRI=";
   };
 
   # no lockfile upstream, npm install --package-lock-only --omit=dev on bump
   postPatch = ''
     cp ${./canvas-lms-mcp-package-lock.json} package-lock.json
-    npm pkg delete devDependencies
   '';
 
-  npmDepsHash = "sha256-2vsMRagoGF887wAVMBB4BZgbCs30sg22zQidbjbv4/k=";
+  # the deps fetch inherits the patch phase and has no npm
+  postUnpack = ''
+    npm pkg delete devDependencies --prefix "$sourceRoot"
+  '';
+
+  npmDepsHash = "sha256-bkaV0NWNDlIOfYU0+9QiBuFssQkiLTm9nwMa5VON11E=";
   dontNpmBuild = true;
 
   meta = {

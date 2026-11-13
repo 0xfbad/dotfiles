@@ -88,6 +88,12 @@ _: {
               "delete_new_quiz_item"
               "delete_page"
               "delete_peer_review"
+              "delete_group"
+              "delete_module"
+              "delete_module_item"
+              "delete_quiz"
+              "delete_quiz_question"
+              "delete_rubric"
             ]
             (_: {
               approval_mode = "prompt";
