@@ -124,7 +124,7 @@
       services.awww.enable = true;
 
       home.packages = with pkgs; [
-        torsocks # route any app traffic through tor
+        torsocks # routes a program through tor
 
         # media
         vlc
@@ -141,7 +141,7 @@
         kdePackages.kdenlive
         xournalpp # pdf annotation and handwriting
 
-        # screenshots and recording
+        # images and clipboard
         imagemagick
         wl-clipboard # provides wl-copy and wl-paste
         pngquant # lossy png compression

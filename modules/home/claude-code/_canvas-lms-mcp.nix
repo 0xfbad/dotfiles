@@ -12,7 +12,7 @@ buildNpmPackage (finalAttrs: {
     hash = "sha256-vqM8tC4/GNigzuPSi+Xmshgi5B9xMKifZi2MSoDCIRI=";
   };
 
-  # no lockfile upstream, npm install --package-lock-only --omit=dev on bump
+  # upstream ships no lockfile, after a version bump regenerate it with npm install --package-lock-only --omit=dev
   postPatch = ''
     cp ${./canvas-lms-mcp-package-lock.json} package-lock.json
   '';

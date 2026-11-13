@@ -35,6 +35,7 @@ in
 
       nix.settings.extra-substituters = nixConfig.extra-substituters;
       nix.settings.extra-trusted-public-keys = nixConfig.extra-trusted-public-keys;
+
       programs.nix-ld.enable = true;
       programs.nix-index-database.comma.enable = true;
       programs.nh = {
@@ -230,6 +231,7 @@ in
         enable = true;
         capSysNice = true;
       };
+
       programs.wireshark = {
         enable = true;
         package = pkgs.wireshark;

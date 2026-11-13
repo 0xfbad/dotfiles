@@ -9,7 +9,7 @@ _: {
     {
       services.xserver.videoDrivers = [ "nvidia" ];
 
-      # videoDrivers only loads these under xserver
+      # the nvidia module loads these only with xserver.enable
       boot.kernelModules = [
         "nvidia"
         "nvidia_modeset"

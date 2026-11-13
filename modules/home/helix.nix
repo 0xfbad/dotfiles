@@ -100,9 +100,8 @@ _: {
               };
             }
             {
-              # upstream also lists golangci-lint-lsp
               name = "go";
-              language-servers = [ "gopls" ];
+              language-servers = [ "gopls" ]; # drops golangci-lint-lsp from the upstream default
             }
             {
               name = "typescript";
@@ -127,9 +126,9 @@ _: {
             {
               name = "bash";
               auto-format = true;
-              # matches the treefmt shfmt args
               formatter = {
                 command = "shfmt";
+                # matches the treefmt shfmt args
                 args = [
                   "-ci"
                   "-i"
@@ -152,8 +151,8 @@ _: {
               auto-format = true;
             }
             {
-              # language-servers replaces the default, marksman restated
               name = "markdown";
+              # language-servers replaces the default, marksman restated
               language-servers = [
                 "marksman"
                 "harper-ls"

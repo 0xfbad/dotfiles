@@ -35,6 +35,7 @@ _: {
           };
         }
       );
+
       scopedCanvas = pkgs.writeScript "codex-canvas-mcp" ''
         #!${pkgs.python3}/bin/python3
         import json
@@ -46,6 +47,7 @@ _: {
           builtins.toJSON (builtins.toJSON (map (d: "${config.home.homeDirectory}/${d}") config.canvas.dirs))
         })
         cwd = Path.cwd().resolve()
+
         if any(cwd.is_relative_to(Path(root).resolve()) for root in roots):  # codex stops inheriting project settings at git roots
             os.execv("${lib.getExe canvas-mcp}", ["${lib.getExe canvas-mcp}"])
 
@@ -56,6 +58,7 @@ _: {
 
             method = request.get("method")
             response = {"jsonrpc": "2.0", "id": request["id"]}
+
             if method == "initialize":
                 response["result"] = {
                     "protocolVersion": request["params"]["protocolVersion"],
@@ -74,6 +77,7 @@ _: {
 
             print(json.dumps(response), flush=True)
       '';
+
       codexServer = {
         command = toString scopedCanvas;
         startup_timeout_sec = 60;

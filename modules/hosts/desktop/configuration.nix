@@ -16,10 +16,10 @@
 
     boot.loader.grub = {
       enable = true;
-      # TODO use the /dev/disk/by-id path, nvme0n1 is enumeration order
+      # on the desktop, get the nvme path from /dev/disk/by-id and set it here, nvme0n1 follows enumeration order and can point grub at the wrong disk
       device = "/dev/nvme0n1";
       configurationLimit = 5;
-      # hidden still honors esc/f4/shift during the timeout, timeout 0 does not
+      # hidden still honors esc, f4 and shift during the timeout, timeout 0 does not
       timeoutStyle = "hidden";
     };
     boot.loader.timeout = 1;

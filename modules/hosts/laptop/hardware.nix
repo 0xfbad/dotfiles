@@ -26,7 +26,7 @@ _: {
         device = "/dev/disk/by-uuid/989d2a80-dc9d-4fb3-8f7f-ccaf01168651";
         allowDiscards = true;
         bypassWorkqueues = true;
-        # enroll after secure boot with systemd-cryptenroll --tpm2-device=auto --tpm2-with-pin=yes --tpm2-pcrs=7, systemd 262 binds to no pcr without --tpm2-pcrs
+        # after secure boot enrollment, run systemd-cryptenroll --tpm2-device=auto --tpm2-with-pin=yes --tpm2-pcrs=7, without --tpm2-pcrs systemd 262 binds to no pcr
         crypttabExtraOpts = [ "tpm2-device=auto" ];
       };
 

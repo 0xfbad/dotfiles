@@ -4,18 +4,17 @@
       inputs.lanzaboote.nixosModules.lanzaboote
     ];
 
-    # the module turns systemd-boot.enable off itself
+    # boot.loader.external defaults systemd-boot.enable to false, no mkForce needed
     boot.lanzaboote = {
       enable = true;
       pkiBundle = "/var/lib/sbctl";
       configurationLimit = 5;
       bootCounting.initialTries = 3;
-      # implies allowUnsigned
+      # enabling this defaults allowUnsigned to true
       autoGenerateKeys.enable = false;
     };
 
+    # to enroll keys, put secure boot in setup mode from the bios, do not clear all keys, then run sbctl enroll-keys --microsoft, without --microsoft the machine can fail to boot
     environment.systemPackages = [ pkgs.sbctl ];
-
-    # enroll via bios reset to setup mode, never clear all keys, then sbctl enroll-keys --microsoft or it may fail to boot
   };
 }

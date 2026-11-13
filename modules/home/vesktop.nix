@@ -36,7 +36,7 @@ _: {
         };
         vencord = {
           themes."catppuccin-mocha-mauve-oled.theme" = oledTheme;
-          mutableSettings = true; # ui plugin toggles persist, close vesktop before a switch
+          mutableSettings = true; # ui plugin toggles persist, before a switch close vesktop to stop concurrent writes
           settings = {
             useQuickCss = true;
             enabledThemes = [ "catppuccin-mocha-mauve-oled.theme.css" ];
@@ -51,7 +51,7 @@ _: {
             };
           };
           extraQuickCss = ''
-            /* doubled class outranks the theme !important rules */
+            /* the theme rules are also !important, the doubled class wins on specificity */
             .visual-refresh.theme-dark.theme-dark,
             .visual-refresh .theme-dark.theme-dark {
               --home-background: ${c.bg} !important;

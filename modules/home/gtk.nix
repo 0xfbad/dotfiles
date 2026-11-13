@@ -170,7 +170,7 @@
 
         KDE = {
           contrast = 4;
-          # qt6 resolves darkly6, qt5 falls back to fusion with the colors above
+          # qt5 apps fall back to fusion with the colors above
           widgetStyle = "Darkly";
         };
       };

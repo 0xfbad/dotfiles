@@ -7,17 +7,18 @@ _: {
         [[ -n "$file" ]] && ''${=EDITOR:-hx} "$file"
       '';
 
-      # --files-from implies --relative
       sff = ''
         (( $# < 1 )) && { print -u2 "usage: sff <host>[:<path>]"; return 1 }
+
         local target="$1"
         [[ "$target" != *:* ]] && target="$target:"
         fzf --multi --preview 'bat --color=always --style=numbers --line-range=:200 {}' |
-          rsync -av --files-from=- . "$target"
+          rsync -av --files-from=- . "$target" # --files-from implies --relative
       '';
 
       ga = ''
         (( $# < 1 )) && { print -u2 "usage: ga <branch-name>"; return 1 }
+
         local branch="$1" main wt
         main=$(git worktree list --porcelain | head -1 | cut -d' ' -f2-) || return 1
         wt="''${main}--''${branch}"
@@ -28,6 +29,7 @@ _: {
 
       gd = ''
         (( $# < 1 )) && { print -u2 "usage: gd <branch-name>"; return 1 }
+
         local branch="$1" main
         main=$(git worktree list --porcelain | head -1 | cut -d' ' -f2-) || return 1
         cd "$main" || return 1
@@ -38,6 +40,7 @@ _: {
 
       fip = ''
         (( $# < 2 )) && { print -u2 "usage: fip <host> <port1> [port2] ..."; return 1 }
+
         local host="$1" port
         shift
         ssh -O check "$host" 2>/dev/null ||
@@ -50,6 +53,7 @@ _: {
 
       dip = ''
         (( $# < 2 )) && { print -u2 "usage: dip <host> <port1> [port2] ..."; return 1 }
+
         local host="$1" port
         shift
         for port in "$@"; do
@@ -83,13 +87,14 @@ _: {
         nh search "$@"
       '';
 
-      # detached --scope is parsed as the query
       no = ''
+        # a space separated --scope value is parsed as the query
         nh search options --scope=home-manager "$@"
       '';
 
       nf = ''
         (( $# < 1 )) && { print -u2 "usage: nf <binary>"; return 1 }
+
         nix-locate --whole-name "bin/$1"
       '';
 
@@ -99,15 +104,19 @@ _: {
 
       port = ''
         (( $# < 1 )) && { print -u2 "usage: port <port>"; return 1 }
+
         ss -tulpnH "sport = :$1" | grep . || print "nothing on port $1"
       '';
 
       termwatch = ''
         local -a loop msg
         zparseopts -D -F -- l=loop m:=msg || return 1
+
         (( $# < 1 )) && { print -u2 "usage: termwatch [-l] [-m <msg>] <video> [mpv-args...]"; return 1 }
+
         local -a args=( --vo=tct --vo-tct-256 )
         (( $#loop )) && args+=( --loop-file=inf )
+
         if (( $#msg )); then
           args+=( --msg-level=all=no,statusline=status --term-status-msg="''${msg[2]}" )
         else
@@ -118,10 +127,15 @@ _: {
 
       adroll = ''
         emulate -L zsh
+
         [[ -o interactive && -t 0 && -t 1 && -z $CLAUDECODE && -z $AI_AGENT ]] || return
+
         (( RANDOM % 1000 )) && return
+
         local -a ads=( ~/Videos/ads/*(N.) )
+
         (( $#ads )) || return
+
         termwatch -m 'your command will be executed shortly after this ad' "$ads[RANDOM % $#ads + 1]"
         clear
       '';

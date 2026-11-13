@@ -4,7 +4,7 @@
     {
       imports = [ inputs.niri.nixosModules.niri ];
       programs.niri.enable = true;
-      # niri-flake lags nixpkgs
+      # the nixpkgs build is on cache.nixos.org, so the niri-flake cachix stays off
       programs.niri.package = pkgs.niri;
       niri-flake.cache.enable = false;
 
@@ -14,7 +14,7 @@
       # niri-flake enables it and it claims org.freedesktop.secrets before keepassxc
       services.gnome.gnome-keyring.enable = lib.mkForce false;
 
-      # hypridle cannot delay suspend on niri
+      # niri lacks hyprland-lock-notify-v1, so hypridle cannot hold suspend until the lock is up
       systemd.services.lock-before-sleep = {
         description = "Lock sessions before sleep";
         before = [ "sleep.target" ];
@@ -31,10 +31,12 @@
           locked() {
             loginctl list-sessions --no-legend | while read -r id _; do
               [ "$(loginctl show-session "$id" -p Class --value)" = user ] || continue
+
               case "$(loginctl show-session "$id" -p Type --value)" in
                 wayland | x11) ;;
                 *) continue ;;
               esac
+
               [ "$(loginctl show-session "$id" -p LockedHint --value)" = yes ] || return 1
             done
           }
@@ -81,6 +83,7 @@
         FREEZE=$!
         unfreeze() { kill "$FREEZE" 2>/dev/null || true; }
         trap 'unfreeze; rm -f "$SYNC"' EXIT
+
         for _ in $(seq 50); do
           [ -e "$SYNC" ] && break
           sleep 0.01
@@ -568,7 +571,7 @@
             action = spawn "vicinae" "vicinae://launch/clipboard/history?toggle=true";
             hotkey-overlay.title = "Clipboard";
           };
-          # hypridle and keepassxc both listen for logind Lock
+          # hypridle and keepassxc both act on the logind lock signal
           "Mod+Escape" = {
             action = spawn (lib.getExe' pkgs.systemd "loginctl") "lock-session";
             hotkey-overlay.title = "Lock";

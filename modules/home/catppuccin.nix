@@ -47,7 +47,7 @@
     {
       imports = [ inputs.catppuccin.homeModules.catppuccin ];
 
-      # gtk theme is in home/gtk.nix
+      # the gtk theme and vesktop get oled variants in home/gtk.nix and home/vesktop.nix
       catppuccin = {
         enable = true;
         autoEnable = false;
@@ -66,7 +66,6 @@
         imv.enable = true;
         mpv.enable = true;
         obs.enable = true;
-        # vesktop is themed in home/vesktop.nix
         vivid.enable = true;
         zathura.enable = true;
         zsh-syntax-highlighting.enable = true;

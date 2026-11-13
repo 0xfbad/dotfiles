@@ -43,7 +43,7 @@ _: {
             after_sleep_cmd = "${niri} msg action power-on-monitors";
           };
 
-          # nothing suspends the machine
+          # idle never suspends the machine
           listener = [
             {
               timeout = 300;

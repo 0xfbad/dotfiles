@@ -11,7 +11,7 @@ _: {
         # each zellij pane is a new ATUIN_SESSION, plain session starts empty
         filter_mode_shell_up_key_binding = "session-preload";
         preview.strategy = "static";
-        # unset it prompts every start, config.toml is a store symlink
+        # unset, the ai keybind prompts on every use since config.toml is a read only store symlink
         ai = {
           enabled = false;
           yolo = false;

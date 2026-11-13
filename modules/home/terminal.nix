@@ -31,8 +31,8 @@ _: {
           base="$(basename "$archive")"
           cd "$dir"
 
-          # --quiet drops the header and the symlink arrows
           top_count=0
+          # --quiet drops the header and the symlink arrows
           if listing="$(ouch list --quiet "$archive" 2>/dev/null)"; then
             top_count="$(printf '%s\n' "$listing" \
               | awk -F'/' 'NF>0 && $1!="" {print $1}' \
@@ -226,17 +226,17 @@ _: {
         socat # bidirectional data relay between streams, sockets, files
         psmisc # killall, fuser, pstree
         libqalculate # calculator with unit conversion and symbolic math
-        nix-output-monitor # nh uses this for build progress
+        nix-output-monitor # nom, tree view of nix build progress
         csvlens # like less but for csv, aligned columns, filtering, search
         wiki-tui # wikipedia in your terminal, fuzzy search, section jumping
         circumflex # hacker news tui, reader mode extracts article text, threaded comments
 
         # modern replacements
-        sd # modern sed, uses normal regex so no escaping needed
+        sd # modern sed, rust regex syntax, -F for literal strings
         procs # modern ps, tree view, ports per process, docker container names
         q # modern dig, doh/dot/doq support, json and table output
-        duf # modern df, grouped table by device type, fits the terminal
-        # TEMP: viddy 1.3.1 is missing its system sqlite build dependency
+        duf # modern df, tables grouped by device type
+        # until nixpkgs adds pkg-config to viddy, cargoUseSystemLibs needs it to find sqlite
         (viddy.overrideAttrs (old: {
           nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkg-config ];
           buildInputs = (old.buildInputs or [ ]) ++ [ sqlite ];
@@ -251,7 +251,7 @@ _: {
         magic-wormhole # send files between computers with a single use code
         rsync # incremental transfers that keep layout, the sff function needs it
         ripdrag # drag and drop files from terminal to gui apps
-        dua # modern du, interactive tui, fast parallel scanning
+        dua # modern du, interactive tui, parallel scanning
         fclones # finds duplicate files, hashes progressively to skip full reads
         rip2 # modern rm, moves to graveyard with undo support
 
@@ -282,7 +282,7 @@ _: {
         # fun
         cowsay # ascii art cow says your message
         glow # renders markdown in the terminal with a file browser tui
-        charm-freeze # generates pretty png or svg screenshots of code or terminal output
+        charm-freeze # generates png or svg screenshots of code or terminal output
       ]);
 
       xdg.desktopEntries.ouch-open = {

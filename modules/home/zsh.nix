@@ -25,7 +25,7 @@ _: {
         zsh = {
           enable = true;
           enableCompletion = true;
-          # hm default from stateVersion 26.05, pinned to move the files once
+          # the hm default from stateVersion 26.05, set now so the later bump moves nothing
           dotDir = "${config.xdg.configHome}/zsh";
 
           autosuggestion = {
@@ -211,7 +211,6 @@ _: {
               zle -N _ctrl_z_toggle
               bindkey '^Z' _ctrl_z_toggle
 
-              # double esc prefixes sudo
               _sudo_toggle() {
                 [[ -z $BUFFER ]] && BUFFER=$(fc -ln -1)
                 local indent=''${BUFFER%%[^[:space:]]*}

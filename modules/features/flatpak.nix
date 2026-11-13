@@ -12,7 +12,6 @@
       ];
 
       update = {
-        # auto.enable only drives the timer, not activation
         auto = {
           enable = true;
           onCalendar = "daily";

@@ -294,7 +294,6 @@ _: {
             color: ${c.overlay0};
           }
 
-          /* source modules get .muted too, .mic must follow .muted */
           #wireplumber.mic {
             color: ${c.rosewater};
           }

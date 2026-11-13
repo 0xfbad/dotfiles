@@ -32,7 +32,7 @@ _: {
       allowedTCPPorts = [ 53 ];
     };
 
-    # one bridge per compose project, firewall.interfaces cannot take the br-* wildcard
+    # compose creates a br-* bridge per project
     networking.firewall.extraInputRules = ''
       iifname "br-*" ip daddr 172.17.0.1 udp dport 53 accept
       iifname "br-*" ip daddr 172.17.0.1 tcp dport 53 accept

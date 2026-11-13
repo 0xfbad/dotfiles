@@ -1,9 +1,10 @@
 _: {
   flake.modules.nixos.audio = { pkgs, ... }: {
     environment.systemPackages = with pkgs; [
-      sox_ng # maintained sox fork, installs as sox/play/rec/soxi
+      sox_ng # maintained sox fork, installs sox, play, rec and soxi
       pwvucontrol # pipewire volume control gui
     ];
+
     security.rtkit.enable = true;
     services.pipewire = {
       enable = true;

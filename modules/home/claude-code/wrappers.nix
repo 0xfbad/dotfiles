@@ -53,7 +53,7 @@ _: {
           export CLAUDE_CODE_SUBAGENT_MODEL="openai/gpt-5.6-luna"
         '')
 
-        # cli-proxy-api --config ~/.cli-proxy-api/config.yaml --codex-login or --kimi-login first
+        # before first use, run cli-proxy-api --config ~/.cli-proxy-api/config.yaml --codex-login or --kimi-login
         (mkClaudeWrapper "ccp" ''
           set -- --dangerously-skip-permissions "$@"
           export ANTHROPIC_BASE_URL="http://127.0.0.1:8317"

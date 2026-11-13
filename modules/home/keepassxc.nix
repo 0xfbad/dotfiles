@@ -2,7 +2,7 @@ _: {
   flake.modules.homeManager.keepassxc =
     { config, lib, ... }:
     let
-      # the db directory is synced
+      # backups stay out of the synced db directory
       backupDir = "${config.xdg.dataHome}/keepassxc/backups";
     in
     {

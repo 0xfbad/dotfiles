@@ -32,7 +32,7 @@ _: {
             show_title = true;
           };
 
-          # the default also falls back to macos and windows pages
+          # the default also falls back to pages for every other platform
           search.platforms = [
             "current"
             "common"

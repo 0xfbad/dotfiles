@@ -11,7 +11,7 @@ _: {
         policies = {
           DisableTelemetry = true;
 
-          # a store pinned xpi breaks on strict_max_version bumps
+          # a store pinned xpi stops loading once thunderbird passes its strict_max_version
           ExtensionSettings."dkim_verifier@pl" = {
             installation_mode = "force_installed";
             install_url = "https://addons.thunderbird.net/thunderbird/downloads/latest/dkim-verifier/latest.xpi";
@@ -56,19 +56,14 @@ _: {
 
             # 0 is unthreaded
             "mailnews.default_view_flags" = 0;
-
             "mailnews.sendInBackground" = true;
-
             "mailnews.mark_message_read.delay" = true;
             "mailnews.mark_message_read.delay.interval" = 3;
-
             "mail.server.default.check_all_folders_for_new" = true;
 
             "mailnews.attachments.display.start_expanded" = true;
-
             # 3 is sanitized html
             "mailnews.display.html_as" = 3;
-
             "mail.dark-reader.show-toggle" = false;
 
             # defaults are 300000 and 30

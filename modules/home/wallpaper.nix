@@ -19,6 +19,7 @@ _: {
           WALL_DIR="$HOME/dotfiles/wallpapers"
 
           mapfile -t walls < <(find "$WALL_DIR" -type f \( -name '*.jpg' -o -name '*.png' \) | shuf)
+
           if [ ''${#walls[@]} -eq 0 ]; then
             exit 0
           fi
@@ -60,7 +61,7 @@ _: {
           Type = "oneshot";
           ExecStart = lib.getExe wallpaper;
         };
-        # no Install, WantedBy cycles through awww.service, the timer starts it
+        # no install section, WantedBy cycles through awww.service, the timer starts it
       };
 
       systemd.user.timers.wallpaper = {

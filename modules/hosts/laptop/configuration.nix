@@ -37,7 +37,7 @@
         percentageAction = 3;
       };
 
-      # screens off undocks logind, it then replays the closed lid as suspend
+      # when the monitors sleep logind stops seeing the dock and suspends on the closed lid
       services.logind.settings.Login.HandleLidSwitchExternalPower = "ignore";
 
       services.power-profiles-daemon.enable = true;
@@ -93,8 +93,8 @@
       # nvidia.nix pins this globally and nvidia-vaapi-driver only decodes
       environment.sessionVariables.LIBVA_DRIVER_NAME = lib.mkForce "iHD";
 
-      # externals skip the igpu to dgpu copy
       home-manager.users.fbad.programs.niri.settings = {
+        # externals skip the igpu to dgpu copy
         debug.render-drm-device = "/dev/dri/by-path/pci-0000:01:00.0-render";
         outputs."LG Electronics LG ULTRAGEAR+ 301NTMX55883" = {
           mode = {
@@ -123,7 +123,6 @@
         };
       };
 
-      # systemd-boot config is in modules.nixos.lanzaboote
       boot.loader.efi.canTouchEfiVariables = true;
       boot.loader.timeout = 0;
       # dell ucsi errors spam the greeter tty

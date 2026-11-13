@@ -7,9 +7,9 @@ _: {
       ...
     }:
     {
-      networking.networkmanager.enable = true; # iwd breaks this wifi driver
+      networking.networkmanager.enable = true; # iwd breaks the laptop intel ax card, stay on wpa_supplicant
 
-      networking.networkmanager.dns = lib.mkForce "none"; # conflicts with resolved in anonymity.nix
+      networking.networkmanager.dns = lib.mkForce "none"; # the resolved module sets systemd-resolved, dhcp resolvers would bypass dnscrypt
       networking.networkmanager.settings.main.systemd-resolved = false; # dns=none still forwards dhcp resolvers to resolved
       networking.nameservers = [
         "127.0.0.1"
@@ -42,14 +42,16 @@ _: {
           mkdir -p /run/NetworkManager/conf.d
           printf '%s\n' "$seed" > "$conf"
 
-          if systemctl is-active --quiet NetworkManager.service; then
-            nmcli general reload conf
-            nmcli -g UUID,TYPE connection show --active | while IFS=: read -r uuid type; do
-              if [ "$type" = "802-11-wireless" ]; then
-                nmcli connection up uuid "$uuid"
-              fi
-            done
+          if ! systemctl is-active --quiet NetworkManager.service; then
+            exit 0
           fi
+
+          nmcli general reload conf
+          nmcli -g UUID,TYPE connection show --active | while IFS=: read -r uuid type; do
+            if [ "$type" = "802-11-wireless" ]; then
+              nmcli connection up uuid "$uuid"
+            fi
+          done
         '';
       };
 

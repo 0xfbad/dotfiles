@@ -16,8 +16,9 @@ _: {
           "172.17.0.1:53"
         ];
 
-        # the default adds google and holds nss-lookup.target 60s offline
+        # the default includes google
         bootstrap_resolvers = [ "9.9.9.9:53" ];
+        # dns is down until the probe passes, the default waits 60s offline
         netprobe_timeout = 10;
 
         dnscrypt_servers = true;
@@ -47,7 +48,7 @@ _: {
               "https://download.dnscrypt.info/resolvers-list/v3/public-resolvers.md"
               "https://cdn.jsdelivr.net/gh/DNSCrypt/dnscrypt-resolvers@master/v3/public-resolvers.md"
             ];
-            # relative resolves into /nix/store and refetches every start
+            # a relative path resolves into /nix/store and refetches every start
             cache_file = "/var/cache/dnscrypt-proxy/public-resolvers.md";
             minisign_key = "RWQf6LRCGA9i53mlYecO4IzT51TGPpvWucNSCh1CBM0QTaLn73Y7GFO3";
             refresh_delay = 73;
@@ -72,7 +73,7 @@ _: {
     services.resolved = {
       enable = true;
       settings.Resolve = {
-        # displaces the builtin cloudflare and google fallbacks
+        # displaces the builtin cloudflare, google and quad9 fallbacks
         FallbackDNS = [
           "127.0.0.1"
           "::1"

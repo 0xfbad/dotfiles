@@ -6,7 +6,7 @@ _: {
 
       programs.btop = {
         enable = true;
-        # cudaSupport just makes the nvml dlopen resolve
+        # cudaSupport only adds the driver runpath so the nvml dlopen resolves
         package = pkgs.btop-cuda;
         settings = {
           theme_background = false; # the terminal supplies the oled black

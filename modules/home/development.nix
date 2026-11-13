@@ -27,7 +27,7 @@ _: {
       rustfmt
 
       # go
-      gotools # goimports, godoc
+      gotools # goimports, stringer, modernize
       delve # go debugger
 
       # zig
@@ -55,9 +55,9 @@ _: {
 
       # security and secret scanning
       trufflehog # scans git repos for leaked secrets, tests if they are still live
-      gitleaks # lighter secret scanner for git history, good for pre-commit hooks
+      gitleaks # scans git history and staged changes for secrets
       age
-      sops # encrypts values but leaves yaml and json keys readable for diffs
+      sops # encrypts values, leaves yaml and json keys readable
 
       # security, more tooling in ctf flake
       nmap
@@ -69,16 +69,16 @@ _: {
       xxd
       expect # automates interactive cli programs
 
-      # parser tools
+      # parsing and search
       tree-sitter
       ast-grep # structural search and replace via tree-sitter
       scooter # find and replace tui, toggle individual replacements, helix integration
 
       # benchmarking and analysis
       hyperfine # benchmarks cli commands
-      tokei # code stats by language, faster than cloc
+      tokei # code stats by language
 
-      # http testing
+      # http and sql clients
       hurl # http request runner driven by plain text files
       harlequin # tui sql editor
     ];

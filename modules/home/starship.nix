@@ -174,7 +174,7 @@ _: {
             ];
           };
 
-          # no style key in 1.26.0, color goes inline
+          # claude_cost has no style key, color goes inline
           claude_cost.format = "[\\$$cost](${c.peach}) [+$lines_added](${c.green})[-$lines_removed](${c.red}) [sess $duration, api $api_duration](${c.subtext0}) ";
         };
       };

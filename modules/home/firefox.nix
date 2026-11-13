@@ -12,6 +12,7 @@ _: {
       programs.firefox = {
         enable = true;
         configPath = "${config.xdg.configHome}/mozilla/firefox";
+
         policies = {
           DisableTelemetry = true;
           DisableFirefoxStudies = true;
@@ -19,6 +20,7 @@ _: {
           DisableFirefoxAccounts = true;
           DisableProfileImport = true;
           DontCheckDefaultBrowser = true;
+
           EnableTrackingProtection = {
             Locked = true;
             Category = "strict";
@@ -31,10 +33,12 @@ _: {
             Locked = true;
           };
           PostQuantumKeyAgreementEnabled = true;
+
           PasswordManagerEnabled = false;
           OfferToSaveLogins = false;
           AutofillAddressEnabled = false;
           AutofillCreditCardEnabled = false;
+
           AIControls = {
             Default = {
               Value = "blocked";
@@ -66,10 +70,12 @@ _: {
             Weather = false;
             Locked = true;
           };
+
           NoDefaultBookmarks = true;
           DisplayBookmarksToolbar = "always";
           DisplayMenuBar = "default-off";
           ShowHomeButton = false;
+
           ExtensionSettings = {
             "uBlock0@raymondhill.net" = {
               install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
@@ -120,17 +126,20 @@ _: {
               private_browsing = true;
             };
           };
+
           "3rdparty".Extensions."keepassxc-browser@keepassxc.org".settings = {
             passkeys = true;
-            # firefox's own prompt only does hardware keys
+            # the firefox fallback only supports hardware keys
             passkeysFallback = false;
             autoFillSingleTotp = true;
             usePasswordGeneratorIcons = true;
             showGettingStartedGuideAlert = false;
           };
         };
+
         profiles.default = {
           isDefault = true;
+
           search = {
             force = true;
             default = "ddg";
@@ -194,6 +203,7 @@ _: {
               "perplexity".metaData.hidden = true;
             };
           };
+
           settings = {
             "toolkit.telemetry.enabled" = false;
             "toolkit.telemetry.unified" = false;
@@ -344,12 +354,14 @@ _: {
               --lwt-accent-color: ${c.bg} !important;
               --toolbarbutton-icon-fill: ${c.text} !important;
             }
+
             #navigator-toolbox,
             #TabsToolbar,
             #PersonalToolbar,
             #nav-bar {
               background-color: ${c.bg} !important;
             }
+
             .tabbrowser-tab[selected] .tab-background {
               background-color: ${c.accent} !important;
             }
@@ -359,6 +371,7 @@ _: {
             .tabbrowser-tab:not([selected]) .tab-background:hover {
               background-color: ${c.mantle} !important;
             }
+
             #sidebar-container,
             #sidebar-launcher-splitter {
               display: none !important;

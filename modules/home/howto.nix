@@ -59,6 +59,7 @@ _: {
 
         siteFunctions.howto = ''
           (( $# < 1 )) && { print -u2 "usage: howto <what you want to do>"; return 1 }
+
           local cmd
           cmd=$(howto-query "$*") || return 1
           # kernel blocks TIOCSTI, only the shell can fill its own buffer

@@ -86,7 +86,7 @@ _: {
           };
 
           env = {
-            # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC disables /remote-control :(
+            # no CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC, it disables /remote-control
             DISABLE_ERROR_REPORTING = "1";
             DISABLE_UPDATES = "1";
             DISABLE_FEEDBACK_COMMAND = "1";
