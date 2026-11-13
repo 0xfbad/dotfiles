@@ -83,15 +83,6 @@ _: {
             proj = "$HOME/projects";
           };
 
-          # double esc prefixes sudo
-          plugins = [
-            {
-              name = "sudo";
-              src = "${pkgs.oh-my-zsh}/share/oh-my-zsh/plugins/sudo";
-              file = "sudo.plugin.zsh";
-            }
-          ];
-
           shellAliases = {
             ls = "eza -l";
             la = "eza -la";
@@ -212,6 +203,22 @@ _: {
               }
               zle -N _ctrl_z_toggle
               bindkey '^Z' _ctrl_z_toggle
+
+              # double esc prefixes sudo
+              _sudo_toggle() {
+                [[ -z $BUFFER ]] && BUFFER=$(fc -ln -1)
+                local indent=''${BUFFER%%[^[:space:]]*}
+                local cmd=''${BUFFER#$indent}
+
+                if [[ $cmd == sudo\ * ]]; then
+                  BUFFER=$indent''${cmd#sudo }
+                else
+                  BUFFER="''${indent}sudo $cmd"
+                fi
+                CURSOR=$#BUFFER
+              }
+              zle -N _sudo_toggle
+              bindkey '^[^[' _sudo_toggle
 
               # sets MANPAGER
               ${pkgs.bat-extras.batman.passthru.shellInit "zsh"}
