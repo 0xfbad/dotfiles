@@ -69,9 +69,6 @@ _: {
       xxd
       expect # automates interactive cli programs
 
-      # monitoring
-      glances # system monitor like htop with more detail
-
       # parser tools
       tree-sitter
       ast-grep # structural search and replace via tree-sitter
