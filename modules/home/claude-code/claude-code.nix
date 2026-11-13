@@ -65,15 +65,12 @@ _: {
 
       programs.claude-code = {
         enable = true;
-        package = pkgs.claude-code;
 
         settings = {
           model = "fable";
           outputStyle = "Concise";
           tui = "fullscreen";
-          includeCoAuthoredBy = false;
-          disableArtifact = true;
-          alwaysThinkingEnabled = true;
+          enableArtifact = false;
           promptSuggestionEnabled = true;
           skipDangerousModePermissionPrompt = true;
           switchModelsOnFlag = false;
@@ -91,11 +88,8 @@ _: {
           env = {
             # CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC disables /remote-control :(
             DISABLE_ERROR_REPORTING = "1";
-            DISABLE_AUTOUPDATER = "1";
             DISABLE_UPDATES = "1";
-            DISABLE_BUG_COMMAND = "1";
-            # 15 is the hard cap
-            CLAUDE_CODE_MAX_RETRIES = "15";
+            DISABLE_FEEDBACK_COMMAND = "1";
             CLAUDE_CODE_RETRY_WATCHDOG = "1";
           };
 
