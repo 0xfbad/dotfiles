@@ -44,6 +44,13 @@ _: {
               "main"
               "cursor"
             ];
+
+            styles = {
+              path_pathseparator = "fg=${config.colors.overlay0}";
+              path_prefix_pathseparator = "fg=${config.colors.overlay0}";
+              commandseparator = "fg=${config.colors.teal}";
+              redirection = "fg=${config.colors.teal}";
+            };
           };
 
           # atuin owns plain up arrow
@@ -226,14 +233,6 @@ _: {
               # sets LESSOPEN
               ${pkgs.bat-extras.batpipe.passthru.shellInit "zsh"}
             ''
-
-            # hm sources the highlighter at 1200
-            (lib.mkOrder 1300 ''
-              ZSH_HIGHLIGHT_STYLES[path_pathseparator]='fg=${config.colors.overlay0}'
-              ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]='fg=${config.colors.overlay0}'
-              ZSH_HIGHLIGHT_STYLES[commandseparator]='fg=${config.colors.teal}'
-              ZSH_HIGHLIGHT_STYLES[redirection]='fg=${config.colors.teal}'
-            '')
 
             (lib.mkOrder 1400 ''
               autoload -Uz add-zsh-hook

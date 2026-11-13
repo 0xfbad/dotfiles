@@ -239,6 +239,7 @@ in
         "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu"; # dolphin needs it outside plasma
 
       programs.zsh.enable = true;
+      programs.zsh.enableGlobalCompInit = false; # home-manager runs compinit for fbad, root zsh gets none
       users.defaultUserShell = pkgs.zsh;
 
       environment.variables.EDITOR = "hx";
