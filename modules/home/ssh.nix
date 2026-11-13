@@ -15,6 +15,9 @@ _: {
           RemainAfterExit = true;
           Environment = "SSH_AUTH_SOCK=%t/ssh-agent";
           ExecStart = "${pkgs.openssh}/bin/ssh-add %h/.ssh/id_ed25519";
+          # ssh-agent.service counts as started before its socket exists
+          Restart = "on-failure";
+          RestartSec = 1;
         };
         Install.WantedBy = [ "default.target" ];
       };
