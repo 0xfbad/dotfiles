@@ -176,6 +176,8 @@ _: {
 
           # claude_cost has no style key, color goes inline
           claude_cost.format = "[\\$$cost](${c.peach}) [+$lines_added](${c.green})[-$lines_removed](${c.red}) [sess $duration, api $api_duration](${c.subtext0}) ";
+          # the default hides the segment below 1 dollar
+          claude_cost.display = [ { threshold = 0.0; } ];
         };
       };
 
