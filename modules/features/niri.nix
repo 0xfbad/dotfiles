@@ -189,7 +189,7 @@
               fi
 
               if [ -f "$FILE" ]; then
-                notify-send -a "recording" -t 3000 "recording saved to ~/videos" "$(basename "$FILE")"
+                notify-send -a "recording" -t 3000 "recording saved to ~/Videos" "$(basename "$FILE")"
               fi
 
               exit 0
@@ -224,9 +224,9 @@
             pkgs.coreutils
           ];
           text = ''
-            # cancelling the picker still exits 0
+            # canceling the picker still exits 0
             HEX=$(niri msg pick-color | grep -oP '#[0-9a-fA-F]+' | head -n1) || exit 0
-            [ -n "$HEX" ] || exit 0
+
             printf '%s' "$HEX" | wl-copy -n
           '';
         }
