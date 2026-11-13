@@ -307,7 +307,6 @@
 
         overview.backdrop-color = c.bg;
 
-        # blur and background-effect wait on niri-flake types, raw kdl replaces all settings
         cursor = {
           theme = config.home.pointerCursor.name;
           inherit (config.home.pointerCursor) size;
