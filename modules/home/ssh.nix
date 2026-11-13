@@ -1,6 +1,16 @@
 _: {
   flake.modules.homeManager.ssh =
-    { pkgs, ... }:
+    { pkgs, lib, ... }:
+    let
+      privateHosts = lib.concatStringsSep " " (
+        [
+          "10.*"
+          "192.168.*"
+          "*.local"
+        ]
+        ++ map (octet: "172.${toString octet}.*") (lib.range 16 31)
+      );
+    in
     {
       services.ssh-agent.enable = true;
 
@@ -33,8 +43,14 @@ _: {
           ControlPersist = "600";
           ServerAliveInterval = 60;
           ServerAliveCountMax = 3;
-          StrictHostKeyChecking = "no";
+          StrictHostKeyChecking = "accept-new";
           # no HashKnownHosts, it breaks hostname completion
+        };
+
+        # competition boxes get new keys on every reimage
+        settings.${privateHosts} = {
+          StrictHostKeyChecking = "no";
+          UserKnownHostsFile = "/dev/null";
         };
       };
     };
