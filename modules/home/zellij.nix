@@ -40,5 +40,8 @@ _: {
           scrollback_editor = lib.getExe pkgs.helix;
         };
       };
+
+      # zellij never deletes exited sessions
+      systemd.user.tmpfiles.rules = [ "e %C/zellij/*/session_info - - - 7d" ];
     };
 }
