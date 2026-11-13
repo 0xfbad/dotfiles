@@ -9,6 +9,12 @@ _: {
     let
       flakePath = "${config.home.homeDirectory}/dotfiles";
       host = osConfig.networking.hostName;
+
+      # prettierd takes a file name and infers the parser from its extension
+      prettierd = extension: {
+        command = "prettierd";
+        args = [ extension ];
+      };
     in
     {
       programs.helix = {
@@ -67,10 +73,8 @@ _: {
         languages = {
           language-server = {
             nixd = {
-              command = "nixd";
               config.nixd = {
                 nixpkgs.expr = ''import (builtins.getFlake "${flakePath}").inputs.nixpkgs { }'';
-                formatting.command = [ "nixfmt" ];
                 options = {
                   nixos.expr = ''(builtins.getFlake "${flakePath}").nixosConfigurations.${host}.options'';
                   home-manager.expr = ''(builtins.getFlake "${flakePath}").nixosConfigurations.${host}.options.home-manager.users.type.getSubOptions []'';
@@ -102,60 +106,32 @@ _: {
             }
             {
               name = "typescript";
-              language-servers = [ "typescript-language-server" ];
               auto-format = true;
-              formatter = {
-                command = "prettierd";
-                args = [
-                  "--parser"
-                  "typescript"
-                ];
-              };
+              formatter = prettierd ".ts";
             }
             {
               name = "javascript";
-              language-servers = [ "typescript-language-server" ];
               auto-format = true;
-              formatter = {
-                command = "prettierd";
-                args = [
-                  "--parser"
-                  "javascript"
-                ];
-              };
+              formatter = prettierd ".js";
             }
             {
               name = "tsx";
-              language-servers = [ "typescript-language-server" ];
               auto-format = true;
-              formatter = {
-                command = "prettierd";
-                args = [
-                  "--parser"
-                  "typescript"
-                ];
-              };
+              formatter = prettierd ".tsx";
             }
             {
               name = "jsx";
-              language-servers = [ "typescript-language-server" ];
               auto-format = true;
-              formatter = {
-                command = "prettierd";
-                args = [
-                  "--parser"
-                  "javascript"
-                ];
-              };
+              formatter = prettierd ".jsx";
             }
             {
               name = "bash";
-              language-servers = [ "bash-language-server" ];
               auto-format = true;
               # matches the treefmt shfmt args
               formatter = {
                 command = "shfmt";
                 args = [
+                  "-ci"
                   "-i"
                   "2"
                   "-s"
@@ -168,11 +144,11 @@ _: {
               auto-format = true;
               formatter = {
                 command = "nixfmt";
+                args = [ "-" ];
               };
             }
             {
               name = "typst";
-              language-servers = [ "tinymist" ];
               auto-format = true;
             }
             {
@@ -183,13 +159,7 @@ _: {
                 "harper-ls"
               ];
               auto-format = true;
-              formatter = {
-                command = "prettierd";
-                args = [
-                  "--parser"
-                  "markdown"
-                ];
-              };
+              formatter = prettierd ".md";
             }
             {
               name = "git-commit";
