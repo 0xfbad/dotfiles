@@ -1,28 +1,15 @@
 _: {
   flake.modules.homeManager.btop =
+    { pkgs, ... }:
     {
-      config,
-      pkgs,
-      ...
-    }:
-    let
-      upstream = builtins.readFile "${config.catppuccin.sources.btop}/catppuccin_mocha.theme";
-      oled =
-        builtins.replaceStrings
-          [ ''theme[main_bg]="#1e1e2e"'' ]
-          [ ''theme[main_bg]="${config.colors.bg}"'' ]
-          upstream;
-    in
-    {
+      catppuccin.btop.enable = true;
+
       programs.btop = {
         enable = true;
         # cudaSupport just makes the nvml dlopen resolve
         package = pkgs.btop-cuda;
-        themes.catppuccin_mocha =
-          assert oled != upstream;
-          oled;
         settings = {
-          color_theme = "catppuccin_mocha";
+          theme_background = false; # the terminal supplies the oled black
           shown_boxes = "cpu mem net proc gpu0";
           shown_gpus = "nvidia";
           vim_keys = true;
