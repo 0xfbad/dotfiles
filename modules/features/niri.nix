@@ -586,6 +586,8 @@
           "Mod+Escape" = {
             action = spawn (lib.getExe' pkgs.systemd "loginctl") "lock-session";
             hotkey-overlay.title = "Lock";
+            # starts a fresh locker from the red screen a dead one leaves
+            allow-when-locked = true;
           };
           "Mod+Shift+W" = {
             action = spawn "vicinae" "vicinae://launch/@sovereign/vicinae-extension-awww-switcher-0/wpgrid?toggle=true";

@@ -27,6 +27,8 @@ _: {
           ];
           ExecStart = lib.getExe config.programs.hyprlock.package;
           ExecStopPost = "-${makoctl} mode -r lock";
+          # a crashed locker leaves the session locked with no prompt, a normal unlock exits 0
+          Restart = "on-failure";
         };
       };
 
