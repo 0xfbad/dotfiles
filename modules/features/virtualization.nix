@@ -18,31 +18,14 @@ _: {
     virtualisation.libvirtd = {
       enable = true;
       onShutdown = "shutdown";
+      shutdownTimeout = 30;
+      parallelShutdown = 4; # 1 or 0 applies the timeout per guest in series
       qemu.swtpm.enable = true;
       qemu.vhostUserPackages = [ pkgs.virtiofsd ];
       nss.enable = true;
       nss.enableGuest = true;
     };
     virtualisation.spiceUSBRedirection.enable = true;
-
-    systemd.services.libvirt-force-stop = {
-      description = "Force-destroy running libvirt VMs on shutdown";
-      after = [
-        "libvirtd.service"
-        "libvirt-guests.service"
-      ];
-      wantedBy = [ "multi-user.target" ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        ExecStart = "${pkgs.coreutils}/bin/true";
-        ExecStop = pkgs.writeShellScript "libvirt-force-stop" ''
-          for dom in $(${pkgs.libvirt}/bin/virsh -c qemu:///system list --name --state-running); do
-            ${pkgs.libvirt}/bin/virsh -c qemu:///system destroy "$dom" || true
-          done
-        '';
-      };
-    };
 
     networking.firewall.interfaces."docker0" = {
       allowedUDPPorts = [ 53 ];
