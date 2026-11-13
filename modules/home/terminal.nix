@@ -236,11 +236,7 @@ _: {
         procs # modern ps, tree view, ports per process, docker container names
         q # modern dig, doh/dot/doq support, json and table output
         duf # modern df, tables grouped by device type
-        # until nixpkgs adds pkg-config to viddy, cargoUseSystemLibs needs it to find sqlite
-        (viddy.overrideAttrs (old: {
-          nativeBuildInputs = (old.nativeBuildInputs or [ ]) ++ [ pkg-config ];
-          buildInputs = (old.buildInputs or [ ]) ++ [ sqlite ];
-        })) # modern watch, highlights diffs between runs, scrollable history
+        viddy # modern watch, highlights diffs between runs, scrollable history
         choose # modern cut/awk, simple field selection, negative indexing
 
         # file tools
