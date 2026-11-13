@@ -17,8 +17,6 @@ _: {
         "thunderbolt"
         "uas"
         "rtsx_pci_sdmmc"
-        "tpm-crb"
-        "tpm-tis"
       ];
       # early kms so the luks prompt reaches the dock monitor
       boot.initrd.kernelModules = [ "i915" ];

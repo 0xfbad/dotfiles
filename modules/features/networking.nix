@@ -28,6 +28,7 @@ _: {
         wantedBy = [ "NetworkManager.service" ];
         path = [ pkgs.networkmanager ];
         serviceConfig.Type = "oneshot";
+        startAt = "daily";
         script = ''
           conf=/run/NetworkManager/conf.d/50-daily-stable-id.conf # NetworkManager.conf overrides this dir
           seed="[connection-wifi-daily]
@@ -51,13 +52,6 @@ _: {
           fi
         '';
       };
-
-      systemd.timers.nm-daily-stable-id = {
-        wantedBy = [ "timers.target" ];
-        timerConfig.OnCalendar = "daily";
-      };
-
-      networking.firewall.enable = true;
 
       # syncthing runs under home-manager
       networking.firewall.allowedTCPPorts = [ 22000 ];

@@ -18,7 +18,6 @@ _: {
 
         # the default adds google and holds nss-lookup.target 60s offline
         bootstrap_resolvers = [ "9.9.9.9:53" ];
-        netprobe_address = "9.9.9.9:53";
         netprobe_timeout = 10;
 
         dnscrypt_servers = true;
@@ -39,9 +38,6 @@ _: {
           ];
         };
         require_dnssec = true;
-
-        # http3_probe slows servers without h3
-        http3 = true;
 
         # sources replaces the whole default table
         sources = {

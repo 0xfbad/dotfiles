@@ -19,8 +19,6 @@
         dolphin
         dolphin-plugins
         qtsvg
-        qtwayland
-        kio
         kio-fuse
         kio-extras
         kio-admin

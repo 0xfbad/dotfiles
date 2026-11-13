@@ -154,17 +154,6 @@ in
 
       time.timeZone = "America/Los_Angeles";
       i18n.defaultLocale = "en_US.UTF-8";
-      i18n.extraLocaleSettings = {
-        LC_ADDRESS = "en_US.UTF-8";
-        LC_IDENTIFICATION = "en_US.UTF-8";
-        LC_MEASUREMENT = "en_US.UTF-8";
-        LC_MONETARY = "en_US.UTF-8";
-        LC_NAME = "en_US.UTF-8";
-        LC_NUMERIC = "en_US.UTF-8";
-        LC_PAPER = "en_US.UTF-8";
-        LC_TELEPHONE = "en_US.UTF-8";
-        LC_TIME = "en_US.UTF-8";
-      };
 
       security.sudo.enable = false; # if polkitd fails, use su or an older generation
       security.run0 = {
@@ -175,7 +164,7 @@ in
       security.polkit.settings.Polkitd.ExpirationSeconds = 30; # applies to every polkit action that keeps auth
 
       security.wrappers.btop = {
-        source = "${pkgs.btop.override { cudaSupport = true; }}/bin/btop"; # must match modules/home/btop.nix
+        source = "${pkgs.btop-cuda}/bin/btop"; # must match modules/home/btop.nix
         capabilities = "cap_perfmon,cap_dac_read_search+ep"; # for rapl power readings
         owner = "fbad";
         group = "users";
@@ -196,9 +185,6 @@ in
           MaxConnectionInterval = 9;
           ConnectionLatency = 0;
         };
-      };
-      hardware.bluetooth.input.General = {
-        UserspaceHID = true;
       };
 
       hardware.xpadneo.enable = true;
@@ -292,7 +278,6 @@ in
         enable = true;
         autoEnable = false;
         flavor = "mocha";
-        tty.enable = true;
       };
 
       console.colors =
@@ -300,26 +285,24 @@ in
           palette = (lib.importJSON "${config.catppuccin.sources.palette}/palette.json").mocha.colors;
           hex = name: lib.substring 1 6 palette.${name}.hex;
         in
-        lib.mkForce (
-          [ "000000" ] # oled black
-          ++ map hex [
-            "red"
-            "green"
-            "yellow"
-            "blue"
-            "pink"
-            "teal"
-            "subtext1"
-            "surface2"
-            "red"
-            "green"
-            "yellow"
-            "blue"
-            "pink"
-            "teal"
-            "subtext0"
-          ]
-        );
+        [ "000000" ] # oled black
+        ++ map hex [
+          "red"
+          "green"
+          "yellow"
+          "blue"
+          "pink"
+          "teal"
+          "subtext1"
+          "surface2"
+          "red"
+          "green"
+          "yellow"
+          "blue"
+          "pink"
+          "teal"
+          "subtext0"
+        ];
 
       fonts.packages = with pkgs; [
         nerd-fonts.jetbrains-mono

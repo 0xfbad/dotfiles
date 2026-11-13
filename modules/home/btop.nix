@@ -17,7 +17,7 @@ _: {
       programs.btop = {
         enable = true;
         # cudaSupport just makes the nvml dlopen resolve
-        package = pkgs.btop.override { cudaSupport = true; };
+        package = pkgs.btop-cuda;
         themes.catppuccin_mocha =
           assert oled != upstream;
           oled;

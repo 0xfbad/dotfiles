@@ -6,8 +6,6 @@ _: {
       ...
     }:
     {
-      home.sessionVariables.T3CODE_DISABLE_AUTO_UPDATE = "1";
-
       programs.t3code = {
         enable = true;
         package = pkgs.t3code.override {

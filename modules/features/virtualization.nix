@@ -12,10 +12,7 @@ _: {
           max-file = "3";
         };
       };
-      autoPrune = {
-        enable = true;
-        dates = "weekly";
-      };
+      autoPrune.enable = true;
     };
 
     virtualisation.libvirtd = {
