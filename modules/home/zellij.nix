@@ -17,7 +17,7 @@ _: {
             (
               builtins.readFile (
                 builtins.fetchurl {
-                  url = "https://raw.githubusercontent.com/zellij-org/zellij/v0.44.3/zellij-utils/assets/themes/catppuccin-mocha.kdl";
+                  url = "https://raw.githubusercontent.com/zellij-org/zellij/v0.45.1/zellij-utils/assets/themes/catppuccin-mocha.kdl";
                   sha256 = "1pb039n0w4wgdc4xk795b68q3qq410dirn2pjbf6qcn6yfa9j06d";
                 }
               )
