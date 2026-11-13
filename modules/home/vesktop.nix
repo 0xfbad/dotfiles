@@ -36,7 +36,7 @@ _: {
         };
         vencord = {
           themes."catppuccin-mocha-mauve-oled.theme" = oledTheme;
-          # settings.json is in the store, ui plugin toggles do not persist
+          mutableSettings = true; # ui plugin toggles persist, close vesktop before a switch
           settings = {
             useQuickCss = true;
             enabledThemes = [ "catppuccin-mocha-mauve-oled.theme.css" ];
