@@ -94,6 +94,7 @@ _: {
               "delete_quiz"
               "delete_quiz_question"
               "delete_rubric"
+              "remove_group_member"
             ]
             (_: {
               approval_mode = "prompt";

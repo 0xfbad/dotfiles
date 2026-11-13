@@ -96,7 +96,10 @@ _: {
           enabledMcpjsonServers = [ "canvas" ];
 
           permissions = {
-            ask = [ "mcp__canvas__delete_*" ];
+            ask = [
+              "mcp__canvas__delete_*"
+              "mcp__canvas__remove_group_member"
+            ];
             deny = [
               "Read(./.env)"
               "Read(./.env.*)"
