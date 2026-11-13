@@ -14,10 +14,11 @@
 
       schemeName = "CatppuccinMochaMauveOled";
 
-      gtkThemeName = "catppuccin-mocha-mauve-standard";
+      gtkThemeName = "catppuccin-mocha-mauve-standard+black";
       catppuccinGtk = pkgs.catppuccin-gtk.override {
         accents = [ "mauve" ];
         variant = "mocha";
+        tweaks = [ "black" ];
       };
 
       catppuccinKde = pkgs.catppuccin-kde.override {
@@ -79,7 +80,6 @@
           "Videos"
         ];
         gtk4 = {
-          # no oled black here, catppuccin-gtk bakes in mocha base
           theme = {
             name = gtkThemeName;
             package = catppuccinGtk;
