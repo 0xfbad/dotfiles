@@ -153,10 +153,8 @@ _: {
         enableJujutsuIntegration = true;
       };
 
-      programs.gitui = {
-        enable = true;
-        theme = builtins.readFile "${config.catppuccin.sources.gitui}/catppuccin-${config.catppuccin.flavor}.ron";
-      };
+      programs.gitui.enable = true;
+      catppuccin.gitui.enable = true;
 
       programs.jjui.enable = true;
 
@@ -172,7 +170,7 @@ _: {
             backends.ssh.allowed-signers = allowedSigners;
           };
 
-          git.sign-on-push = true;
+          revsets.git-sign-on-push = "~signed() & mine()";
 
           "--scope" = [
             {
