@@ -18,10 +18,6 @@
         inputs.vicinae.homeManagerModules.default
       ];
 
-      xdg.configFile."xdg-terminals.list".text = ''
-        org.wezfurlong.wezterm.desktop
-      '';
-
       programs.vicinae = {
         enable = true;
         systemd.enable = true;

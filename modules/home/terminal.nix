@@ -300,10 +300,14 @@ _: {
         noDisplay = true;
       };
 
+      xdg.terminal-exec = {
+        enable = true;
+        settings.default = [ "org.wezfurlong.wezterm.desktop" ];
+      };
+
       xdg.mimeApps = {
         enable = true;
         defaultApplications = {
-          "x-scheme-handler/terminal" = "org.wezfurlong.wezterm.desktop";
           "x-scheme-handler/http" = "firefox.desktop";
           "x-scheme-handler/https" = "firefox.desktop";
           "text/html" = "firefox.desktop";
