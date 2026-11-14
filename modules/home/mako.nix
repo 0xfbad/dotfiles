@@ -32,7 +32,6 @@ _: {
             default-timeout = 0;
           };
 
-          # hyprlock.service in hypridle.nix toggles this mode
           "mode=lock".invisible = 1;
           "mode=do-not-disturb".invisible = 1;
         };

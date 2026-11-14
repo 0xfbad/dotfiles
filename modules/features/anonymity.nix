@@ -26,10 +26,10 @@ _: {
         doh_servers = false;
         anonymized_dns = {
           skip_incompatible = true;
-          # unrelated operators
           routes = [
             {
               server_name = "*";
+              # unrelated operators
               via = [
                 "anon-cs-de"
                 "anon-kama"

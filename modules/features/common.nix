@@ -162,7 +162,7 @@ in
         sudo-shim.enable = true;
         persistentAuth.enable = true;
       };
-      security.polkit.settings.Polkitd.ExpirationSeconds = 30; # applies to every polkit action that keeps auth
+      security.polkit.settings.Polkitd.ExpirationSeconds = 30;
 
       security.wrappers.btop = {
         source = "${pkgs.btop-cuda}/bin/btop"; # must match modules/home/btop.nix
@@ -288,7 +288,7 @@ in
           palette = (lib.importJSON "${config.catppuccin.sources.palette}/palette.json").mocha.colors;
           hex = name: lib.substring 1 6 palette.${name}.hex;
         in
-        [ "000000" ] # oled black
+        [ "000000" ]
         ++ map hex [
           "red"
           "green"

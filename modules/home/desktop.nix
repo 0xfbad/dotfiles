@@ -126,30 +126,24 @@
       home.packages = with pkgs; [
         torsocks # routes a program through tor
 
-        # media
         vlc
         ffmpeg
         gimp-with-plugins
 
-        # communication
         signal-desktop
         weechat # irc client
 
-        # productivity
         libreoffice
         odt2txt
         kdePackages.kdenlive
         xournalpp # pdf annotation and handwriting
 
-        # images and clipboard
         imagemagick
         wl-clipboard # provides wl-copy and wl-paste
         pngquant # lossy png compression
 
-        # gaming
         supertuxkart
 
-        # vpn and networking
         openconnect # cisco and juniper vpn client
         wireguard-tools
         remmina # remote desktop client for rdp vnc ssh

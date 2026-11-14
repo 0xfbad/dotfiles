@@ -3,7 +3,6 @@ _: {
     programs.fzf = {
       enable = true;
       defaultCommand = "fd --type f --hidden --exclude .git";
-      # colors come from the catppuccin FZF_DEFAULT_OPTS_FILE
       defaultOptions = [
         "--layout=reverse"
         "--border=rounded"

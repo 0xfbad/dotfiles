@@ -5,6 +5,5 @@
     treefmt.inputs.nixpkgs.follows = "";
   };
 
-  # inputs only, see flake-module.nix
   outputs = _: { };
 }

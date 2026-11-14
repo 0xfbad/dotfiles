@@ -47,7 +47,6 @@
     {
       imports = [ inputs.catppuccin.homeModules.catppuccin ];
 
-      # the gtk theme and vesktop get oled variants in home/gtk.nix and home/vesktop.nix
       catppuccin = {
         enable = true;
         autoEnable = false;

@@ -26,7 +26,6 @@ _: {
 
         (mkClaudeWrapper "claude-moonshot" ''
           ${getToken "claude-moonshot" "MOONSHOT_API_KEY"}
-          # the kimi membership plan uses https://api.kimi.com/coding/ instead
           export ANTHROPIC_BASE_URL="https://api.moonshot.ai/anthropic"
           export ANTHROPIC_MODEL="kimi-k3[1m]"
           export ANTHROPIC_DEFAULT_OPUS_MODEL="kimi-k3[1m]"

@@ -16,7 +16,6 @@ _: {
           };
         };
 
-        # LS_COLORS for eza and the completion list
         vivid = {
           enable = true;
           activeTheme = lib.mkDefault "catppuccin-mocha";
@@ -226,10 +225,8 @@ _: {
               zle -N _sudo_toggle
               bindkey '^[^[' _sudo_toggle
 
-              # sets MANPAGER
               ${pkgs.bat-extras.batman.passthru.shellInit "zsh"}
 
-              # sets LESSOPEN
               ${pkgs.bat-extras.batpipe.passthru.shellInit "zsh"}
             ''
 

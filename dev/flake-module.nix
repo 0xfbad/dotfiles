@@ -27,10 +27,9 @@
 
         programs.nixf-diagnose.enable = true;
 
-        # after the statix and deadnix rewrites
         programs.nixfmt = {
           enable = true;
-          priority = 1;
+          priority = 1; # runs after the statix and deadnix rewrites
         };
 
         programs.shfmt.enable = true;

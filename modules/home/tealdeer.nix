@@ -23,7 +23,6 @@ _: {
       inherit (config) colors;
     in
     {
-      # the enableAutoUpdates timer refreshes the cache
       programs.tealdeer = {
         enable = true;
         settings = {

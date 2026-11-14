@@ -280,7 +280,6 @@
 
         xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
 
-        # outputs are per host
         layout = {
           gaps = 8;
           preset-column-widths = [

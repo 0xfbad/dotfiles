@@ -128,7 +128,7 @@ _: {
               auto-format = true;
               formatter = {
                 command = "shfmt";
-                # matches the treefmt shfmt args
+                # keep in sync with the treefmt shfmt args
                 args = [
                   "-ci"
                   "-i"

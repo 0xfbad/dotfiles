@@ -36,14 +36,12 @@ _: {
         enable = true;
         settings = {
           general = {
-            # keepassxc and Mod+Escape lock through logind too
             lock_cmd = "${systemctl} --user start hyprlock.service";
             # lock-before-sleep in niri.nix waits instead
             inhibit_sleep = 0;
             after_sleep_cmd = "${niri} msg action power-on-monitors";
           };
 
-          # idle never suspends the machine
           listener = [
             {
               timeout = 300;

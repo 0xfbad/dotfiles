@@ -16,33 +16,25 @@ _: {
     };
 
     home.packages = with pkgs; [
-      # python
       (python3.withPackages (ps: with ps; [ pwntools ])) # pkgs.pwntools is toPythonApplication, not importable
       ty # python type checker from the ruff team
       ruff
 
-      # rust
       cargo # rust-analyzer shells out to it for workspace metadata
       rustc
       rustfmt
 
-      # go
       gotools # goimports, stringer, modernize
       delve # go debugger
 
-      # zig
       zig
 
-      # javascript and typescript
       prettierd
 
-      # networking
       cloudflared
 
-      # shell
       shfmt
 
-      # nix
       nix-inspect
       nix-tree # browse a closure interactively, find what pulls a dependency in
       statix # nix linter, suggests antipattern fixes
@@ -50,16 +42,13 @@ _: {
       nixfmt # the rfc 166 style treefmt runs
       manix # searches nixos and home-manager docs from the cli
 
-      # typst
       typst
 
-      # security and secret scanning
       trufflehog # scans git repos for leaked secrets, tests if they are still live
       gitleaks # scans git history and staged changes for secrets
       age
       sops # encrypts values, leaves yaml and json keys readable
 
-      # security, more tooling in ctf flake
       nmap
       strace
       gdb
@@ -69,16 +58,13 @@ _: {
       xxd
       expect # automates interactive cli programs
 
-      # parsing and search
       tree-sitter
       ast-grep # structural search and replace via tree-sitter
       scooter # find and replace tui, toggle individual replacements, helix integration
 
-      # benchmarking and analysis
       hyperfine # benchmarks cli commands
       tokei # code stats by language
 
-      # http and sql clients
       hurl # http request runner driven by plain text files
       harlequin # tui sql editor
     ];

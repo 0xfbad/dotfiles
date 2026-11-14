@@ -13,7 +13,7 @@ _: {
         local target="$1"
         [[ "$target" != *:* ]] && target="$target:"
         fzf --multi --preview 'bat --color=always --style=numbers --line-range=:200 {}' |
-          rsync -av --files-from=- . "$target" # --files-from implies --relative
+          rsync -av --files-from=- . "$target"
       '';
 
       ga = ''

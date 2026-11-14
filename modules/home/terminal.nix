@@ -32,7 +32,6 @@ _: {
           cd "$dir"
 
           top_count=0
-          # --quiet drops the header and the symlink arrows
           if listing="$(ouch list --quiet "$archive" 2>/dev/null)"; then
             top_count="$(printf '%s\n' "$listing" \
               | awk -F'/' 'NF>0 && $1!="" {print $1}' \
@@ -217,10 +216,9 @@ _: {
 
       home.packages = [
         ouch-open
-        ouchPkg # modern tar/zip/gzip/bzip2/rar/7z, replaces individual compression tools
+        ouchPkg # modern tar, zip, gzip, bzip2, rar and 7z, replaces individual compression tools
       ]
       ++ (with pkgs; [
-        # cli utilities
         jnv # modern jq, tui where you build filters and see results live
         file # identifies file types by content, not extension
         socat # bidirectional data relay between streams, sockets, files
@@ -231,15 +229,13 @@ _: {
         wiki-tui # wikipedia in your terminal, fuzzy search, section jumping
         circumflex # hacker news tui, reader mode extracts article text, threaded comments
 
-        # modern replacements
         sd # modern sed, rust regex syntax, -F for literal strings
         procs # modern ps, tree view, ports per process, docker container names
-        q # modern dig, doh/dot/doq support, json and table output
+        q # modern dig, doh, dot and doq support, json and table output
         duf # modern df, tables grouped by device type
         viddy # modern watch, highlights diffs between runs, scrollable history
-        choose # modern cut/awk, simple field selection, negative indexing
+        choose # modern cut and awk, simple field selection, negative indexing
 
-        # file tools
         mdcat # renders markdown in terminal with images and links
         pdfgrep # grep through pdf files
         poppler-utils # pdftotext, pdfinfo, pdfunite, pdftoppm
@@ -251,7 +247,6 @@ _: {
         fclones # finds duplicate files, hashes progressively to skip full reads
         rip2 # modern rm, moves to graveyard with undo support
 
-        # networking
         dnsutils # dig, nslookup, nsupdate
         mtr # traceroute and ping combined, runs continuously
         rdap # modern whois, structured queries via the rdap protocol
@@ -263,7 +258,6 @@ _: {
         gping # modern ping, live line graph, multiple hosts on same chart
         miniserve # modern python -m http.server, file upload, auth, tls, qr code
 
-        # system tools
         libnotify # notify-send for desktop notifications
         gum # charm shell scripting toolkit, interactive prompts and spinners
         lazyjournal # tui for browsing journalctl, docker logs, and plain log files
@@ -271,11 +265,10 @@ _: {
         brightnessctl # screen brightness control
         bluetui # bluetooth tui manager
         process-compose # like docker-compose for bare processes, yaml config, tui
-        tailspin # pipe any log through tspin, highlights dates/ips/uuids/severity
+        tailspin # pipe any log through tspin, highlights dates, ips, uuids and severity
         watchexec # modern entr, file watcher that ignores .git, coalesces events
-        wlctl # networkmanager tui for wifi/ethernet/vpn, waybar network click target
+        wlctl # networkmanager tui for wifi, ethernet and vpn, waybar network click target
 
-        # fun
         cowsay # ascii art cow says your message
         glow # renders markdown in the terminal with a file browser tui
         charm-freeze # generates png or svg screenshots of code or terminal output
