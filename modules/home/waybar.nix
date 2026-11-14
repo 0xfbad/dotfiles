@@ -8,13 +8,13 @@ _: {
     }:
     let
       c = config.colors;
-      term = lib.getExe pkgs.wezterm;
-      btTui = "${term} start --class floating-term -- ${lib.getExe pkgs.bluetui}";
-      wifiTui = "${term} start --class floating-term -- ${pkgs.wlctl}/bin/wlctl";
+      tui = cmd: "${lib.getExe pkgs.wezterm} start --class floating-term -- ${cmd}";
+      btTui = tui (lib.getExe pkgs.bluetui);
+      wifiTui = tui (lib.getExe pkgs.wlctl);
       # setcap wrapper, the store path loses the watts row
-      btop = "${term} start --class floating-term -- /run/wrappers/bin/btop";
+      btop = tui "/run/wrappers/bin/btop";
       mixer = lib.getExe pkgs.pwvucontrol;
-      wpctl = "${pkgs.wireplumber}/bin/wpctl";
+      wpctl = lib.getExe' pkgs.wireplumber "wpctl";
 
       barSpacing = 2;
       gap = {
@@ -42,7 +42,6 @@ _: {
 
         settings.mainBar = {
           layer = "top";
-          position = "top";
           height = 30;
           spacing = barSpacing;
 
@@ -75,7 +74,6 @@ _: {
             format = "{:%a, %d %b - %H:%M}";
             tooltip-format = "<tt>{calendar}</tt>";
             calendar = {
-              mode = "month";
               iso8601 = true;
               # waybar replaces each span class with the color of #clock.calendar-x below
               format = {
@@ -109,7 +107,7 @@ _: {
               volIcons.med
               volIcons.high
             ];
-            on-click = mixer;
+            on-click = "${mixer} --tab 4";
             on-click-right = "${wpctl} set-mute @DEFAULT_AUDIO_SINK@ toggle";
             scroll-step = 5;
           };
@@ -118,7 +116,8 @@ _: {
             node-type = "Audio/Source";
             format = g "f130";
             format-muted = g "f131";
-            on-click = "${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+            on-click = "${mixer} --tab 3";
+            on-click-right = "${wpctl} set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
             scroll-step = 5;
             tooltip = false;
           };
@@ -169,10 +168,8 @@ _: {
           };
 
           "power-profiles-daemon" = {
-            format = "{icon}";
-            tooltip-format = "power profile: {profile}\ndriver: {driver}";
+            tooltip-format = "power profile: {profile}\ncpu driver: {cpu_driver}\nplatform driver: {platform_driver}";
             format-icons = {
-              default = g "f0e7";
               performance = g "f135";
               balanced = g "f24e";
               power-saver = g "f06c";
@@ -203,7 +200,6 @@ _: {
               activated = g "f06e";
               deactivated = g "f070";
             };
-            timeout = 0;
             tooltip-format-activated = "screenlock disabled";
             tooltip-format-deactivated = "screenlock enabled";
           };
@@ -223,8 +219,6 @@ _: {
           }
 
           #workspaces {
-            background: transparent;
-            margin: 0;
             padding: 0 6px;
           }
 
@@ -274,7 +268,6 @@ _: {
           #power-profiles-daemon,
           #battery,
           #idle_inhibitor {
-            background: transparent;
             padding: 0 ${pad gap.section}px;
           }
 
@@ -290,16 +283,11 @@ _: {
             color: ${c.pink};
           }
 
-          #wireplumber.muted {
-            color: ${c.overlay0};
-          }
-
           #wireplumber.mic {
             color: ${c.rosewater};
           }
 
-          #wireplumber.mic.muted,
-          #wireplumber.mic.source-muted {
+          #wireplumber.muted {
             color: ${c.overlay0};
           }
 
@@ -346,15 +334,11 @@ _: {
 
           #power-profiles-daemon {
             color: ${c.peach};
-            padding-right: ${pad gap.section}px;
+            padding-left: ${pad gap.group}px;
           }
 
           #power-profiles-daemon.performance {
             color: ${c.red};
-          }
-
-          #power-profiles-daemon.balanced {
-            color: ${c.peach};
           }
 
           #power-profiles-daemon.power-saver {
