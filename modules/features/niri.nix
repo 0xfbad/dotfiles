@@ -1,6 +1,6 @@
 { inputs, ... }: {
   flake.modules.nixos.niri =
-    { pkgs, lib, ... }:
+    { pkgs, ... }:
     {
       imports = [ inputs.niri.nixosModules.niri ];
       programs.niri.enable = true;
@@ -11,8 +11,10 @@
       # setcap kms helper, no polkit prompts
       programs.gpu-screen-recorder.enable = true;
 
-      # niri-flake enables it and it claims org.freedesktop.secrets before keepassxc
-      services.gnome.gnome-keyring.enable = lib.mkForce false;
+      # app secrets, keepassxc keeps passwords, browser and ssh keys
+      services.gnome.gnome-keyring.enable = true;
+      # on by default with gnome-keyring, it takes SSH_AUTH_SOCK from the home-manager agent
+      services.gnome.gcr-ssh-agent.enable = false;
 
       # niri lacks hyprland-lock-notify-v1, so hypridle cannot hold suspend until the lock is up
       systemd.services.lock-before-sleep = {
@@ -62,7 +64,7 @@
       };
 
       # programs.hyprlock.enable would also add hypridle and hyprland
-      security.pam.services.hyprlock = { };
+      security.pam.services.hyprlock.enableGnomeKeyring = true;
     };
 
   flake.modules.homeManager.niri =

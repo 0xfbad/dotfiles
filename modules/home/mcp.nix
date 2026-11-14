@@ -24,7 +24,7 @@ _: {
       };
 
       programs.codex.enableMcpIntegration = true;
-      programs.codex.settings.mcp_oauth_credentials_store = "file"; # auto blocks thread/start on a locked keepassxc
+      programs.codex.settings.mcp_oauth_credentials_store = "file";
       programs.codex.settings.mcp_servers.canvas = config.canvas.codexServer; # programs.mcp.servers.canvas is unscoped
 
       home.activation.claudeMcp = lib.hm.dag.entryAfter [ "writeBoundary" ] (

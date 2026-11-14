@@ -18,20 +18,11 @@ _: {
           After = [ config.wayland.systemd.target ];
         };
         Service = {
-          Type = "dbus";
-          BusName = "org.freedesktop.secrets";
           ExecStart = lib.getExe config.programs.keepassxc.package;
           Restart = "on-failure";
         };
         Install.WantedBy = [ config.wayland.systemd.target ];
       };
-
-      xdg.dataFile."dbus-1/services/org.freedesktop.secrets.service".text = ''
-        [D-BUS Service]
-        Name=org.freedesktop.secrets
-        Exec=/bin/false
-        SystemdService=keepassxc.service
-      '';
 
       programs.keepassxc = {
         enable = true;
@@ -71,8 +62,6 @@ _: {
           };
 
           SSHAgent.Enabled = true;
-
-          FdoSecrets.Enabled = true;
         };
       };
     };
