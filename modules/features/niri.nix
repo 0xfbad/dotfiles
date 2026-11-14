@@ -159,62 +159,64 @@
         }
       );
 
-      recordToggle = lib.getExe (
-        pkgs.writeShellApplication {
-          name = "record-toggle";
-          runtimeInputs = with pkgs; [
-            gpu-screen-recorder
-            slurp
-            libnotify
-            procps
-            coreutils
-            gnused
-            systemd
-          ];
-          text = ''
-            VIDDIR="$HOME/Videos"
-            mkdir -p "$VIDDIR"
-            WORDS="${pkgs.scowl}/share/dict/words.txt"
+      recordToggle = pkgs.writeShellApplication {
+        name = "record-toggle";
+        runtimeInputs = with pkgs; [
+          gpu-screen-recorder
+          slurp
+          libnotify
+          procps
+          coreutils
+          gnused
+          systemd
+        ];
+        text = ''
+          VIDDIR="$HOME/Videos"
+          mkdir -p "$VIDDIR"
+          WORDS="${pkgs.scowl}/share/dict/words.txt"
 
-            gen_name() {
-              shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
-            }
+          gen_name() {
+            shuf -n 2 "$WORDS" | tr '[:upper:]' '[:lower:]' | tr -cd 'a-z\n' | tr '\n' '-' | sed 's/-$//'
+          }
 
-            UNIT=screen-record.service
+          UNIT=screen-record.service
 
-            if systemctl --user is-active --quiet "$UNIT"; then
-              FILE=$(systemctl --user show -p Description --value "$UNIT")
-              systemctl --user stop "$UNIT"
+          if systemctl --user is-active --quiet "$UNIT"; then
+            FILE=$(systemctl --user show -p Description --value "$UNIT")
+            systemctl --user stop "$UNIT"
 
-              if [ "$(systemctl --user show -p Result --value "$UNIT")" = timeout ]; then
-                notify-send -u critical -a "recording" -t 5000 "recording force-killed" "file may be corrupt"
-              fi
-
-              if [ -f "$FILE" ]; then
-                notify-send -a "recording" -t 3000 "recording saved to ~/Videos" "$(basename "$FILE")"
-              fi
-
-              exit 0
+            if [ "$(systemctl --user show -p Result --value "$UNIT")" = timeout ]; then
+              notify-send -u critical -a "recording" -t 5000 "recording force-killed" "file may be corrupt"
             fi
 
-            pgrep -x slurp && exit 0
+            if [ -f "$FILE" ]; then
+              notify-send -a "recording" -t 3000 "recording saved to ~/Videos" "$(basename "$FILE")"
+            fi
 
-            NAME=$(gen_name)
-            FILE="$VIDDIR/$NAME.mp4"
-            GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -s 00000000) || exit 0
-            notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
+            exit 0
+          fi
 
-            # a failed unit stays loaded and blocks the name
-            systemctl --user reset-failed "$UNIT" 2> /dev/null || true
+          pgrep -x slurp && exit 0
 
-            # sigint finalizes the mp4
-            systemd-run --user --quiet --unit="$UNIT" \
-              -p KillSignal=SIGINT -p TimeoutStopSec=5 -p Description="$FILE" \
-              gpu-screen-recorder -w region -region "$GEOM" -f 60 -fm cfr \
-              -a default_output -ac aac -fallback-cpu-encoding yes -o "$FILE"
-          '';
-        }
-      );
+          NAME=$(gen_name)
+          FILE="$VIDDIR/$NAME.mp4"
+          GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -s 00000000) || exit 0
+          notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
+
+          # a failed unit stays loaded and blocks the name
+          systemctl --user reset-failed "$UNIT" 2> /dev/null || true
+
+          # the dash ignores a missing waybar
+          REFRESH="-${lib.getExe' pkgs.procps "pkill"} -RTMIN+8 waybar"
+
+          # sigint finalizes the mp4
+          systemd-run --user --quiet --unit="$UNIT" \
+            -p KillSignal=SIGINT -p TimeoutStopSec=5 -p Description="$FILE" \
+            -p ExecStartPost="$REFRESH" -p ExecStopPost="$REFRESH" \
+            gpu-screen-recorder -w region -region "$GEOM" -f 60 -fm cfr \
+            -a default_output -ac aac -fallback-cpu-encoding yes -o "$FILE"
+        '';
+      };
 
       colorPicker = lib.getExe (
         pkgs.writeShellApplication {
@@ -238,6 +240,8 @@
     in
     {
       # name and package come from the catppuccin cursors port
+      home.packages = [ recordToggle ];
+
       home.pointerCursor = {
         enable = true;
         size = 24;
@@ -610,7 +614,7 @@
             hotkey-overlay.title = "Edit clipboard";
           };
           "Mod+Shift+R" = {
-            action = spawn recordToggle;
+            action = spawn (lib.getExe recordToggle);
             hotkey-overlay.title = "Record";
           };
 

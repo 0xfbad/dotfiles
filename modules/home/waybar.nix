@@ -15,6 +15,7 @@ _: {
       btop = tui "/run/wrappers/bin/btop";
       mixer = lib.getExe pkgs.pwvucontrol;
       wpctl = lib.getExe' pkgs.wireplumber "wpctl";
+      systemctl = lib.getExe' pkgs.systemd "systemctl";
 
       barSpacing = 2;
       gap = {
@@ -48,6 +49,7 @@ _: {
           modules-left = [ "niri/workspaces" ];
           modules-center = [ "clock" ];
           modules-right = [
+            "custom/recording"
             "privacy"
             "wireplumber"
             "wireplumber#mic"
@@ -97,6 +99,20 @@ _: {
               { type = "screenshare"; }
               { type = "audio-in"; }
             ];
+            ignore = [
+              {
+                type = "audio-in";
+                name = "gsr-default_output";
+              }
+            ];
+          };
+
+          "custom/recording" = {
+            # ExecStartPost signals while the unit is still activating
+            exec = "case $(${systemctl} --user is-active screen-record.service) in active | activating) echo ${g "f111"} ;; esac";
+            signal = 8;
+            on-click = "record-toggle";
+            tooltip = false;
           };
 
           wireplumber = {
@@ -258,6 +274,7 @@ _: {
             color: ${c.pink};
           }
 
+          #custom-recording,
           #privacy,
           #wireplumber,
           #network,
@@ -269,6 +286,17 @@ _: {
           #battery,
           #idle_inhibitor {
             padding: 0 ${pad gap.section}px;
+          }
+
+          @keyframes rec-blink {
+            to {
+              color: alpha(${c.red}, 0.25);
+            }
+          }
+
+          #custom-recording {
+            color: ${c.red};
+            animation: rec-blink 1s steps(10) infinite alternate;
           }
 
           #privacy-item.screenshare {
