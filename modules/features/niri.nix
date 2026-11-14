@@ -159,10 +159,58 @@
         }
       );
 
+      recordFrame = pkgs.writeTextDir "shell.qml" ''
+        //@ pragma Env QT_QUICK_BACKEND=software
+        import QtQuick
+        import Quickshell
+        import Quickshell.Wayland
+
+        ShellRoot {
+          id: root
+
+          readonly property var geom: Quickshell.env("REC_GEOM").split(/[x+]/).map(Number)
+          // kms capture would record a border drawn inside the region
+          readonly property int pad: 4
+
+          settings.watchFiles: false
+
+          Variants {
+            model: Quickshell.screens.filter(s => root.geom[2] < s.x + s.width && root.geom[2] + root.geom[0] > s.x && root.geom[3] < s.y + s.height && root.geom[3] + root.geom[1] > s.y)
+
+            PanelWindow {
+              required property ShellScreen modelData
+
+              screen: modelData
+              anchors {
+                top: true
+                left: true
+              }
+              margins.left: root.geom[2] - modelData.x - root.pad
+              margins.top: root.geom[3] - modelData.y - root.pad
+              implicitWidth: root.geom[0] + 2 * root.pad
+              implicitHeight: root.geom[1] + 2 * root.pad
+              exclusionMode: ExclusionMode.Ignore
+              color: "transparent"
+              mask: Region {}
+              WlrLayershell.layer: WlrLayer.Overlay
+              WlrLayershell.namespace: "recording-frame"
+
+              Rectangle {
+                anchors.fill: parent
+                color: "transparent"
+                border.width: 2
+                border.color: "${c.accent}"
+              }
+            }
+          }
+        }
+      '';
+
       recordToggle = pkgs.writeShellApplication {
         name = "record-toggle";
         runtimeInputs = with pkgs; [
           gpu-screen-recorder
+          quickshell
           slurp
           libnotify
           procps
@@ -200,7 +248,7 @@
 
           NAME=$(gen_name)
           FILE="$VIDDIR/$NAME.mp4"
-          GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -s 00000000) || exit 0
+          GEOM=$(slurp -f "%wx%h+%x+%y" -b 000000CC -c ${lib.removePrefix "#" c.accent}ff -s 00000020 -w 2) || exit 0
           notify-send -a "recording" -t 2000 "recording started" "super+shift+r to stop"
 
           # a failed unit stays loaded and blocks the name
@@ -213,8 +261,13 @@
           systemd-run --user --quiet --unit="$UNIT" \
             -p KillSignal=SIGINT -p TimeoutStopSec=5 -p Description="$FILE" \
             -p ExecStartPost="$REFRESH" -p ExecStopPost="$REFRESH" \
-            gpu-screen-recorder -w region -region "$GEOM" -f 60 -fm cfr \
+            gpu-screen-recorder -w "$GEOM" -f 60 -fm cfr \
             -a default_output -ac aac -fallback-cpu-encoding yes -o "$FILE"
+
+          # a backgrounded child in the recorder unit would ignore sigint
+          systemd-run --user --quiet --collect --unit=screen-record-frame \
+            -p BindsTo="$UNIT" -p After="$UNIT" -E REC_GEOM="$GEOM" \
+            quickshell -p ${recordFrame}
         '';
       };
 
