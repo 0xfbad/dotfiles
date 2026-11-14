@@ -22,12 +22,6 @@
 
       system.stateVersion = "24.11";
 
-      # luks at boot already authenticates
-      services.greetd.settings.initial_session = {
-        command = "niri-session";
-        user = "fbad";
-      };
-
       services.upower = {
         enable = true;
         # HybridSleep still drains
