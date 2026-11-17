@@ -129,8 +129,6 @@ _: {
 
           "3rdparty".Extensions."keepassxc-browser@keepassxc.org".settings = {
             passkeys = true;
-            # the firefox fallback only supports hardware keys
-            passkeysFallback = false;
             autoFillSingleTotp = true;
             usePasswordGeneratorIcons = true;
             showGettingStartedGuideAlert = false;
