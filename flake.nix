@@ -56,6 +56,10 @@
     windows-vm-stealth = {
       url = "path:/home/fbad/windows-sandbox";
     };
+    niri-ar-desktop = {
+      url = "git+file:///home/fbad/Projects/niri-ar-desktop";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   # for nixos-install, before nix.settings exists
