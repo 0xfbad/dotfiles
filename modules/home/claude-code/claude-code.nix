@@ -91,6 +91,7 @@ _: {
             DISABLE_UPDATES = "1";
             DISABLE_FEEDBACK_COMMAND = "1";
             CLAUDE_CODE_RETRY_WATCHDOG = "1";
+            CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
           };
 
           enabledMcpjsonServers = [ "canvas" ];
