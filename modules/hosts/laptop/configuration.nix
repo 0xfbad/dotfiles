@@ -11,6 +11,7 @@
         self.modules.nixos.laptopHardware
         self.modules.nixos.lanzaboote
         self.modules.nixos.workstation
+        self.modules.nixos.niri-ar-desktop
       ];
 
       networking.hostName = "laptop";
