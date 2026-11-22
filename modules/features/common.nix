@@ -237,8 +237,12 @@ in
         package = pkgs.wireshark;
       };
 
+      # dolphin needs this menu to resolve file associations under niri
       environment.etc."xdg/menus/applications.menu".source =
-        "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu"; # dolphin needs it outside plasma
+        pkgs.runCommand "xdg-applications.menu" { inherit (pkgs.kdePackages.plasma-workspace) src version; }
+          ''
+            tar -xOf "$src" "plasma-workspace-$version/menu/desktop/plasma-applications.menu" > "$out"
+          '';
 
       programs.zsh.enable = true;
       programs.zsh.enableGlobalCompInit = false; # home-manager runs compinit for fbad, root zsh gets none
