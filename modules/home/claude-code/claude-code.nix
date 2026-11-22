@@ -83,7 +83,7 @@ _: {
           remoteControlAtStartup = false;
           syncClaudeAiSkills = false;
 
-          cleanupPeriodDays = 5;
+          cleanupPeriodDays = 14;
           askUserQuestionTimeout = "5m";
 
           attribution = {
