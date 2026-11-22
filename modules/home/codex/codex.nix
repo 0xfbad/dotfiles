@@ -18,6 +18,7 @@ _: {
           analytics.enabled = false;
           feedback.enabled = false;
           approvals_reviewer = "auto_review";
+          shell_environment_policy.set = import ../claude-code/_agent-git-env.nix "${cc}/hooks/agent_git.py";
         };
 
         hooks.PreToolUse = [

@@ -99,7 +99,8 @@ _: {
             DISABLE_FEEDBACK_COMMAND = "1";
             CLAUDE_CODE_RETRY_WATCHDOG = "1";
             CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = "1";
-          };
+          }
+          // import ./_agent-git-env.nix "${dots}/modules/home/claude-code/hooks/agent_git.py";
 
           enabledMcpjsonServers = [ "canvas" ];
 
