@@ -125,8 +125,6 @@ _: {
             padding = 0;
           };
 
-          enabledPlugins."frontend-design@claude-plugins-official" = true;
-
           hooks.PreToolUse = [
             {
               matcher = "Bash";
