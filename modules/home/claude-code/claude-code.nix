@@ -22,7 +22,7 @@ _: {
           t=$(mktemp)
           trap 'rm -f "$t"' EXIT
           tar --sort=name --owner=0 --group=0 --numeric-owner --mtime=@0 \
-            --anchored --no-wildcards-match-slash --exclude=skills/synced --exclude='skills/*-workspace' \
+            --anchored --no-wildcards-match-slash --exclude=skills/synced --exclude='skills/*-workspace' --exclude='skills/.*' \
             -C modules/home/claude-code -cf "$t" skills hooks CLAUDE.md
           if [ -f secrets/prompts.age ] && age -d -i ${key} secrets/prompts.age 2>/dev/null | cmp -s - "$t"; then
             echo unchanged
@@ -38,10 +38,16 @@ _: {
         runtimeInputs = with pkgs; [
           age
           gnutar
+          findutils
         ];
         text = ''
           cd ${dots}
-          age -d -i ${key} secrets/prompts.age | tar -xpf - -C modules/home/claude-code
+          t=$(mktemp)
+          trap 'rm -f "$t"' EXIT
+          age -d -i ${key} -o "$t" secrets/prompts.age
+          mkdir -p modules/home/claude-code/skills
+          find modules/home/claude-code/skills -mindepth 1 -maxdepth 1 ! -name synced ! -name '*-workspace' ! -name '.*' -exec rm -rf {} +
+          tar -xpf "$t" -C modules/home/claude-code
         '';
       };
     in
@@ -52,7 +58,7 @@ _: {
         run ${pkgs.git}/bin/git -C ${dots} config core.hooksPath .githooks
         cc=${dots}/modules/home/claude-code
         if [ -f ${dots}/secrets/prompts.age ]; then
-          if [ ! -e "$cc/skills" ] || [ -z "$(${pkgs.findutils}/bin/find "$cc/skills" "$cc/hooks" "$cc/CLAUDE.md" \( -path "$cc/skills/synced" -o -path "$cc/skills/*-workspace" ! -path "$cc/skills/*/*" \) -prune -o -newer ${dots}/secrets/prompts.age -print -quit 2>/dev/null)" ]; then
+          if [ ! -e "$cc/skills" ] || [ -z "$(${pkgs.findutils}/bin/find "$cc/skills" "$cc/hooks" "$cc/CLAUDE.md" \( -path "$cc/skills/synced" -o \( -path "$cc/skills/*-workspace" -o -path "$cc/skills/.*" \) ! -path "$cc/skills/*/*" \) -prune -o -newer ${dots}/secrets/prompts.age -print -quit 2>/dev/null)" ]; then
             run ${lib.getExe prompts-unpack} || verboseEcho "prompts unpack failed"
           fi
         fi
@@ -75,6 +81,7 @@ _: {
           skipDangerousModePermissionPrompt = true;
           switchModelsOnFlag = false;
           remoteControlAtStartup = false;
+          syncClaudeAiSkills = false;
 
           cleanupPeriodDays = 5;
           askUserQuestionTimeout = "5m";

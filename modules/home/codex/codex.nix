@@ -7,10 +7,7 @@ _: {
     in
     {
       home.file.".codex/AGENTS.md".source = config.lib.file.mkOutOfStoreSymlink "${cc}/CLAUDE.md";
-      home.file.".codex/skills/cleanup".source =
-        config.lib.file.mkOutOfStoreSymlink "${cc}/skills/cleanup";
-      home.file.".codex/skills/complexity-review".source =
-        config.lib.file.mkOutOfStoreSymlink "${cc}/skills/complexity-review";
+      home.file.".agents/skills".source = config.lib.file.mkOutOfStoreSymlink "${cc}/skills";
 
       programs.codex = {
         enable = true;
