@@ -31,6 +31,19 @@ _: {
             ];
           }
         ];
+
+        hooks.PostToolUse = [
+          {
+            matcher = "^(apply_patch|Edit|Write)$";
+            hooks = [
+              {
+                type = "command";
+                command = "${cc}/hooks/comment-guard.py";
+                timeout = 10;
+              }
+            ];
+          }
+        ];
       };
     };
 }

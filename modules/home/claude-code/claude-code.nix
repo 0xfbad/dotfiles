@@ -137,6 +137,19 @@ _: {
               ];
             }
           ];
+
+          hooks.PostToolUse = [
+            {
+              matcher = "Edit|Write";
+              hooks = [
+                {
+                  type = "command";
+                  command = "${config.home.homeDirectory}/dotfiles/modules/home/claude-code/hooks/comment-guard.py";
+                  timeout = 10;
+                }
+              ];
+            }
+          ];
         };
       };
     };
