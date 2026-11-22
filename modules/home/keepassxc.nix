@@ -36,6 +36,7 @@ _: {
 
           Browser = {
             Enabled = true;
+            UnlockDatabase = false;
             SearchInAllDatabases = true;
             BestMatchOnly = true;
             ShowNotification = false;
