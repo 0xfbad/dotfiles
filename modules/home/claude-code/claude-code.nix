@@ -72,6 +72,16 @@ _: {
       programs.claude-code = {
         enable = true;
 
+        # TEMP sdk sessions need 2.1.330 for code mode, drop with _claude-code-manifest.json once nixpkgs unstable ships it
+        package =
+          let
+            manifest = lib.importJSON ./_claude-code-manifest.json;
+          in
+          if lib.versionOlder pkgs.claude-code.version manifest.version then
+            pkgs.claude-code.override { inherit manifest; }
+          else
+            pkgs.claude-code;
+
         settings = {
           model = "fable";
           outputStyle = "Concise";
