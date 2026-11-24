@@ -46,6 +46,10 @@ _: {
       };
     in
     {
+      home.sessionVariables.T3CODE_TELEMETRY_ENABLED = "false";
+      systemd.user.sessionVariables.T3CODE_TELEMETRY_ENABLED =
+        config.home.sessionVariables.T3CODE_TELEMETRY_ENABLED;
+
       programs.t3code = {
         enable = true;
         package = pkgs.t3code.override {
