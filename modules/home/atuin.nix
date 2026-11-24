@@ -6,6 +6,7 @@ _: {
       daemon.enable = true;
       settings = {
         auto_sync = false;
+        update_check = false;
         enter_accept = true;
         search_mode = "daemon-fuzzy";
         # each zellij pane is a new ATUIN_SESSION, plain session starts empty

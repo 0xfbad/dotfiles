@@ -45,6 +45,11 @@ _: {
               CommandsAPI.enabled = true;
               CrashHandler.enabled = true;
               MessageAccessoriesAPI.enabled = true;
+              NoTrack = {
+                enabled = true;
+                allowBadgeTracking = false;
+                disableAnalytics = true;
+              };
               UserSettingsAPI.enabled = true;
               WebKeybinds.enabled = true;
               WebScreenShareFixes.enabled = true;

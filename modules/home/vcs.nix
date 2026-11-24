@@ -56,6 +56,7 @@ _: {
         enable = true;
         gitCredentialHelper.enable = true;
         settings.git_protocol = "ssh";
+        settings.telemetry = "disabled";
       };
 
       xdg.configFile."nix/nix.conf".text = "!include ${nixGithubTokenFile}\n"; # nix.settings would put the token in the store

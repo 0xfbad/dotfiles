@@ -1,5 +1,15 @@
 _: {
   flake.modules.homeManager.development = { pkgs, ... }: {
+    home.sessionVariables = {
+      ASTRO_TELEMETRY_DISABLED = "1";
+      DOTNET_CLI_TELEMETRY_OPTOUT = "1";
+      LANGSMITH_TRACING = "false";
+      LANGSMITH_TRACING_V2 = "false";
+      NEXT_TELEMETRY_DISABLED = "1";
+      POWERSHELL_TELEMETRY_OPTOUT = "1";
+      WANDB_MODE = "disabled";
+    };
+
     programs = {
       direnv = {
         enable = true;

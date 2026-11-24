@@ -105,6 +105,7 @@ _: {
           env = {
             # no CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC, it disables /remote-control
             DISABLE_ERROR_REPORTING = "1";
+            DISABLE_TELEMETRY = "1";
             DISABLE_UPDATES = "1";
             DISABLE_FEEDBACK_COMMAND = "1";
             CLAUDE_CODE_RETRY_WATCHDOG = "1";
