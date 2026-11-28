@@ -8,7 +8,7 @@
       enable = true;
       packages = [
         "org.vinegarhq.Sober"
-        "io.github.mandruis7.xbox-cloud-gaming-electron"
+        "io.github.unknownskl.greenlight"
       ];
 
       update = {
